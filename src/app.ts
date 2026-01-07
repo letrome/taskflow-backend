@@ -7,6 +7,8 @@ app.set('port', normalizePort(process.env.PORT));
 
 app.use(express.json());
 
+app.disable("x-powered-by");
+
 app.get('/health', (req, res) => {
     res.json({ status: 'OK' });
 });

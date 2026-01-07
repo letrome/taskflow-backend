@@ -32,8 +32,10 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 ## 🛠️ Scripts
 
 - **`pnpm run dev`**: Starts the development server with hot-reloading using `tsx watch`.
-- **`pnpm run test:unit`**: Runs unit tests using Vitest.
-- **`pnpm run test:e2e`**: Runs end-to-end tests using Bruno CLI.
+- **`pnpm test`**: Runs all tests (Unit, Integration, and E2E) in sequence.
+- **`pnpm run test:unit`**: Runs unit tests located in `tests/unit`.
+- **`pnpm run test:integration`**: Runs integration tests located in `tests/integration`.
+- **`pnpm run test:e2e`**: Automated E2E testing. Starts a clean server instance on port 3001 and runs Bruno API tests against it.
 
 ## 🔌 API Endpoints
 
@@ -56,5 +58,6 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **Language**: TypeScript
 - **Tooling**:
   - [tsx](https://github.com/privatenumber/tsx) (Execution)
-  - [Vitest](https://vitest.dev/) (Unit Testing)
-  - [Bruno](https://www.usebruno.com/) (API Testing)
+  - [Vitest](https://vitest.dev/) (Unit & Integration Runner)
+  - [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
+  - [Bruno](https://www.usebruno.com/) (End-to-End API Testing)

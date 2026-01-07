@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizePort } from '../src/utils.js';
+import { normalizePort } from '../../src/utils.js';
 
 describe('normalizePort', () => {
   it('should return default port 3000 when value is undefined', () => {

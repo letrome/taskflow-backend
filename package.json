@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "test:unit": "vitest",
     "test:e2e": "cd bruno/Taskflow-backend && bru run --env development"
   },
   "keywords": [],
@@ -17,7 +18,8 @@
     "@types/node": "^25.0.3",
     "@usebruno/cli": "^3.0.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "express": "^5.2.1"

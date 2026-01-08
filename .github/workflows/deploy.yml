@@ -16,8 +16,11 @@ jobs:
     runs-on: self-hosted
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
     steps:
+      - name: Lowercase Image Name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+
       - name: Set target ip
         run: |
           if [ "${{ inputs.environment }}" == "prod" ]; then

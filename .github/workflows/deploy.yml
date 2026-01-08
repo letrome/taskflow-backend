@@ -14,39 +14,42 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    env:
-      REGISTRY: ghcr.io
-      TARGET_IP: ""
-      SSH_PRIVATE_KEY: ""
-      IMAGE_NAME: ""
     steps:
       - name: Lowercase Image Name
         run: |
           echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
 
-      - name: Set target ip
+      - name: Set Environment Variables
         run: |
           if [ "${{ inputs.environment }}" == "prod" ]; then
+            echo "TARGET_IP=${{ secrets.PROD_IP }}" >> $GITHUB_ENV
             echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
             echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
-            echo "TARGET_IP=${{ secrets.PROD_IP }}" >> $GITHUB_ENV
+            echo "BASIC_SECRET=${{ secrets.PROD_BASIC_SECRET }}" >> $GITHUB_ENV
           else
+            echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
             echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
             echo "${{ secrets.PREPROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
-            echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
+            echo "BASIC_SECRET=${{ secrets.PREPROD_BASIC_SECRET }}" >> $GITHUB_ENV
           fi
 
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.TARGET_IP }}
           username: github
           key: ${{ env.SSH_PRIVATE_KEY }}
+          envs: BASIC_SECRET, IMAGE_NAME, GITHUB_ACTOR
           script: |
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+            docker pull ghcr.io/$IMAGE_NAME:latest
             docker stop taskflow-backend || true
             docker rm taskflow-backend || true
-            docker run -d --restart always -p 4000:4000 --name taskflow-backend ghcr.io/${{ env.IMAGE_NAME }}:latest
+            docker run -d \
+              --restart always \
+              -p 4000:4000 \
+              -e BASIC_SECRET=$BASIC_SECRET \
+              --name taskflow-backend \
+              ghcr.io/$IMAGE_NAME:latest

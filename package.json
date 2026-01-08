@@ -10,7 +10,7 @@
     "test:coverage": "vitest run --coverage",
     "test:unit": "vitest tests/unit",
     "test:integration": "vitest tests/integration",
-    "test:e2e": "start-server-and-test \"PORT=3001 tsx src/index.ts\" http://localhost:3001/health \"cd bruno/Taskflow-backend && bru run --env e2e\"",
+    "test:e2e": "start-server-and-test \"BASIC_SECRET=test-secret PORT=3001 tsx src/index.ts\" tcp:3001 \"cd bruno/Taskflow-backend && bru run --env e2e\"",
     "sonar": "sonar-scanner",
     "build": "tsc -p tsconfig.build.json"
   },
@@ -30,9 +30,11 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16",
-    "vitest-sonar-reporter": "^3.0.0"
+    "vitest-sonar-reporter": "^3.0.0",
+    "wait-on": "^9.0.3"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.2.1"
   },
   "pnpm": {

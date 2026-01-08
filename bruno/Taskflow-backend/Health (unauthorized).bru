@@ -1,7 +1,7 @@
 meta {
-  name: Health
+  name: Health (unauthorized)
   type: http
-  seq: 1
+  seq: 4
 }
 
 get {
@@ -10,14 +10,10 @@ get {
   auth: inherit
 }
 
-headers {
-  Authorization: Basic {{basic_secret}}
-}
-
 assert {
-  res.status: eq 200
+  res.status: eq 401
   res.body: isJson
-  res.body.status: eq OK
+  res.body.error: eq Unauthorized
 }
 
 settings {

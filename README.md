@@ -39,7 +39,12 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **`pnpm run test:e2e`**: Automated E2E testing. Starts a clean server instance on port 3001 and runs Bruno API tests against it.
 - **`pnpm sonar`**: Runs the SonarQube scanner to analyze code quality and coverage.
 
-## 🔌 API Endpoints
+## � CI/CD & Automation
+
+- **GitHub Actions**: A workflow is configured to automatically run unit tests (`test:unit`) on every push. It includes Slack notifications for build status.
+- **Dependabot**: Automated dependency updates are enabled. Checks for `npm` package updates daily and opens pull requests.
+
+## �🔌 API Endpoints
 
 ### Health Check
 

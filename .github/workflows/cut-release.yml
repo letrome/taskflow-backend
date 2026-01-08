@@ -43,6 +43,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
-          target_commitish: HEAD
+          target_commitish: main
           generate_release_notes: false
           # The body will be updated by your 'Update Release Notes' workflow

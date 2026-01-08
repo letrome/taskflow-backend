@@ -67,6 +67,18 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   }
   ```
 
+### Version
+
+- **URL**: `/version`
+- **Method**: `GET`
+- **Description**: Returns the current version of the service.
+- **Response**:
+  ```json
+  {
+    "version": "0.0.13"
+  }
+  ```
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

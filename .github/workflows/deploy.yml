@@ -16,6 +16,9 @@ jobs:
     runs-on: self-hosted
     env:
       REGISTRY: ghcr.io
+      TARGET_IP: ""
+      SSH_PRIVATE_KEY: ""
+      IMAGE_NAME: ""
     steps:
       - name: Lowercase Image Name
         run: |

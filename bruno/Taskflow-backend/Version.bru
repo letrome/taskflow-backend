@@ -1,0 +1,22 @@
+meta {
+  name: Version
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseurl}}/version
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.version: matches ^\d+\.\d+\.\d+$
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -11,7 +11,8 @@
     "test:unit": "vitest tests/unit",
     "test:integration": "vitest tests/integration",
     "test:e2e": "start-server-and-test \"PORT=3001 tsx src/index.ts\" http://localhost:3001/health \"cd bruno/Taskflow-backend && bru run --env e2e\"",
-    "sonar": "sonar-scanner"
+    "sonar": "sonar-scanner",
+    "build": "tsc -p tsconfig.build.json"
   },
   "keywords": [],
   "author": "",

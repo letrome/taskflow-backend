@@ -41,7 +41,10 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 
 ## � CI/CD & Automation
 
-- **GitHub Actions**: A workflow is configured to automatically run unit tests (`test:unit`) on every push. It includes Slack notifications for build status.
+- **GitHub Actions**: Workflows are configured for:
+  - **Unit Tests**: Runs `test:unit` on `push` and manual trigger.
+  - **Integration Tests**: Runs `test:integration` on `pull_request` and manual trigger.
+  - Both workflows include Slack notifications for build status.
 - **Dependabot**: Automated dependency updates are enabled. Checks for `npm` package updates daily and opens pull requests.
 
 ## �🔌 API Endpoints

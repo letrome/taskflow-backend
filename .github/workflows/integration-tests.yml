@@ -1,7 +1,7 @@
 name: Unit Tests
 
 on:
-  push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -25,16 +25,16 @@ jobs:
       - name: Install and Test
         run: |
           pnpm install
-          pnpm run test:unit
+          pnpm run test:integration
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         if: always()
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_UNIT_TESTS_URL }}
-          SLACK_CHANNEL: taskflow-backend-unit-tests
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_INTEGRATION_TESTS_URL }}
+          SLACK_CHANNEL: taskflow-backend-integration-tests
           SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "Unit tests execution finished with status: ${{ job.status }}"
-          SLACK_TITLE: Unit Tests Status
+          SLACK_MESSAGE: "Integration tests execution finished with status: ${{ job.status }}"
+          SLACK_TITLE: Integration Tests Status
           SLACK_USERNAME: GitHub Actions

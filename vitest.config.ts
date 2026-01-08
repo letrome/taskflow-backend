@@ -11,5 +11,6 @@ export default defineConfig({
       exclude: ['src/index.ts'],
     },
     reporters: ['default', new sonarReporter({ outputFile: 'radar.xml' })],
+    setupFiles: ['./tests/setup.ts'],
   },
 });

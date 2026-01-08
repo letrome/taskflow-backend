@@ -10,6 +10,10 @@ get {
   auth: inherit
 }
 
+headers {
+  Authorization: Basic {{basic_secret}}
+}
+
 assert {
   res.status: eq 200
   res.body: isJson

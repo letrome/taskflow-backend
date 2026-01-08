@@ -8,7 +8,9 @@ import path from 'node:path';
 describe('Integration Tests', () => {
   describe('GET /health', () => {
     it('should return 200 OK', async () => {
-      const response = await request(app).get('/health');
+      const response = await request(app)
+        .get('/health')
+        .set('Authorization', 'Basic test-secret');
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ status: 'OK' });
     });
@@ -24,9 +26,44 @@ describe('Integration Tests', () => {
       const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
       const expectedVersion = packageJson.version;
 
-      const response = await request(app).get('/version');
+      const response = await request(app)
+        .get('/version')
+        .set('Authorization', 'Basic test-secret');
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ version: expectedVersion });
+    });
+  });
+});
+
+// Basic Auth Check
+describe('Integration Tests', () => {
+  describe('GET /health without auth', () => {
+    it('should return 401 Unauthorized', async () => {
+      const response = await request(app)
+        .get('/health');
+      expect(response.status).toBe(401);
+    });
+  });
+});
+
+describe('Integration Tests', () => {
+  describe('GET /health with wrong auth type', () => {
+    it('should return 401 Unauthorized', async () => {
+      const response = await request(app)
+        .get('/health')
+        .set('Authorization', 'Invalid test-secret');
+      expect(response.status).toBe(401);
+    });
+  });
+});
+
+describe('Integration Tests', () => {
+  describe('GET /health with wrong bearer secret', () => {
+    it('should return 401 Unauthorized', async () => {
+      const response = await request(app)
+        .get('/health')
+        .set('Authorization', 'Basic wrong-secret');
+      expect(response.status).toBe(401);
     });
   });
 });

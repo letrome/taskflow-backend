@@ -46,6 +46,12 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Integration Tests**: Runs `test:integration` on `pull_request` and manual trigger.
   - Both workflows include Slack notifications for build status.
 - **Dependabot**: Automated dependency updates are enabled. Checks for `npm` package updates daily and opens pull requests.
+- **Releases**:
+  - **Cut Release**: Manual workflow to bump version, tag, and create a GitHub Release.
+  - **Docker Build**: Automatically builds and pushes Docker image to GHCR on release.
+  - **Release Notes**: Automatically updates GitHub Release body with notes from `CHANGELOG.md`.
+- **Deployment**:
+  - **Deploy**: Manual workflow to deploy a specific environment (preprod/prod) using the built Docker image.
 
 ## �🔌 API Endpoints
 

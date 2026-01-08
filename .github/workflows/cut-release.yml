@@ -1,0 +1,48 @@
+name: Cut Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 0.0.2)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  cut-release:
+    name: Cut Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # Note: If your main branch is protected, you may need to use a Personal Access Token (PAT)
+          # by uncommenting the line below and adding the secret.
+          # token: ${{ secrets.PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update Version
+        run: |
+          npm version ${{ inputs.version }} --no-git-tag-version
+
+      - name: Commit and Push
+        run: |
+          git add package.json
+          git commit -m "chore: release v${{ inputs.version }}"
+          git push origin HEAD
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          target_commitish: HEAD
+          generate_release_notes: false
+          # The body will be updated by your 'Update Release Notes' workflow

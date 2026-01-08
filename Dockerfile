@@ -1,7 +1,7 @@
 FROM node:25-alpine AS builder
 
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g corepack && corepack enable
 
 COPY package.json pnpm-lock.yaml tsconfig.json tsconfig.build.json ./
 RUN pnpm install --frozen-lockfile
@@ -11,7 +11,7 @@ RUN pnpm build
 
 FROM node:25-alpine AS runner
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g corepack && corepack enable
 
 ENV NODE_ENV=production
 ENV PORT=3000

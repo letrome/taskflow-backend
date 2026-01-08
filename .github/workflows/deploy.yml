@@ -21,9 +21,11 @@ jobs:
       - name: Set target ip
         run: |
           if [ "${{ inputs.environment }}" == "prod" ]; then
+            echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
             echo "TARGET_IP=${{ secrets.PROD_IP }}" >> $GITHUB_ENV
           else
-             echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
+            echo "SSH_PRIVATE_KEY=${{ secrets.PREPROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+            echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
           fi
 
       - name: Deploy to Server
@@ -31,7 +33,7 @@ jobs:
         with:
           host: ${{ env.TARGET_IP }}
           username: github
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
           script: |
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest

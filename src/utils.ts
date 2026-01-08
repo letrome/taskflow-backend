@@ -1,5 +1,5 @@
 export const normalizePort = (val: string | undefined): number => {
-  const defaultPort: number = 3000;
+  const defaultPort: number = 4000;
   if (!val) {
     return defaultPort;
   }

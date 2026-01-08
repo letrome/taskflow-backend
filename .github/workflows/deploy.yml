@@ -46,4 +46,4 @@ jobs:
             docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
             docker stop taskflow-backend || true
             docker rm taskflow-backend || true
-            docker run -d --restart always -p 3000:3000 --name taskflow-backend ghcr.io/${{ env.IMAGE_NAME }}:latest
+            docker run -d --restart always -p 4000:4000 --name taskflow-backend ghcr.io/${{ env.IMAGE_NAME }}:latest

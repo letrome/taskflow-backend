@@ -21,10 +21,14 @@ jobs:
       - name: Set target ip
         run: |
           if [ "${{ inputs.environment }}" == "prod" ]; then
-            echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+            echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+            echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
             echo "TARGET_IP=${{ secrets.PROD_IP }}" >> $GITHUB_ENV
           else
-            echo "SSH_PRIVATE_KEY=${{ secrets.PREPROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+            echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+            echo "${{ secrets.PREPROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
             echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
           fi
 

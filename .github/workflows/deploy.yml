@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        options:
+          - preprod
+          - prod
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - name: Set target ip
+        run: |
+          if [ "${{ inputs.environment }}" == "prod" ]; then
+            echo "TARGET_IP=${{ secrets.PROD_IP }}" >> $GITHUB_ENV
+          else
+             echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.TARGET_IP }}
+          username: github
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
+            docker stop taskflow-backend || true
+            docker rm taskflow-backend || true
+            docker run -d --restart always -p 3000:3000 --name taskflow-backend ghcr.io/${{ env.IMAGE_NAME }}:latest

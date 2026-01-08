@@ -49,7 +49,7 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **Releases**:
   - **Cut Release**: Manual workflow to bump version, tag, and create a GitHub Release.
   - **Docker Build**: Automatically builds and pushes Docker image to GHCR on release.
-  - **Release Notes**: Automatically updates GitHub Release body with notes from `CHANGELOG.md`.
+  - **Release Notes**: The `Cut Release` workflow automatically populates the release body with notes from `CHANGELOG.md`.
 - **Deployment**:
   - **Deploy**: Manual workflow to deploy a specific environment (preprod/prod) using the built Docker image.
 

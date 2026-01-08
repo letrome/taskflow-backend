@@ -39,10 +39,29 @@ jobs:
           git commit -m "chore: release v${{ inputs.version }}"
           git push origin HEAD
 
+      - name: Extract release notes
+        id: extract_notes
+        run: |
+          VERSION="${{ inputs.version }}"
+          # Extract the content between the version header and the next header
+          NOTES=$(awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "::warning::No release notes found for version $VERSION in CHANGELOG.md"
+            # Fallback to empty if not found, or standard text
+            NOTES="No release notes available for v$VERSION"
+          fi
+
+          # Use a random delimiter for the hereditary document to avoid conflicts
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "notes<<$EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
           target_commitish: main
           generate_release_notes: false
-          # The body will be updated by your 'Update Release Notes' workflow
+          body: ${{ steps.extract_notes.outputs.notes }}

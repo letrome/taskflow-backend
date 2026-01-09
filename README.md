@@ -79,6 +79,14 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   }
   ```
 
+### Metrics
+
+- **URL**: `/metrics`
+- **Method**: `GET`
+- **Description**: Exposes application metrics for Prometheus scraping.
+- **Auth**: Requires `Basic Auth` (header `Authorization: Basic <BASIC_SECRET>`).
+- **Response**: Prometheus formatted metrics.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js
@@ -90,3 +98,4 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
   - [Bruno](https://www.usebruno.com/) (End-to-End API Testing)
   - [SonarQube](https://www.sonarsource.com/) (Code Quality & Security)
+  - [Prometheus Client](https://github.com/siimon/prom-client) (Metrics Collection)

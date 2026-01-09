@@ -6,5 +6,6 @@ const router: express.Router = express.Router();
 
 router.get('/health', basicAuth, adminCtrl.getHealth);
 router.get('/version', basicAuth, adminCtrl.getVersion);
+router.get('/metrics', basicAuth, adminCtrl.getMetrics);
 
 export default router;

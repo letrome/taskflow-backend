@@ -8,9 +8,10 @@ import path from 'node:path';
 describe('Integration Tests', () => {
   describe('GET /health', () => {
     it('should return 200 OK', async () => {
+      const auth = Buffer.from('admin:test-secret').toString('base64');
       const response = await request(app)
         .get('/health')
-        .set('Authorization', 'Basic test-secret');
+        .set('Authorization', `Basic ${auth}`);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ status: 'OK' });
     });
@@ -26,9 +27,10 @@ describe('Integration Tests', () => {
       const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
       const expectedVersion = packageJson.version;
 
+      const auth = Buffer.from('admin:test-secret').toString('base64');
       const response = await request(app)
         .get('/version')
-        .set('Authorization', 'Basic test-secret');
+        .set('Authorization', `Basic ${auth}`);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ version: expectedVersion });
     });
@@ -39,9 +41,10 @@ describe('Integration Tests', () => {
 describe('Integration Tests', () => {
   describe('GET /metrics', () => {
     it('should return 200 OK', async () => {
+      const auth = Buffer.from('admin:test-secret').toString('base64');
       const response = await request(app)
         .get('/metrics')
-        .set('Authorization', 'Basic test-secret');
+        .set('Authorization', `Basic ${auth}`);
       expect(response.status).toBe(200);
       expect(response.body).toBeTypeOf('object');
     });

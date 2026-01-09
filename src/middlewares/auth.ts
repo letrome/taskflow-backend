@@ -7,19 +7,25 @@ const BASIC_SECRET: string = process.env.BASIC_SECRET;
  
 export default function basicAuth(req: Request, res: Response, next: NextFunction) {
    try {
-    const type = req.headers.authorization?.split(' ')[0];
-    if (type !== 'Basic') {
-      throw new Error('Invalid authorization type');
+    const header = req.headers.authorization;
+    if (!header) {
+      throw new Error('No authorization header provided');
     }
-       const token = req.headers.authorization?.split(' ')[1];
-       if (!token) {
-         throw new Error('No token provided');
-       }
 
-       if(token !== BASIC_SECRET) {
-         throw new Error('Invalid token');
-       }
-       next();
+    const [type, token] = header.split(' ');
+    if (type !== 'Basic' || !token) {
+      throw new Error('Invalid authorization format');
+    }
+
+    const decoded = Buffer.from(token, 'base64').toString('utf-8');
+    // Basic auth format is "username:password"
+    const [_, password] = decoded.split(':');
+
+    if (password !== BASIC_SECRET) {
+       throw new Error('Invalid credentials');
+    }
+    
+    next();
    } catch(error) {
         console.debug(error);
        res.status(401).json({ "error": "Unauthorized" });

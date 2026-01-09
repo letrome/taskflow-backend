@@ -6,7 +6,7 @@ describe('basicAuth', () => {
   it('should pass', () => {
     const request = {
         headers: {
-            authorization: 'Basic test-secret'
+            authorization: `Basic ${Buffer.from('admin:test-secret').toString('base64')}`
         }
     } as Request;
     const response = {

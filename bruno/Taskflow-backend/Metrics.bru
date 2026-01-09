@@ -1,11 +1,11 @@
 meta {
-  name: Health
+  name: Metrics
   type: http
-  seq: 1
+  seq: 4
 }
 
 get {
-  url: {{baseurl}}/health
+  url: {{baseurl}}/metrics
   body: none
   auth: basic
 }
@@ -17,8 +17,7 @@ auth:basic {
 
 assert {
   res.status: eq 200
-  res.body: isJson
-  res.body.status: eq OK
+  res.body: isString
 }
 
 settings {

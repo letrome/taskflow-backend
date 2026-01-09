@@ -84,7 +84,7 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **URL**: `/metrics`
 - **Method**: `GET`
 - **Description**: Exposes application metrics for Prometheus scraping.
-- **Auth**: Requires `Basic Auth` (header `Authorization: Basic <BASIC_SECRET>`).
+- **Auth**: Requires standard `Basic Auth` (Base64 encoded `username:password`). Password must match `BASIC_SECRET`.
 - **Response**: Prometheus formatted metrics.
 
 ## 🧰 Tech Stack

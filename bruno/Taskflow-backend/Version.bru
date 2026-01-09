@@ -7,11 +7,12 @@ meta {
 get {
   url: {{baseurl}}/version
   body: none
-  auth: inherit
+  auth: basic
 }
 
-headers {
-  Authorization: Basic {{basic_secret}}
+auth:basic {
+  username: admin
+  password: {{basic_secret}}
 }
 
 assert {

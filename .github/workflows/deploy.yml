@@ -56,6 +56,24 @@ jobs:
               --name taskflow-backend \
               ghcr.io/$IMAGE_NAME:latest
 
+      - name: Verify Deployment Health
+        run: |
+          echo "Waiting for service to be healthy on http://${{ env.TARGET_IP }}:4000..."
+          for i in {1..10}; do
+            HTTP_CODE=$(curl --connect-timeout 5 --write-out "%{http_code}" --silent --output /dev/null http://${{ env.TARGET_IP }}:4000/health -H "Authorization: Basic ${BASIC_SECRET}" || echo "000")
+            
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              echo "✅ Service is UP and Healthy!"
+              exit 0
+            fi
+            
+            echo "Waiting for service... (Attempt $i/10) - Status: $HTTP_CODE"
+            sleep 5
+          done
+          
+          echo "❌ Deployment failed: Service did not become healthy."
+          exit 1
+
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         if: always()

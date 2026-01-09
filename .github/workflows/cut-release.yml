@@ -97,3 +97,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_RELEASE_URL }}
+          SLACK_CHANNEL: taskflow-backend-deploy
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: "Deploy finished with status: ${{ job.status }}"
+          SLACK_TITLE: Deploy Status
+          SLACK_USERNAME: GitHub Actions

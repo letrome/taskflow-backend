@@ -1,0 +1,22 @@
+name: Dependabot Alerts
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.DEPENDABOT_WEBHOOK_URL }}
+          SLACK_CHANNEL: taskflow-backend-deploy
+          SLACK_COLOR: "#36a64f"
+          SLACK_ICON: https://avatars.githubusercontent.com/in/29110?s=64&v=4
+          SLACK_USERNAME: Dependabot
+          SLACK_TITLE: "Dependabot Update Detected"
+          SLACK_MESSAGE: "A new dependency update is available: ${{ github.event.pull_request.title }}"
+          SLACK_FOOTER: "Taskflow Backend"

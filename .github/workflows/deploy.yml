@@ -27,12 +27,14 @@ jobs:
             echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
             echo "BASIC_SECRET=${{ secrets.PROD_BASIC_SECRET }}" >> $GITHUB_ENV
+            echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_PROD_URL }}" >> $GITHUB_ENV
           else
             echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
             echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
             echo "${{ secrets.PREPROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
             echo "BASIC_SECRET=${{ secrets.PREPROD_BASIC_SECRET }}" >> $GITHUB_ENV
+            echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_PREPROD_URL }}" >> $GITHUB_ENV
           fi
 
       - name: Deploy to Server
@@ -53,3 +55,15 @@ jobs:
               -e BASIC_SECRET=$BASIC_SECRET \
               --name taskflow-backend \
               ghcr.io/$IMAGE_NAME:latest
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: taskflow-backend-deploy
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: "Deploy finished with status: ${{ job.status }}"
+          SLACK_TITLE: Deploy Status
+          SLACK_USERNAME: GitHub Actions

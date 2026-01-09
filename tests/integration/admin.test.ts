@@ -35,6 +35,19 @@ describe('Integration Tests', () => {
   });
 });
 
+// Metrics Check
+describe('Integration Tests', () => {
+  describe('GET /metrics', () => {
+    it('should return 200 OK', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .set('Authorization', 'Basic test-secret');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeTypeOf('object');
+    });
+  });
+});
+
 // Basic Auth Check
 describe('Integration Tests', () => {
   describe('GET /health without auth', () => {

@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-01-09
+
+### Added
+
+**Infrastructure & CI/CD**
+
+- Complete CI/CD pipeline with GitHub Actions for automated testing, building, and deployment.
+- Multi-stage Dockerfile for optimized production builds.
+- Automated release management (`cut-release`) with changelog extraction and semantic versioning.
+- Deployment workflows for preprod/prod environments.
+- Slack notifications for releases, deployments, and Dependabot alerts.
+
+**API & Backend**
+
+- Core Express.js application setup with TypeScript.
+- Admin routes: `/health`, `/version`, and `/metrics`.
+- Prometheus metrics integration with `prom-client`.
+- Secure Basic Authentication middleware for protected endpoints.
+
+**Testing & Quality**
+
+- Comprehensive testing strategy: Unit, Integration, and End-to-End (E2E) tests.
+- SonarQube integration for code quality and coverage analysis.
+- End-to-end testing pipeline using Bruno and `start-server-and-test`.
+- Smoketests in deployment workflows to verify successful deployments.
+
 ## [0.0.17] - 2026-01-09
 
 ### Changed

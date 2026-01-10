@@ -1,0 +1,26 @@
+const checkAndGetPort = (val: string | undefined): number => {
+  const defaultPort: number = 4000;
+  if (!val) {
+    return defaultPort;
+  }
+
+  const port: number = Number.parseInt(val, 10);
+
+  if (Number.isNaN(port)) {
+    return defaultPort;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return defaultPort;
+};
+
+const checkAndGetBasicSecret = (val: string | undefined): string => {
+  if (!val) {
+    throw new Error('BASIC_SECRET is not defined');
+  }
+  return val;
+};
+
+export const PORT = checkAndGetPort(process.env.PORT);
+export const BASIC_SECRET = checkAndGetBasicSecret(process.env.BASIC_SECRET);

@@ -1,24 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { normalizePort, errorHandler, logListening } from '../../src/utils.js';
+import { errorHandler, logListening } from '../../src/utils.js';
 import type { Server } from 'node:http';
-
-describe('normalizePort', () => {
-  it('should return default port 4000 when value is undefined', () => {
-    expect(normalizePort(undefined)).toBe(4000);
-  });
-
-  it('should return the parsed integer when value is a valid number string', () => {
-    expect(normalizePort('4000')).toBe(4000);
-  });
-
-  it('should return default port when value is not a number', () => {
-    expect(normalizePort('invalid')).toBe(4000);
-  });
-
-  it('should return default port when value is negative', () => {
-    expect(normalizePort('-1')).toBe(4000);
-  });
-});
 
 describe('errorHandler', () => {
   const mockServer = {

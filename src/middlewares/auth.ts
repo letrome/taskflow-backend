@@ -1,9 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-
-if (!process.env.BASIC_SECRET) {
-  throw new Error('BASIC_SECRET environment variable is not defined');
-}
-const BASIC_SECRET: string = process.env.BASIC_SECRET;
+import { BASIC_SECRET } from '../config.js';
  
 export default function basicAuth(req: Request, res: Response, next: NextFunction) {
    try {
@@ -18,7 +14,6 @@ export default function basicAuth(req: Request, res: Response, next: NextFunctio
     }
 
     const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    // Basic auth format is "username:password"
     const [_, password] = decoded.split(':');
 
     if (password !== BASIC_SECRET) {

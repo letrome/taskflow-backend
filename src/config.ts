@@ -22,5 +22,14 @@ const checkAndGetBasicSecret = (val: string | undefined): string => {
   return val;
 };
 
+const checkAndGetLogLevel = (val: string | undefined): string => {
+  const validLevels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace'];
+  if (val && validLevels.includes(val)) {
+    return val;
+  }
+  return 'info';
+};
+
 export const PORT = checkAndGetPort(process.env.PORT);
 export const BASIC_SECRET = checkAndGetBasicSecret(process.env.BASIC_SECRET);
+export const PINO_LOG_LEVEL = checkAndGetLogLevel(process.env.PINO_LOG_LEVEL);

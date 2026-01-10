@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { errorHandler, logListening } from '../../src/utils.js';
 import type { Server } from 'node:http';
+import logger from '../../src/logger.js';
 
 describe('errorHandler', () => {
   const mockServer = {
@@ -8,7 +9,7 @@ describe('errorHandler', () => {
   } as unknown as Server;
 
   beforeEach(() => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(logger, 'error').mockImplementation(() => {});
     vi.spyOn(process, 'exit').mockImplementation(() => { throw new Error('process.exit'); });
   });
 
@@ -29,7 +30,7 @@ describe('errorHandler', () => {
     vi.mocked(mockServer.address).mockReturnValue(null);
 
     expect(() => errorHandler(error, mockServer, 3000)).toThrow('process.exit');
-    expect(console.error).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
     expect(process.exit).toHaveBeenCalledWith(1);
   });
 
@@ -40,7 +41,7 @@ describe('errorHandler', () => {
     vi.mocked(mockServer.address).mockReturnValue(null);
 
     expect(() => errorHandler(error, mockServer, 3000)).toThrow('process.exit');
-    expect(console.error).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
     expect(process.exit).toHaveBeenCalledWith(1);
   });
 
@@ -60,7 +61,7 @@ describe('logListening', () => {
   } as unknown as Server;
 
   beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(logger, 'info').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -70,6 +71,6 @@ describe('logListening', () => {
   it('should log listening (port)', () => {
     vi.mocked(mockServer.address).mockReturnValue(null);
     logListening(mockServer, 3000);
-    expect(console.log).toHaveBeenCalledWith('Listening on port 3000');
+    expect(logger.info).toHaveBeenCalledWith('Listening on port 3000');
   });
 });

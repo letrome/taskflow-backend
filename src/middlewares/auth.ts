@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { BASIC_SECRET } from '../config.js';
+import logger from '../logger.js';
  
 export default function basicAuth(req: Request, res: Response, next: NextFunction) {
    try {
@@ -22,7 +23,7 @@ export default function basicAuth(req: Request, res: Response, next: NextFunctio
     
     next();
    } catch(error) {
-        console.debug(error);
+        logger.debug(error);
        res.status(401).json({ "error": "Unauthorized" });
    }
 }

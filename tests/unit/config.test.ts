@@ -46,4 +46,22 @@ describe('config', () => {
     delete process.env.BASIC_SECRET;
     await expect(import('../../src/config.js')).rejects.toThrow('BASIC_SECRET is not defined');
   });
+
+  it('should verify PINO_LOG_LEVEL uses the provided value', async () => {
+    process.env.PINO_LOG_LEVEL = 'warn';
+    const { PINO_LOG_LEVEL } = await import('../../src/config.js');
+    expect(PINO_LOG_LEVEL).toBe('warn');
+  });
+
+  it('should use info as default value when PINO_LOG_LEVEL is undefined', async () => {
+    delete process.env.PINO_LOG_LEVEL;
+    const { PINO_LOG_LEVEL } = await import('../../src/config.js');
+    expect(PINO_LOG_LEVEL).toBe('info');
+  });
+
+  it('should use info as default value when PINO_LOG_LEVEL is invalid', async () => {
+    process.env.PINO_LOG_LEVEL = 'invalid';
+    const { PINO_LOG_LEVEL } = await import('../../src/config.js');
+    expect(PINO_LOG_LEVEL).toBe('info');
+  });
 });

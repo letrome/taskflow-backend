@@ -37,6 +37,8 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **`pnpm run test:integration`**: Runs integration tests located in `tests/integration`.
 - **`pnpm run test:coverage`**: Runs tests with code coverage reporting.
 - **`pnpm run test:e2e`**: Automated E2E testing. Starts a clean server instance on port 3001 and runs Bruno API tests against it.
+- **`pnpm lint`**: Checks code quality and formatting using Biome.
+- **`pnpm lint:fix`**: Automatically fixes linting errors and formats code using Biome.
 - **`pnpm sonar`**: Runs the SonarQube scanner to analyze code quality and coverage.
 
 ## � CI/CD & Automation
@@ -99,3 +101,6 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - [Bruno](https://www.usebruno.com/) (End-to-End API Testing)
   - [SonarQube](https://www.sonarsource.com/) (Code Quality & Security)
   - [Prometheus Client](https://github.com/siimon/prom-client) (Metrics Collection)
+  - [Pino](https://getpino.io/) (Structured Logging)
+  - [Biome](https://biomejs.dev/) (Linting & Formatting)
+  - [Helmet](https://helmetjs.github.io/) (Security Headers)

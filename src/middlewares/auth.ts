@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import { BASIC_SECRET } from "../config.js";
-import logger from "../logger.js";
+import { BASIC_SECRET } from "../core/config.js";
+import logger from "../core/logger.js";
 
 export default function basicAuth(
 	req: Request,

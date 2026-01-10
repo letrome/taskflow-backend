@@ -1,5 +1,5 @@
 import express from "express";
-import { PORT } from "./config.js";
+import { PORT } from "./core/config.js";
 
 import { metricsMiddleware } from "./middlewares/metrics.js";
 import adminRoutes from "./routes/admin.js";

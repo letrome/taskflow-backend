@@ -1,7 +1,7 @@
 import "dotenv/config";
 import http from "node:http";
 import app from "./app.js";
-import { errorHandler, logListening } from "./utils.js";
+import { errorHandler, logListening } from "./core/utils.js";
 
 const server = http.createServer(app);
 const port = app.get("port");

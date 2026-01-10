@@ -66,4 +66,17 @@ describe("config", () => {
 		const { PINO_LOG_LEVEL } = await import("../../src/core/config.js");
 		expect(PINO_LOG_LEVEL).toBe("info");
 	});
+
+  it("should verify ALLOWED_ORIGINS uses the provided value", async () => {
+		process.env.ALLOWED_ORIGINS = "http://localhost:4001";
+		const { ALLOWED_ORIGINS } = await import("../../src/core/config.js");
+		expect(ALLOWED_ORIGINS).toEqual(["http://localhost:4001"]);
+	});
+
+	it("should use empty array as default value when ALLOWED_ORIGINS is undefined", async () => {
+		delete process.env.ALLOWED_ORIGINS;
+		const { ALLOWED_ORIGINS } = await import("../../src/core/config.js");
+		expect(ALLOWED_ORIGINS).toEqual([]);
+	});
+
 });

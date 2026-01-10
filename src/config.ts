@@ -1,33 +1,33 @@
 const checkAndGetPort = (val: string | undefined): number => {
-  const defaultPort: number = 4000;
-  if (!val) {
-    return defaultPort;
-  }
+	const defaultPort: number = 4000;
+	if (!val) {
+		return defaultPort;
+	}
 
-  const port: number = Number.parseInt(val, 10);
+	const port: number = Number.parseInt(val, 10);
 
-  if (Number.isNaN(port)) {
-    return defaultPort;
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return defaultPort;
+	if (Number.isNaN(port)) {
+		return defaultPort;
+	}
+	if (port >= 0) {
+		return port;
+	}
+	return defaultPort;
 };
 
 const checkAndGetBasicSecret = (val: string | undefined): string => {
-  if (!val) {
-    throw new Error('BASIC_SECRET is not defined');
-  }
-  return val;
+	if (!val) {
+		throw new Error("BASIC_SECRET is not defined");
+	}
+	return val;
 };
 
 const checkAndGetLogLevel = (val: string | undefined): string => {
-  const validLevels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace'];
-  if (val && validLevels.includes(val)) {
-    return val;
-  }
-  return 'info';
+	const validLevels = ["fatal", "error", "warn", "info", "debug", "trace"];
+	if (val && validLevels.includes(val)) {
+		return val;
+	}
+	return "info";
 };
 
 export const PORT = checkAndGetPort(process.env.PORT);

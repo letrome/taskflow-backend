@@ -1,1 +1,1 @@
-process.env.BASIC_SECRET = 'test-secret';
+process.env.BASIC_SECRET = "test-secret";

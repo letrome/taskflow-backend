@@ -37,9 +37,17 @@ const checkAndGetAllowedOrigins = (val: string | undefined): string[] => {
 	return val.split(",");
 };
 
+const checkAndGetMongoUri = (val: string | undefined): string => {
+	if (!val) {
+		throw new Error("MONGO_URI is not defined");
+	}
+	return val;
+};
+
 export const PORT = checkAndGetPort(process.env.PORT);
 export const BASIC_SECRET = checkAndGetBasicSecret(process.env.BASIC_SECRET);
 export const PINO_LOG_LEVEL = checkAndGetLogLevel(process.env.PINO_LOG_LEVEL);
 export const ALLOWED_ORIGINS = checkAndGetAllowedOrigins(
 	process.env.ALLOWED_ORIGINS,
 );
+export const MONGO_URI = checkAndGetMongoUri(process.env.MONGO_URI);

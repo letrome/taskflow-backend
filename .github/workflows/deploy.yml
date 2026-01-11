@@ -28,6 +28,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "BASIC_SECRET=${{ secrets.PROD_BASIC_SECRET }}" >> $GITHUB_ENV
             echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_PROD_URL }}" >> $GITHUB_ENV
+            echo "MONGO_URI=${{ secrets.PROD_MONGO_URI }}" >> $GITHUB_ENV
           else
             echo "TARGET_IP=${{ secrets.PREPROD_IP }}" >> $GITHUB_ENV
             echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
@@ -35,6 +36,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "BASIC_SECRET=${{ secrets.PREPROD_BASIC_SECRET }}" >> $GITHUB_ENV
             echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_PREPROD_URL }}" >> $GITHUB_ENV
+            echo "MONGO_URI=${{ secrets.PREPROD_MONGO_URI }}" >> $GITHUB_ENV
           fi
 
       - name: Deploy to Server
@@ -53,6 +55,7 @@ jobs:
               --restart always \
               -p 4000:4000 \
               -e BASIC_SECRET=$BASIC_SECRET \
+              -e MONGO_URI=$MONGO_URI \
               --name taskflow-backend \
               ghcr.io/$IMAGE_NAME:latest
 

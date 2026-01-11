@@ -1,0 +1,8 @@
+name: taskflow-backend-test
+services:
+  mongo-test:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: test

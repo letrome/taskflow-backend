@@ -17,18 +17,27 @@ auth:basic {
 
 body:json {
   {
-    "email": "admin@laromierre.com",
+    "email": "{{unique_email}}",
     "password": "Azx5L08tKQ7CQ5Deu2Th",
-    "first_name": "admin",
-    "last_name": "laromierre",
+    "first_name": "endt",
+    "last_name": "oend",
     "roles": ["ROLE_MANAGER"]
   }
 }
 
 assert {
-  res.status: eq 200
+  res.status: eq 201
   res.body: isJson
-  res.body.status: eq OK
+  res.body.email: eq {{unique_email}}
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles[0]: eq ROLE_MANAGER
+}
+
+script:pre-request {
+  const randomId = Math.floor(Math.random() * 1000000);
+  bru.setVar("unique_email", `endtoend-${randomId}@laromierre.com`);
 }
 
 settings {

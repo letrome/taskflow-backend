@@ -41,6 +41,9 @@ jobs:
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          MONGO_URI: ${{ env.MONGO_URI }}
+          BASIC_SECRET: ${{ env.BASIC_SECRET }}
         with:
           host: ${{ env.TARGET_IP }}
           username: github

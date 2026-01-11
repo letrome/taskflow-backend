@@ -67,7 +67,7 @@ describe("config", () => {
 		expect(PINO_LOG_LEVEL).toBe("info");
 	});
 
-  it("should verify ALLOWED_ORIGINS uses the provided value", async () => {
+	it("should verify ALLOWED_ORIGINS uses the provided value", async () => {
 		process.env.ALLOWED_ORIGINS = "http://localhost:4001";
 		const { ALLOWED_ORIGINS } = await import("../../src/core/config.js");
 		expect(ALLOWED_ORIGINS).toEqual(["http://localhost:4001"]);
@@ -78,5 +78,4 @@ describe("config", () => {
 		const { ALLOWED_ORIGINS } = await import("../../src/core/config.js");
 		expect(ALLOWED_ORIGINS).toEqual([]);
 	});
-
 });

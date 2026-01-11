@@ -8,6 +8,7 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 
 - [Node.js](https://nodejs.org/) (Latest LTS version recommended)
 - [pnpm](https://pnpm.io/) (Package manager)
+- [MongoDB](https://www.mongodb.com/) (Database)
 
 ### Installation
 
@@ -89,11 +90,30 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - **Auth**: Requires standard `Basic Auth` (Base64 encoded `username:password`). Password must match `BASIC_SECRET`.
 - **Response**: Prometheus formatted metrics.
 
+### Create User
+
+- **URL**: `/create-user`
+- **Method**: `POST`
+- **Description**: Creates a new user (Admin only).
+- **Auth**: Requires standard `Basic Auth`.
+- **Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "securepassword",
+    "first_name": "John",
+    "last_name": "Doe",
+    "roles": ["ROLE_USER"]
+  }
+  ```
+- **Response**: Returns the created user object (password hash removed).
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js
 - **Framework**: Express.js
 - **Language**: TypeScript
+- **Database**: MongoDB (with Mongoose)
 - **Tooling**:
   - [tsx](https://github.com/privatenumber/tsx) (Execution)
   - [Vitest](https://vitest.dev/) (Unit & Integration Runner)

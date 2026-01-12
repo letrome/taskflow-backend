@@ -121,7 +121,11 @@ describe("createUser", () => {
 				last_name: "Last",
 				roles: ["ROLE_USER"],
 			},
-		} as Request;
+		} as unknown as Request<
+			Record<string, never>,
+			Record<string, never>,
+			CreateUserDTO
+		>;
 		const response = {
 			set: vi.fn().mockReturnThis(),
 			status: vi.fn().mockReturnThis(),
@@ -178,11 +182,19 @@ describe("createUser", () => {
 
 describe("getUser", () => {
 	it("should get a user", async () => {
+		vi.mocked(adminService.getUser).mockResolvedValue({
+			email: "test@test.com",
+			password_hash: "hashed_password",
+			first_name: "First",
+			last_name: "Last",
+			roles: ["ROLE_USER"],
+		} as unknown as IUser);
+
 		const request = {
 			params: {
 				id: "123",
 			},
-		} as unknown as Request;
+		} as unknown as Request<{ id: string }>;
 
 		const response = {
 			set: vi.fn().mockReturnThis(),
@@ -191,7 +203,8 @@ describe("getUser", () => {
 			json: vi.fn(),
 		} as unknown as Response;
 
-		await getUser(request, response);
+		const next = vi.fn();
+		await getUser(request, response, next);
 
 		expect(response.status).toHaveBeenCalledWith(200);
 		expect(response.json).toHaveBeenCalledWith(
@@ -206,11 +219,13 @@ describe("getUser", () => {
 	});
 
 	it("should return not found", async () => {
+		vi.mocked(adminService.getUser).mockRejectedValue(new Error("not found"));
+
 		const request = {
 			params: {
 				id: "456",
 			},
-		} as unknown as Request;
+		} as unknown as Request<{ id: string }>;
 
 		const response = {
 			set: vi.fn().mockReturnThis(),
@@ -219,8 +234,9 @@ describe("getUser", () => {
 			json: vi.fn(),
 		} as unknown as Response;
 
-		await getUser(request, response);
+		const next = vi.fn();
+		await getUser(request, response, next);
 
-		expect(response.status).toHaveBeenCalledWith(404);
+		expect(next).toHaveBeenCalledWith(expect.any(Error));
 	});
 });

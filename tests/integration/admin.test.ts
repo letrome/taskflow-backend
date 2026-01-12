@@ -89,7 +89,7 @@ describe("Integration Tests", () => {
 		});
 	});
 
-	// User Check
+	// Create User Check
 	describe("POST /users", () => {
 		it("should return 201 Created", async () => {
 			const auth = Buffer.from("admin:test-secret").toString("base64");
@@ -114,48 +114,92 @@ describe("Integration Tests", () => {
 		});
 	});
 
-	it("should return 409 Conflict if mail is reused", async () => {
-		const auth = Buffer.from("admin:test-secret").toString("base64");
-		const body = {
-			email: "test@test.com",
-			password: "password",
-			first_name: "First",
-			last_name: "Last",
-			roles: ["ROLE_USER"],
-		};
+	describe("POST /users", () => {
+		it("should return 409 Conflict if mail is reused", async () => {
+			const auth = Buffer.from("admin:test-secret").toString("base64");
+			const body = {
+				email: "test@test.com",
+				password: "password",
+				first_name: "First",
+				last_name: "Last",
+				roles: ["ROLE_USER"],
+			};
 
-		await request(app)
-			.post("/admin/users")
-			.set("Authorization", `Basic ${auth}`)
-			.send(body);
+			await request(app)
+				.post("/admin/users")
+				.set("Authorization", `Basic ${auth}`)
+				.send(body);
 
-		const response = await request(app)
-			.post("/admin/users")
-			.set("Authorization", `Basic ${auth}`)
-			.send(body);
-		expect(response.status).toBe(409);
-		expect(response.body).toEqual({
-			status: "error",
-			message: "Email already exists",
+			const response = await request(app)
+				.post("/admin/users")
+				.set("Authorization", `Basic ${auth}`)
+				.send(body);
+			expect(response.status).toBe(409);
+			expect(response.body).toEqual({
+				status: "error",
+				message: "Email already exists",
+			});
 		});
 	});
 
-	it("should return 400 Bad Request if mail format is not valid", async () => {
-		const auth = Buffer.from("admin:test-secret").toString("base64");
-		const body = {
-			email: "invalid",
-			password: "password",
-			first_name: "First",
-			last_name: "Last",
-			roles: ["ROLE_USER"],
-		};
+	describe("POST /users", () => {
+		it("should return 400 Bad Request if mail format is not valid", async () => {
+			const auth = Buffer.from("admin:test-secret").toString("base64");
+			const body = {
+				email: "invalid",
+				password: "password",
+				first_name: "First",
+				last_name: "Last",
+				roles: ["ROLE_USER"],
+			};
 
-		const response = await request(app)
-			.post("/admin/users")
-			.set("Authorization", `Basic ${auth}`)
-			.send(body);
-		expect(response.status).toBe(400);
-		expect(response.body.status).toEqual("error");
-		expect(response.body.errors[0].message).toEqual("Invalid email format");
+			const response = await request(app)
+				.post("/admin/users")
+				.set("Authorization", `Basic ${auth}`)
+				.send(body);
+			expect(response.status).toBe(400);
+			expect(response.body.status).toEqual("error");
+			expect(response.body.message).toEqual("Invalid email format");
+		});
+	});
+
+	// Get User Check
+	describe("GET /users", () => {
+		it("should return 200 OK", async () => {
+			const auth = Buffer.from("admin:test-secret").toString("base64");
+			const response = await request(app)
+				.post("/admin/users")
+				.set("Authorization", `Basic ${auth}`)
+				.send({
+					email: "test2@test.com",
+					password: "password",
+					first_name: "First",
+					last_name: "Last",
+					roles: ["ROLE_USER"],
+				});
+
+			const id = response.body.id;
+			const response2 = await request(app)
+				.get(`/admin/users/${id}`)
+				.set("Authorization", `Basic ${auth}`);
+			expect(response2.status).toBe(200);
+			expect(response2.body).toEqual({
+				email: "test2@test.com",
+				id: id,
+				first_name: "First",
+				last_name: "Last",
+				roles: ["ROLE_USER"],
+			});
+		});
+
+		it("should return 404 Not Found", async () => {
+			const auth = Buffer.from("admin:test-secret").toString("base64");
+			const response = await request(app)
+				.get("/admin/users/123")
+				.set("Authorization", `Basic ${auth}`);
+			expect(response.status).toBe(404);
+			expect(response.body.status).toEqual("error");
+			expect(response.body.message).toEqual("User not found");
+		});
 	});
 });

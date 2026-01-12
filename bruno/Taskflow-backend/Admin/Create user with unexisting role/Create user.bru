@@ -1,0 +1,42 @@
+meta {
+  name: Create user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/admin/users/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "Azx5L08tKQ7CQ5Deu2Th",
+    "first_name": "endt",
+    "last_name": "oend",
+    "roles": ["INVALID"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+  res.body.status: eq error
+  res.body.message: matches Invalid option: expected one of \"ROLE_USER\"|"ROLE_MANAGER"
+}
+
+script:pre-request {
+  const randomId = Math.floor(Math.random() * 1000000);
+  bru.setVar("unique_email", `endtoend-${randomId}@laromierre.com`);
+}
+
+script:post-response {
+  bru.setVar("user_id", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

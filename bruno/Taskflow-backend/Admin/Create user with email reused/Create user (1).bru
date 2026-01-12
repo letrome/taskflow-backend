@@ -1,12 +1,12 @@
 meta {
-  name: Admin Get user
+  name: Create user (1)
   type: http
-  seq: 5
+  seq: 1
 }
 
-get {
-  url: {{baseurl}}/admin/users/{{user_id}}
-  body: none
+post {
+  url: {{baseurl}}/admin/users/
+  body: json
   auth: inherit
 }
 
@@ -21,13 +21,22 @@ body:json {
 }
 
 assert {
-  res.status: eq 200
+  res.status: eq 201
   res.body: isJson
   res.body.email: eq {{unique_email}}
-  res.body.id: matches {{user_id}}
+  res.body.id: matches ^[0-9a-f]{24}$
   res.body.first_name: eq endt
   res.body.last_name: eq oend
   res.body.roles[0]: eq ROLE_MANAGER
+}
+
+script:pre-request {
+  const randomId = Math.floor(Math.random() * 1000000);
+  bru.setVar("unique_email", `endtoend-${randomId}@laromierre.com`);
+}
+
+script:post-response {
+  bru.setVar("user_id", res.body.id);
 }
 
 settings {

@@ -19,8 +19,13 @@ export const errorHandler = (
 		message = error.message;
 	} else if (error instanceof ZodError) {
 		statusCode = 400;
-		message = "Validation failed";
-		errors = error.issues;
+		message = error.issues[0]?.message || "Validation error";
+	} else if (
+		"statusCode" in error &&
+		typeof (error as Record<string, unknown>).statusCode === "number"
+	) {
+		statusCode = (error as { statusCode: number }).statusCode;
+		message = error.message;
 	}
 
 	if (statusCode >= 400 && statusCode < 500) {
@@ -32,6 +37,5 @@ export const errorHandler = (
 	res.status(statusCode).json({
 		status: "error",
 		message,
-		...(errors && { errors }),
 	});
 };

@@ -3,7 +3,6 @@ import path from "node:path";
 import type express from "express";
 import client from "prom-client";
 import * as adminService from "../services/admin.js";
-import User from "../services/models/user.js";
 
 import type { CreateUserDTO } from "./schemas/user.js";
 
@@ -42,14 +41,16 @@ export const createUser = async (
 	}
 };
 
-export const getUser = async (req: express.Request, res: express.Response) => {
-	return User.findById(req.params.id)
-		.then((user) => {
-			res.status(200).json(user);
-		})
-		.catch((error: Error) => {
-			res.status(404).json({
-				error: error,
-			});
-		});
+export const getUser = async (
+	req: express.Request<{ id: string }>,
+	res: express.Response,
+	next: express.NextFunction,
+) => {
+	try {
+		const id: string = req.params.id;
+		const user = await adminService.getUser(id);
+		res.status(200).json(user);
+	} catch (error) {
+		next(error);
+	}
 };

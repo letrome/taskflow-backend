@@ -1,8 +1,8 @@
+import * as adminCtrl from "@src/controllers/admin.js";
+import { createUserSchema } from "@src/controllers/schemas/user.js";
+import basicAuth from "@src/middlewares/auth.js";
+import { validate } from "@src/middlewares/validate.js";
 import express from "express";
-import * as adminCtrl from "../controllers/admin.js";
-import { createUserSchema } from "../controllers/schemas/user.js";
-import basicAuth from "../middlewares/auth.js";
-import { validate } from "../middlewares/validate.js";
 
 const router: express.Router = express.Router();
 

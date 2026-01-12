@@ -1,5 +1,5 @@
+import { Roles } from "@src/services/models/user.js";
 import { z } from "zod";
-import { Roles } from "../../services/models/user.js";
 
 export const createUserSchema = z.object({
 	email: z.email("Invalid email format"),

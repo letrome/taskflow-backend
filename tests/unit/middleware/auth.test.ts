@@ -1,19 +1,16 @@
-import type { Request, Response } from "express";
+import { UnauthorizedError } from "@src/core/errors.js";
+import basicAuth from "@src/middlewares/auth.js";
 import { describe, expect, it, vi } from "vitest";
-import { UnauthorizedError } from "../../src/core/errors.js";
-import basicAuth from "../../src/middlewares/auth.js";
+import { createMockRequest, createMockResponse } from "../test-utils.js";
 
 describe("basicAuth", () => {
 	it("should pass", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {
 				authorization: `Basic ${Buffer.from("admin:test-secret").toString("base64")}`,
 			},
-		} as Request;
-		const response = {
-			status: vi.fn().mockReturnThis(),
-			json: vi.fn(),
-		} as unknown as Response;
+		});
+		const response = createMockResponse();
 
 		const nextStub = vi.fn();
 
@@ -23,10 +20,10 @@ describe("basicAuth", () => {
 	});
 
 	it("should return unauthorized when no authorization header", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {},
-		} as Request;
-		const response = {} as Response;
+		});
+		const response = createMockResponse();
 		const nextStub = vi.fn();
 
 		expect(() => basicAuth(request, response, nextStub)).toThrow(
@@ -35,12 +32,12 @@ describe("basicAuth", () => {
 	});
 
 	it("should return unauthorized when invalid authorization type", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {
 				authorization: "Bearer test-secret",
 			},
-		} as Request;
-		const response = {} as Response;
+		});
+		const response = createMockResponse();
 		const nextStub = vi.fn();
 
 		expect(() => basicAuth(request, response, nextStub)).toThrow(
@@ -49,12 +46,12 @@ describe("basicAuth", () => {
 	});
 
 	it("should return unauthorized when invalid authorization secret", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {
 				authorization: "Basic wrong-secret",
 			},
-		} as Request;
-		const response = {} as Response;
+		});
+		const response = createMockResponse();
 		const nextStub = vi.fn();
 
 		expect(() => basicAuth(request, response, nextStub)).toThrow(
@@ -63,12 +60,12 @@ describe("basicAuth", () => {
 	});
 
 	it("should return unauthorized when enmpty authorization value", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {
 				authorization: "",
 			},
-		} as Request;
-		const response = {} as Response;
+		});
+		const response = createMockResponse();
 		const nextStub = vi.fn();
 
 		expect(() => basicAuth(request, response, nextStub)).toThrow(
@@ -77,12 +74,12 @@ describe("basicAuth", () => {
 	});
 
 	it("should return unauthorized when authorization value has no space", () => {
-		const request = {
+		const request = createMockRequest({
 			headers: {
 				authorization: "Basicwrong-secret",
 			},
-		} as Request;
-		const response = {} as Response;
+		});
+		const response = createMockResponse();
 		const nextStub = vi.fn();
 
 		expect(() => basicAuth(request, response, nextStub)).toThrow(

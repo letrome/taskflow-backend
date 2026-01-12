@@ -1,12 +1,12 @@
-import * as bcrypt from "bcrypt";
-import type { CreateUserDTO } from "../controllers/schemas/user.js";
+import type { CreateUserDTO } from "@src/controllers/schemas/user.js";
 import {
 	ConflictError,
 	InternalServerError,
 	NotFoundError,
-} from "../core/errors.js";
-import logger from "../core/logger.js";
-import { isDuplicateError } from "../core/utils.js";
+} from "@src/core/errors.js";
+import logger from "@src/core/logger.js";
+import { isDuplicateError } from "@src/core/utils.js";
+import * as bcrypt from "bcrypt";
 import User, { type IUser } from "./models/user.js";
 
 export const createUser = async (userData: CreateUserDTO): Promise<IUser> => {

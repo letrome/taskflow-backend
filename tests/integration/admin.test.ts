@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import app from "@src/app.js";
 import {
 	MongoDBContainer,
 	type StartedMongoDBContainer,
@@ -7,7 +8,6 @@ import {
 import mongoose from "mongoose";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import app from "../../src/app.js";
 
 describe("Integration Tests", () => {
 	let mongoContainer: StartedMongoDBContainer;

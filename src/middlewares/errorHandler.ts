@@ -1,7 +1,7 @@
+import { AppError } from "@src/core/errors.js";
+import logger from "@src/core/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { AppError } from "../core/errors.js";
-import logger from "../core/logger.js";
 
 export const errorHandler = (
 	error: Error,
@@ -11,8 +11,6 @@ export const errorHandler = (
 ) => {
 	let statusCode = 500;
 	let message = "Internal Server Error";
-	// biome-ignore lint/suspicious/noExplicitAny: Generic error structure flexibility
-	let errors: any;
 
 	if (error instanceof AppError) {
 		statusCode = error.statusCode;

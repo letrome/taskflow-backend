@@ -1,7 +1,7 @@
+import { BASIC_SECRET } from "@src/core/config.js";
+import { UnauthorizedError } from "@src/core/errors.js";
+import logger from "@src/core/logger.js";
 import type { NextFunction, Request, Response } from "express";
-import { BASIC_SECRET } from "../core/config.js";
-import { UnauthorizedError } from "../core/errors.js";
-import logger from "../core/logger.js";
 
 export default function basicAuth(
 	req: Request,

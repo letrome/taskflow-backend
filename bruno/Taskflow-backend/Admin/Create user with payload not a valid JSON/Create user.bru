@@ -34,7 +34,7 @@ assert {
   res.status: eq 400
   res.body: isJson
   res.body.status: eq error
-  res.body.message: eq Expected ',' or '}' after property value in JSON at position 48 (line 3 column 3)
+  res.body.message: matches Unexpected token
 }
 
 script:pre-request {

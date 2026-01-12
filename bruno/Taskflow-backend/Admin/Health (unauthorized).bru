@@ -13,7 +13,7 @@ get {
 assert {
   res.status: eq 401
   res.body: isJson
-  res.body.error: eq Unauthorized
+  res.body.message: eq Unauthorized
 }
 
 settings {

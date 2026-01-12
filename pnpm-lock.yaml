@@ -28,11 +28,11 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       mongoose:
-        specifier: ^9.1.2
-        version: 9.1.2(socks@2.8.7)
+        specifier: ^9.1.3
+        version: 9.1.3(socks@2.8.7)
       mongoose-unique-validator:
         specifier: ^4.0.1
-        version: 4.0.1(mongoose@9.1.2(socks@2.8.7))
+        version: 4.0.1(mongoose@9.1.3(socks@2.8.7))
       pino:
         specifier: ^10.1.1
         version: 10.1.1
@@ -1199,6 +1199,9 @@ packages:
 
   '@types/lodash@4.17.21':
     resolution: {integrity: sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==}
+
+  '@types/lodash@4.17.23':
+    resolution: {integrity: sha512-RDvF6wTulMPjrNdCoYRC8gNR880JNGT8uB+REUpC2Ns4pRqQJhGz90wh7rgdXDPpCczF3VGktDuFGVnz8zP7HA==}
 
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
@@ -2518,8 +2521,8 @@ packages:
     resolution: {integrity: sha512-JHKco/533CyVrqCbyQsnqMpLn8ZCiKrPDTd2mvo2W7ygIvhygWjX2wj+RPjn6upZZgw0jC6U51RD7kUsyK8NBg==}
     engines: {node: '>=12.0.0'}
 
-  mongoose@9.1.2:
-    resolution: {integrity: sha512-EdxZ/l+wLIPymy/ODxulg13CaUPpt8RenGmuoNAuRhA5Dgk/QERkUm3U0wOEbAi6ULG08bGDo9sy2tKX0KwxIg==}
+  mongoose@9.1.3:
+    resolution: {integrity: sha512-vIKt/qjdgXt0C/75g8/ROLY+o5rrVsjqwmo1C9qpGYIpJQI9KLZjuBXJTyL+8RXH2cGFumADCd7PIE3mry3ibw==}
     engines: {node: '>=20.19.0'}
 
   mpath@0.9.0:
@@ -5087,6 +5090,8 @@ snapshots:
 
   '@types/lodash@4.17.21': {}
 
+  '@types/lodash@4.17.23': {}
+
   '@types/methods@1.1.4': {}
 
   '@types/mongoose-unique-validator@1.0.9':
@@ -6553,12 +6558,12 @@ snapshots:
     optionalDependencies:
       socks: 2.8.7
 
-  mongoose-unique-validator@4.0.1(mongoose@9.1.2(socks@2.8.7)):
+  mongoose-unique-validator@4.0.1(mongoose@9.1.3(socks@2.8.7)):
     dependencies:
       lodash.foreach: 4.5.0
       lodash.get: 4.4.2
       lodash.merge: 4.6.2
-      mongoose: 9.1.2(socks@2.8.7)
+      mongoose: 9.1.3(socks@2.8.7)
 
   mongoose@6.13.8:
     dependencies:
@@ -6573,7 +6578,7 @@ snapshots:
       - aws-crt
       - supports-color
 
-  mongoose@9.1.2(socks@2.8.7):
+  mongoose@9.1.3(socks@2.8.7):
     dependencies:
       kareem: 3.0.0
       mongodb: 7.0.0(socks@2.8.7)
@@ -7597,7 +7602,7 @@ snapshots:
   yup@0.32.11:
     dependencies:
       '@babel/runtime': 7.28.4
-      '@types/lodash': 4.17.21
+      '@types/lodash': 4.17.23
       lodash: 4.17.21
       lodash-es: 4.17.22
       nanoclone: 0.2.1

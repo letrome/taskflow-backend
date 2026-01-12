@@ -13,8 +13,6 @@ const envSchema = z.object({
 	MONGO_URI: z.string().min(1, { message: "MONGO_URI is not defined" }),
 });
 
-// We generally populate default environment variables if they are missing
-// and then parse process.env to ensure it matches the schema.
 const env = envSchema.parse(process.env);
 
 export const PORT = env.PORT;

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-01-12
+
+### Added
+
+- **Zod** integration for runtime schema validation.
+- Global error handling architecture with custom error classes.
+- Standardized validation middleware using Zod schemas.
+
+### Changed
+
+- Refactored Admin Service and Controllers to use Zod validation and new error handling flow.
+
 ## [0.1.2] - 2026-01-11
 
 ### Added

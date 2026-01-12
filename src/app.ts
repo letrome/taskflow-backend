@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { ALLOWED_ORIGINS, PORT } from "./core/config.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 import { metricsMiddleware } from "./middlewares/metrics.js";
 import adminRoutes from "./routes/admin.js";
 
@@ -19,5 +20,7 @@ app.use(metricsMiddleware);
 app.use(express.json());
 
 app.use("/", adminRoutes);
+
+app.use(errorHandler);
 
 export default app;

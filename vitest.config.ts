@@ -1,7 +1,9 @@
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 import sonarReporter from "vitest-sonar-reporter";
 
 export default defineConfig({
+	plugins: [tsconfigPaths()],
 	test: {
 		coverage: {
 			provider: "v8",

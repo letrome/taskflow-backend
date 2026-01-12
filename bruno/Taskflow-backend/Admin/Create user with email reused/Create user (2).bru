@@ -1,0 +1,37 @@
+meta {
+  name: Create user (2)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/admin/users/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "Azx5L08tKQ7CQ5Deu2Th",
+    "first_name": "endt",
+    "last_name": "oend",
+    "roles": ["ROLE_MANAGER"]
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body: isJson
+  res.body.status: eq error
+  res.body.message: matches Email already exists
+}
+
+script:post-response {
+  bru.setVar("user_id", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

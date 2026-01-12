@@ -1,7 +1,7 @@
 import type { Server } from "node:http";
+import logger from "@src/core/logger.js";
+import { errorHandler, logListening } from "@src/core/utils.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import logger from "../../src/core/logger.js";
-import { errorHandler, logListening } from "../../src/core/utils.js";
 
 describe("errorHandler", () => {
 	const mockServer = {

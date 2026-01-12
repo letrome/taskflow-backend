@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import bcrypt from "bcrypt";
+import * as adminService from "@src/services/admin.js";
 import type express from "express";
 import client from "prom-client";
-import User from "../models/user.js";
+
+import type { CreateUserDTO } from "./schemas/user.js";
 
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
@@ -24,37 +25,32 @@ export const getVersion = (_: express.Request, res: express.Response) => {
 };
 
 export const createUser = async (
-	req: express.Request,
+	req: express.Request<
+		Record<string, never>,
+		Record<string, never>,
+		CreateUserDTO
+	>,
 	res: express.Response,
+	next: express.NextFunction,
 ) => {
 	try {
-		const hash = await bcrypt.hash(req.body.password, 10);
-		const user = new User({
-			email: req.body.email,
-			password_hash: hash,
-			first_name: req.body.first_name,
-			last_name: req.body.last_name,
-			roles: req.body.roles,
-		});
-		try {
-			const savedUser = await user.save();
-			res.status(201).json(savedUser);
-		} catch (error) {
-			res.status(400).json({ error });
-		}
+		const savedUser = await adminService.createUser(req.body);
+		res.status(201).json(savedUser);
 	} catch (error) {
-		res.status(500).json({ error });
+		next(error);
 	}
 };
 
-export const getUser = async (req: express.Request, res: express.Response) => {
-	return User.findById(req.params.id)
-		.then((user) => {
-			res.status(200).json(user);
-		})
-		.catch((error: Error) => {
-			res.status(404).json({
-				error: error,
-			});
-		});
+export const getUser = async (
+	req: express.Request<{ id: string }>,
+	res: express.Response,
+	next: express.NextFunction,
+) => {
+	try {
+		const id: string = req.params.id;
+		const user = await adminService.getUser(id);
+		res.status(200).json(user);
+	} catch (error) {
+		next(error);
+	}
 };

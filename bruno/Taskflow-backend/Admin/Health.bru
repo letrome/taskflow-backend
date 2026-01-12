@@ -7,12 +7,7 @@ meta {
 get {
   url: {{baseurl}}/health
   body: none
-  auth: basic
-}
-
-auth:basic {
-  username: admin
-  password: {{basic_secret}}
+  auth: inherit
 }
 
 assert {

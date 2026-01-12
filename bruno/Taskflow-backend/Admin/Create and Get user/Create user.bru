@@ -1,18 +1,13 @@
 meta {
   name: Create user
   type: http
-  seq: 6
+  seq: 2
 }
 
 post {
-  url: {{baseurl}}/create-user
+  url: {{baseurl}}/admin/users/
   body: json
-  auth: basic
-}
-
-auth:basic {
-  username: admin
-  password: {{basic_secret}}
+  auth: inherit
 }
 
 body:json {
@@ -38,6 +33,10 @@ assert {
 script:pre-request {
   const randomId = Math.floor(Math.random() * 1000000);
   bru.setVar("unique_email", `endtoend-${randomId}@laromierre.com`);
+}
+
+script:post-response {
+  bru.setVar("user_id", res.body.id);
 }
 
 settings {

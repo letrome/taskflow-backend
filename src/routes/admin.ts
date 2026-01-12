@@ -7,6 +7,7 @@ const router: express.Router = express.Router();
 router.get("/health", basicAuth, adminCtrl.getHealth);
 router.get("/version", basicAuth, adminCtrl.getVersion);
 router.get("/metrics", basicAuth, adminCtrl.getMetrics);
-router.post("/create-user", basicAuth, adminCtrl.createUser);
+router.post("/admin/users", basicAuth, adminCtrl.createUser);
+router.get("/admin/users/:id", basicAuth, adminCtrl.getUser);
 
 export default router;

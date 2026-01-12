@@ -1,0 +1,36 @@
+meta {
+  name: Admin Get user
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseurl}}/admin/users/{{user_id}}
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "Azx5L08tKQ7CQ5Deu2Th",
+    "first_name": "endt",
+    "last_name": "oend",
+    "roles": ["ROLE_MANAGER"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.email: eq {{unique_email}}
+  res.body.id: matches {{user_id}}
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles[0]: eq ROLE_MANAGER
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,18 +1,13 @@
 meta {
   name: Version
   type: http
-  seq: 3
+  seq: 4
 }
 
 get {
   url: {{baseurl}}/version
   body: none
-  auth: basic
-}
-
-auth:basic {
-  username: admin
-  password: {{basic_secret}}
+  auth: inherit
 }
 
 assert {

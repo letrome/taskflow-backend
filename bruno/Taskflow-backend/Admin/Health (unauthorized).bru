@@ -1,13 +1,13 @@
 meta {
   name: Health (unauthorized)
   type: http
-  seq: 4
+  seq: 2
 }
 
 get {
   url: {{baseurl}}/health
   body: none
-  auth: inherit
+  auth: none
 }
 
 assert {

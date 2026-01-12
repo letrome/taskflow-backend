@@ -1,18 +1,13 @@
 meta {
   name: Metrics
   type: http
-  seq: 4
+  seq: 3
 }
 
 get {
   url: {{baseurl}}/metrics
   body: none
-  auth: basic
-}
-
-auth:basic {
-  username: admin
-  password: {{basic_secret}}
+  auth: inherit
 }
 
 assert {

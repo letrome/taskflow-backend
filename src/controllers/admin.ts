@@ -46,3 +46,15 @@ export const createUser = async (
 		res.status(500).json({ error });
 	}
 };
+
+export const getUser = async (req: express.Request, res: express.Response) => {
+	return User.findById(req.params.id)
+		.then((user) => {
+			res.status(200).json(user);
+		})
+		.catch((error: Error) => {
+			res.status(404).json({
+				error: error,
+			});
+		});
+};

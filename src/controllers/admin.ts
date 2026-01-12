@@ -1,9 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import bcrypt from "bcrypt";
 import type express from "express";
 import client from "prom-client";
-import User from "../models/user.js";
+import * as adminService from "../services/admin.js";
+import User from "../services/models/user.js";
+
+import type { CreateUserDTO } from "./schemas/user.js";
 
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
@@ -24,26 +26,19 @@ export const getVersion = (_: express.Request, res: express.Response) => {
 };
 
 export const createUser = async (
-	req: express.Request,
+	req: express.Request<
+		Record<string, never>,
+		Record<string, never>,
+		CreateUserDTO
+	>,
 	res: express.Response,
+	next: express.NextFunction,
 ) => {
 	try {
-		const hash = await bcrypt.hash(req.body.password, 10);
-		const user = new User({
-			email: req.body.email,
-			password_hash: hash,
-			first_name: req.body.first_name,
-			last_name: req.body.last_name,
-			roles: req.body.roles,
-		});
-		try {
-			const savedUser = await user.save();
-			res.status(201).json(savedUser);
-		} catch (error) {
-			res.status(400).json({ error });
-		}
+		const savedUser = await adminService.createUser(req.body);
+		res.status(201).json(savedUser);
 	} catch (error) {
-		res.status(500).json({ error });
+		next(error);
 	}
 };
 

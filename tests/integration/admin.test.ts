@@ -113,4 +113,49 @@ describe("Integration Tests", () => {
 			});
 		});
 	});
+
+	it("should return 409 Conflict if mail is reused", async () => {
+		const auth = Buffer.from("admin:test-secret").toString("base64");
+		const body = {
+			email: "test@test.com",
+			password: "password",
+			first_name: "First",
+			last_name: "Last",
+			roles: ["ROLE_USER"],
+		};
+
+		await request(app)
+			.post("/admin/users")
+			.set("Authorization", `Basic ${auth}`)
+			.send(body);
+
+		const response = await request(app)
+			.post("/admin/users")
+			.set("Authorization", `Basic ${auth}`)
+			.send(body);
+		expect(response.status).toBe(409);
+		expect(response.body).toEqual({
+			status: "error",
+			message: "Email already exists",
+		});
+	});
+
+	it("should return 400 Bad Request if mail format is not valid", async () => {
+		const auth = Buffer.from("admin:test-secret").toString("base64");
+		const body = {
+			email: "invalid",
+			password: "password",
+			first_name: "First",
+			last_name: "Last",
+			roles: ["ROLE_USER"],
+		};
+
+		const response = await request(app)
+			.post("/admin/users")
+			.set("Authorization", `Basic ${auth}`)
+			.send(body);
+		expect(response.status).toBe(400);
+		expect(response.body.status).toEqual("error");
+		expect(response.body.errors[0].message).toEqual("Invalid email format");
+	});
 });

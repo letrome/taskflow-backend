@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ZodError } from "zod";
 
 describe("config", () => {
 	const originalEnv = process.env;
@@ -24,16 +25,15 @@ describe("config", () => {
 		expect(PORT).toBe(5000);
 	});
 
-	it("should verify PORT defaults to 4000 for invalid number", async () => {
+	it("should verify PORT throws validation error for invalid number", async () => {
 		process.env.PORT = "invalid";
-		const { PORT } = await import("../../src/core/config.js");
-		expect(PORT).toBe(4000);
+		await expect(import("../../src/core/config.js")).rejects.toThrow(ZodError);
 	});
 
 	it("should verify PORT defaults to 4000 for negative number", async () => {
+		// Note from schema: .min(0) means negative numbers fail validation
 		process.env.PORT = "-1";
-		const { PORT } = await import("../../src/core/config.js");
-		expect(PORT).toBe(4000);
+		await expect(import("../../src/core/config.js")).rejects.toThrow(ZodError);
 	});
 
 	it("should verify BASIC_SECRET uses the provided value", async () => {
@@ -44,9 +44,7 @@ describe("config", () => {
 
 	it("should throw error when BASIC_SECRET is undefined", async () => {
 		delete process.env.BASIC_SECRET;
-		await expect(import("../../src/core/config.js")).rejects.toThrow(
-			"BASIC_SECRET is not defined",
-		);
+		await expect(import("../../src/core/config.js")).rejects.toThrow(ZodError);
 	});
 
 	it("should verify PINO_LOG_LEVEL uses the provided value", async () => {
@@ -61,10 +59,9 @@ describe("config", () => {
 		expect(PINO_LOG_LEVEL).toBe("info");
 	});
 
-	it("should use info as default value when PINO_LOG_LEVEL is invalid", async () => {
+	it("should throw validation error when PINO_LOG_LEVEL is invalid", async () => {
 		process.env.PINO_LOG_LEVEL = "invalid";
-		const { PINO_LOG_LEVEL } = await import("../../src/core/config.js");
-		expect(PINO_LOG_LEVEL).toBe("info");
+		await expect(import("../../src/core/config.js")).rejects.toThrow(ZodError);
 	});
 
 	it("should verify ALLOWED_ORIGINS uses the provided value", async () => {

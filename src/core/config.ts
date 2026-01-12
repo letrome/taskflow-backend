@@ -1,53 +1,24 @@
-const checkAndGetPort = (val: string | undefined): number => {
-	const defaultPort: number = 4000;
-	if (!val) {
-		return defaultPort;
-	}
+import { z } from "zod";
 
-	const port: number = Number.parseInt(val, 10);
+const envSchema = z.object({
+	PORT: z.coerce.number().min(0).default(4000),
+	BASIC_SECRET: z.string().min(1, { message: "BASIC_SECRET is not defined" }),
+	PINO_LOG_LEVEL: z
+		.enum(["fatal", "error", "warn", "info", "debug", "trace"])
+		.default("info"),
+	ALLOWED_ORIGINS: z
+		.string()
+		.default("")
+		.transform((val) => (val ? val.split(",") : [])),
+	MONGO_URI: z.string().min(1, { message: "MONGO_URI is not defined" }),
+});
 
-	if (Number.isNaN(port)) {
-		return defaultPort;
-	}
-	if (port >= 0) {
-		return port;
-	}
-	return defaultPort;
-};
+// We generally populate default environment variables if they are missing
+// and then parse process.env to ensure it matches the schema.
+const env = envSchema.parse(process.env);
 
-const checkAndGetBasicSecret = (val: string | undefined): string => {
-	if (!val) {
-		throw new Error("BASIC_SECRET is not defined");
-	}
-	return val;
-};
-
-const checkAndGetLogLevel = (val: string | undefined): string => {
-	const validLevels = ["fatal", "error", "warn", "info", "debug", "trace"];
-	if (val && validLevels.includes(val)) {
-		return val;
-	}
-	return "info";
-};
-
-const checkAndGetAllowedOrigins = (val: string | undefined): string[] => {
-	if (!val) {
-		return [];
-	}
-	return val.split(",");
-};
-
-const checkAndGetMongoUri = (val: string | undefined): string => {
-	if (!val) {
-		throw new Error("MONGO_URI is not defined");
-	}
-	return val;
-};
-
-export const PORT = checkAndGetPort(process.env.PORT);
-export const BASIC_SECRET = checkAndGetBasicSecret(process.env.BASIC_SECRET);
-export const PINO_LOG_LEVEL = checkAndGetLogLevel(process.env.PINO_LOG_LEVEL);
-export const ALLOWED_ORIGINS = checkAndGetAllowedOrigins(
-	process.env.ALLOWED_ORIGINS,
-);
-export const MONGO_URI = checkAndGetMongoUri(process.env.MONGO_URI);
+export const PORT = env.PORT;
+export const BASIC_SECRET = env.BASIC_SECRET;
+export const PINO_LOG_LEVEL = env.PINO_LOG_LEVEL;
+export const ALLOWED_ORIGINS = env.ALLOWED_ORIGINS;
+export const MONGO_URI = env.MONGO_URI;

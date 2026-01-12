@@ -7,15 +7,21 @@ import {
 	getUser,
 	getVersion,
 } from "../../src/controllers/admin.js";
+import type { CreateUserDTO } from "../../src/controllers/schemas/user.js";
+import * as adminService from "../../src/services/admin.js";
+import type { IUser } from "../../src/services/models/user.js";
 
 // Mocks
 vi.mock("bcrypt", () => ({
+	hash: vi.fn().mockResolvedValue("hashed_password"),
 	default: {
 		hash: vi.fn().mockResolvedValue("hashed_password"),
 	},
 }));
 
-vi.mock("../../src/models/user.js", () => {
+vi.mock("../../src/services/admin.js");
+
+vi.mock("../../src/services/models/user.js", () => {
 	return {
 		default: class User {
 			private readonly _data;
@@ -99,6 +105,14 @@ describe("getMetrics", () => {
 
 describe("createUser", () => {
 	it("should create a user", async () => {
+		vi.mocked(adminService.createUser).mockResolvedValue({
+			email: "test@test.com",
+			password_hash: "hashed_password",
+			first_name: "First",
+			last_name: "Last",
+			roles: ["ROLE_USER"],
+		} as unknown as IUser);
+
 		const request = {
 			body: {
 				email: "test@test.com",
@@ -115,7 +129,8 @@ describe("createUser", () => {
 			json: vi.fn(),
 		} as unknown as Response;
 
-		await createUser(request, response);
+		const next = vi.fn();
+		await createUser(request, response, next);
 
 		expect(response.status).toHaveBeenCalledWith(201);
 		expect(response.json).toHaveBeenCalledWith(
@@ -137,17 +152,27 @@ describe("createUser", () => {
 				last_name: "Last",
 				roles: ["ROLE_USER"],
 			},
-		} as Request;
+		} as unknown as Request<
+			Record<string, never>,
+			Record<string, never>,
+			CreateUserDTO
+		>;
 		const response = {
 			set: vi.fn().mockReturnThis(),
 			status: vi.fn().mockReturnThis(),
 			send: vi.fn(),
 			json: vi.fn(),
 		} as unknown as Response;
+		const next = vi.fn();
 
-		await createUser(request, response);
+		// Update service mock to throw error that will be caught
+		vi.mocked(adminService.createUser).mockRejectedValueOnce(
+			new Error("email is empty"),
+		);
 
-		expect(response.status).toHaveBeenCalledWith(400);
+		await createUser(request, response, next);
+
+		expect(next).toHaveBeenCalledWith(expect.any(Error));
 	});
 });
 

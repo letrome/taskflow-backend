@@ -123,4 +123,5 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - [Prometheus Client](https://github.com/siimon/prom-client) (Metrics Collection)
   - [Pino](https://getpino.io/) (Structured Logging)
   - [Biome](https://biomejs.dev/) (Linting & Formatting)
+  - [Zod](https://zod.dev/) (Schema Validation)
   - [Helmet](https://helmetjs.github.io/) (Security Headers)

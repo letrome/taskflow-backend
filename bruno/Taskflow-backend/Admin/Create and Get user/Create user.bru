@@ -28,6 +28,7 @@ assert {
   res.body.first_name: eq endt
   res.body.last_name: eq oend
   res.body.roles[0]: eq ROLE_MANAGER
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
 }
 
 script:pre-request {

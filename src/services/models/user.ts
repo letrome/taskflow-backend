@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema<IUser>(
 		toJSON: {
 			transform: (_doc, ret: Record<string, unknown>) => {
 				ret.id = ret._id;
+				ret.created_at = (ret._id as mongoose.Types.ObjectId).getTimestamp();
 				delete ret._id;
 				delete ret.__v;
 				delete ret.password_hash;

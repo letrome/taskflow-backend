@@ -6,8 +6,8 @@ import {
 	getVersion,
 } from "@src/controllers/admin.js";
 import type { CreateUserDTO } from "@src/controllers/schemas/user.js";
-import * as adminService from "@src/services/admin.js";
 import { type IUser, Roles } from "@src/services/models/user.js";
+import * as adminService from "@src/services/user.js";
 import type { Request } from "express";
 import { describe, expect, it, vi } from "vitest";
 import { createMockRequest, createMockResponse } from "../test-utils.js";
@@ -20,7 +20,7 @@ vi.mock("bcrypt", () => ({
 	},
 }));
 
-vi.mock("@src/services/admin.js");
+vi.mock("@src/services/user.js");
 
 describe("getHealth", () => {
 	it("should return a body with status ok", () => {

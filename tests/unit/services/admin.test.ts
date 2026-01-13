@@ -3,10 +3,9 @@ import {
 	InternalServerError,
 	NotFoundError,
 } from "@src/core/errors.js";
-
-import { createUser, getUser } from "@src/services/admin.js";
 import type { IUser } from "@src/services/models/user.js";
 import User, { Roles } from "@src/services/models/user.js";
+import { createUser, getUser } from "@src/services/user.js";
 import bcrypt from "bcrypt";
 import { describe, expect, it, vi } from "vitest";
 

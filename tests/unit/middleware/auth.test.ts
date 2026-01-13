@@ -1,5 +1,5 @@
 import { UnauthorizedError } from "@src/core/errors.js";
-import basicAuth from "@src/middlewares/auth.js";
+import { basicAuth } from "@src/middlewares/auth.js";
 import { describe, expect, it, vi } from "vitest";
 import { createMockRequest, createMockResponse } from "../test-utils.js";
 

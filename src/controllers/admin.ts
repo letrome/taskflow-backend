@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import * as adminService from "@src/services/admin.js";
+import * as adminService from "@src/services/user.js";
 import type express from "express";
 import client from "prom-client";
 

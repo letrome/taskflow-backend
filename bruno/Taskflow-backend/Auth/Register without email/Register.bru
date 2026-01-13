@@ -12,17 +12,22 @@ post {
 
 body:json {
   {
-    "email": "{{unique_email}}",
     "password": "{{unique_password}}",
     "first_name": "endt",
     "last_name": "oend"
   }
 }
 
+assert {
+  res.status: eq 400
+  res.body: isJson
+  res.body.status: eq error
+  res.body.message: eq Email is required
+}
+
 script:pre-request {
-  const randomId = Math.floor(Math.random() * 1000000);
-  bru.setVar("unique_email", `endtoend-${randomId}@laromierre.com`);
-  bru.setVar("unique_password", `endtoend-${randomId}@laromierre.com`);
+  const uuid = require("uuid").v4()
+  bru.setVar("wrong_password", `${uuid}`);
 }
 
 settings {

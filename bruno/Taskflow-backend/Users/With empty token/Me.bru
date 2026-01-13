@@ -1,7 +1,7 @@
 meta {
   name: Me
   type: http
-  seq: 4
+  seq: 1
 }
 
 get {
@@ -11,7 +11,13 @@ get {
 }
 
 auth:bearer {
-  token: {{token}}
+  token: 
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
 }
 
 settings {

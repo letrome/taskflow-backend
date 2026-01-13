@@ -1,0 +1,39 @@
+meta {
+  name: Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{wrong_email}}",
+    "password": "{{wrong_password}}"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Invalid email/password combination
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("wrong_email", `${uuid}@example.com`);
+  bru.setVar("wrong_password", `${uuid}`);
+}
+
+script:post-response {
+  bru.setVar("token", res.body.token);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

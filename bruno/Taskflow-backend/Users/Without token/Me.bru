@@ -1,0 +1,22 @@
+meta {
+  name: Me
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseurl}}/me
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

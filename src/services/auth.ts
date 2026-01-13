@@ -45,14 +45,14 @@ export const login = async (
 	try {
 		const user = await User.findOne({ email: loginSchemaDto.email });
 		if (!user) {
-			throw new NotFoundError("User not found");
+			throw new UnauthorizedError("Invalid email/password combination");
 		}
 		const isPasswordValid = await bcrypt.compare(
 			loginSchemaDto.password,
 			user.password_hash,
 		);
 		if (!isPasswordValid) {
-			throw new UnauthorizedError("Invalid password");
+			throw new UnauthorizedError("Invalid email/password combination");
 		}
 
 		const token = jwt.sign({ id: user._id, roles: user.roles }, JWT_SECRET, {

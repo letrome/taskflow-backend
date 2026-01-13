@@ -37,7 +37,8 @@ export function jwtAuth(req: Request, _res: Response, next: NextFunction) {
 
 	const token = req.headers.authorization?.split(" ")[1];
 	if (!token) {
-		throw new Error("No token provided");
+		logger.debug("No token provided");
+		throw new UnauthorizedError("Unauthorized");
 	}
 
 	try {

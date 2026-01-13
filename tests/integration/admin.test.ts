@@ -16,11 +16,13 @@ describe("Integration Tests", () => {
 		mongoContainer = await new MongoDBContainer("mongo:6.0").start();
 		const uri = mongoContainer.getConnectionString();
 		await mongoose.connect(uri, { directConnection: true });
-	}, 60000); // Increase timeout for docker pull
+	}, 120000);
 
 	afterAll(async () => {
 		await mongoose.disconnect();
-		await mongoContainer.stop();
+		if (mongoContainer) {
+			await mongoContainer.stop();
+		}
 	});
 
 	describe("GET /health", () => {

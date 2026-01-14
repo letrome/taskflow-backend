@@ -2,7 +2,7 @@ import * as userService from "@src/services/user.js";
 import type { NextFunction, Request, Response } from "express";
 
 export const getUser = async (
-	req: Request,
+	req: Request<{ id: string }>,
 	res: Response,
 	next: NextFunction,
 ) => {

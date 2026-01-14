@@ -5349,7 +5349,7 @@ snapshots:
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 25.0.7
+      '@types/node': 25.0.8
 
   '@types/lodash@4.17.23': {}
 
@@ -5435,7 +5435,7 @@ snapshots:
       '@usebruno/js': 0.44.0(debug@4.4.3)
       '@usebruno/lang': 0.33.0
       '@usebruno/requests': 0.14.0
-      aws4-axios: 3.4.0(axios@1.13.2)
+      aws4-axios: 3.4.0(axios@1.13.2(debug@4.4.3))
       axios: 1.13.2(debug@4.4.3)
       axios-ntlm: 1.4.6(debug@4.4.3)
       chai: 4.5.0
@@ -5707,7 +5707,7 @@ snapshots:
 
   aws-sign2@0.7.0: {}
 
-  aws4-axios@3.4.0(axios@1.13.2):
+  aws4-axios@3.4.0(axios@1.13.2(debug@4.4.3)):
     dependencies:
       '@aws-sdk/client-sts': 3.967.0
       aws4: 1.13.2

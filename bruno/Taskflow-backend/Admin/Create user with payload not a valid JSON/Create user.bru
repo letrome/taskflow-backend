@@ -34,7 +34,7 @@ assert {
   res.status: eq 400
   res.body: isJson
   res.body.status: eq error
-  res.body.message: matches Unexpected token
+  res.body.message: matches Unexpected token '"'|Expected ',' or '}'
 }
 
 script:pre-request {

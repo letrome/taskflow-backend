@@ -1,0 +1,43 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "{{unique_password}}",
+    "first_name": "endt",
+    "last_name": "oend"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body: isJson
+  res.body.email: eq {{unique_email}}
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles: isArray
+  res.body.roles[0]: eq ROLE_USER
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("unique_email", `${uuid}@example.com`);
+  bru.setVar("unique_password", `${uuid}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -108,6 +108,40 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   ```
 - **Response**: Returns the created user object (password hash removed).
 
+### Authentication
+
+- **Register**
+  - **URL**: `/auth/register`
+  - **Method**: `POST`
+  - **Body**:
+    ```json
+    {
+      "email": "user@example.com",
+      "password": "password",
+      "first_name": "John",
+      "last_name": "Doe"
+    }
+    ```
+  - **Response**: `201 Created` with user details.
+
+- **Login**
+  - **URL**: `/auth/login`
+  - **Method**: `POST`
+  - **Body**:
+    ```json
+    {
+      "email": "user@example.com",
+      "password": "password"
+    }
+    ```
+  - **Response**: `200 OK` with JWT token.
+
+- **Get Current User**
+  - **URL**: `/users/me`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with user profile.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

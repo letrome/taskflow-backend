@@ -1,6 +1,6 @@
 import * as adminCtrl from "@src/controllers/admin.js";
 import { createUserSchema } from "@src/controllers/schemas/user.js";
-import basicAuth from "@src/middlewares/auth.js";
+import { basicAuth } from "@src/middlewares/auth.js";
 import { validate } from "@src/middlewares/validate.js";
 import express from "express";
 

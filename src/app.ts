@@ -5,6 +5,8 @@ import { ALLOWED_ORIGINS, PORT } from "./core/config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { metricsMiddleware } from "./middlewares/metrics.js";
 import adminRoutes from "./routes/admin.js";
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
 
 const app: express.Application = express();
 
@@ -20,6 +22,8 @@ app.use(metricsMiddleware);
 app.use(express.json());
 
 app.use("/", adminRoutes);
+app.use("/auth", authRoutes);
+app.use("/", userRoutes);
 
 app.use(errorHandler);
 

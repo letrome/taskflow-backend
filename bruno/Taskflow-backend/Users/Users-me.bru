@@ -1,0 +1,31 @@
+meta {
+  name: Users/me
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseurl}}/users/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.email: eq {{unique_email}}
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles: isArray
+  res.body.roles[0]: eq ROLE_USER
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -6,7 +6,6 @@ import { EXPIRES_IN_SECONDS, JWT_SECRET } from "@src/core/config.js";
 import {
 	ConflictError,
 	InternalServerError,
-	NotFoundError,
 	UnauthorizedError,
 } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
@@ -35,7 +34,7 @@ export const register = async (userData: RegisterSchemaDto): Promise<IUser> => {
 			throw new ConflictError("Email already exists");
 		}
 		logger.error(error, "Error creating user");
-		throw new InternalServerError("Error creating user");
+		throw new InternalServerError("Internal server error");
 	}
 };
 
@@ -60,7 +59,7 @@ export const login = async (
 		});
 		return { token: token, expires_in: `${EXPIRES_IN_SECONDS} seconds` };
 	} catch (error) {
-		if (error instanceof NotFoundError || error instanceof UnauthorizedError) {
+		if (error instanceof UnauthorizedError) {
 			logger.debug(error);
 			throw error;
 		}

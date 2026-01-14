@@ -23,7 +23,7 @@ vi.mock("@src/services/models/user.js", () => {
 	return { default: UserMock, Roles: { ROLE_USER: "ROLE_USER" } };
 });
 
-describe("Admin Service", () => {
+describe("User Service", () => {
 	describe("createUser", () => {
 		const mockUserData = {
 			email: "test@example.com",

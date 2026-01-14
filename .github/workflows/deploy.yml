@@ -52,7 +52,7 @@ jobs:
           host: ${{ env.TARGET_IP }}
           username: github
           key: ${{ env.SSH_PRIVATE_KEY }}
-          envs: BASIC_SECRET, MONGO_URI, IMAGE_NAME, GITHUB_ACTOR
+          envs: BASIC_SECRET, MONGO_URI, IMAGE_NAME, GITHUB_ACTOR, JWT_SECRET, EXPIRES_IN_SECONDS
           script: |
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker pull ghcr.io/$IMAGE_NAME:latest

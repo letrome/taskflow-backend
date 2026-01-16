@@ -1,0 +1,49 @@
+meta {
+  name: Add project member
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/members
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "members": ["{{user_id_b}}", "{{user_id_c}}"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq Project title
+  res.body.description: eq Project description
+  res.body.start_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.end_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.status: eq ACTIVE
+  res.body.created_by: eq {{user_id_a}}
+  res.body.members: isArray
+  res.body.members[0]: eq {{user_id_b}}
+  res.body.members[1]: eq {{user_id_c}}
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

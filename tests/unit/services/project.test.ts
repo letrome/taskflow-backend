@@ -7,14 +7,17 @@ import {
 import Project from "@src/services/models/project.js";
 import { type IUser, Roles } from "@src/services/models/user.js";
 import {
+	addProjectMember,
 	createProject,
 	deleteProject,
 	getProjectForUser,
 	getProjectsForUser,
 	patchProject,
+	removeProjectMember,
 	updateProject,
 } from "@src/services/project.js";
 import { getUser } from "@src/services/user.js";
+import mongoose from "mongoose";
 import { describe, expect, it, vi } from "vitest";
 
 // Mock dependencies
@@ -681,6 +684,255 @@ describe("Project Service", () => {
 			await expect(deleteProject("p1", "user-id")).rejects.toThrow(
 				InternalServerError,
 			);
+		});
+	});
+
+	describe("addProjectMember", () => {
+		it("should add a member to the project", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				members: [],
+				save: vi.fn().mockResolvedValue({
+					_id: "project-id",
+					members: [memberId],
+				}),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue({
+				_id: memberId,
+			} as unknown as IUser);
+
+			const result = await addProjectMember("project-id", user, {
+				members: [memberId],
+			});
+			expect(getUser).toHaveBeenCalledWith(memberId);
+			expect(result.members).toEqual([memberId]);
+			expect(projectMock.members).toContain(memberId);
+			expect(projectMock.save).toHaveBeenCalled();
+		});
+
+		it("should throw NotFoundError if project not found or unauthorized", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+
+			// Mock findOne to return null (project not found)
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(null);
+
+			await expect(
+				addProjectMember("project-id", user, { members: [memberId] }),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw NotFoundError if user is not authorized (not manager/creator)", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "creator-id",
+				members: ["user-id"], // User is a member
+				save: vi.fn(),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+
+			await expect(
+				addProjectMember("project-id", user, { members: [memberId] }),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw NotFoundError if member user does not exist", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "invalid-member-id";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				members: [],
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockRejectedValue(new NotFoundError("User not found"));
+
+			await expect(
+				addProjectMember("project-id", user, { members: [memberId] }),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw InternalServerError on generic error", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+
+			vi.mocked(Project).findOne = vi
+				.fn()
+				.mockRejectedValue(new Error("DB Error"));
+
+			await expect(
+				addProjectMember("project-id", user, { members: [memberId] }),
+			).rejects.toThrow(InternalServerError);
+		});
+	});
+
+	describe("removeProjectMember", () => {
+		it("should remove a member from the project", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				members: [new mongoose.Types.ObjectId(memberId)],
+				save: vi.fn().mockResolvedValue({
+					_id: "project-id",
+					members: [],
+				}),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			// getUser is called for user (requester), already mocked generally or passed?
+			// The mocked getUser in other tests was usually sufficient or specifically mocked.
+			// In removeProjectMember, it calls getProjectForUser first.
+
+			const result = await removeProjectMember("project-id", user, memberId);
+			expect(result.members).toEqual([]);
+			expect(projectMock.save).toHaveBeenCalled();
+		});
+
+		it("should throw NotFoundError if project not found or unauthorized", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(null);
+
+			await expect(
+				removeProjectMember("project-id", user, memberId),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw NotFoundError if member is not in the project", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				members: [], // Empty members
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+
+			await expect(
+				removeProjectMember("project-id", user, memberId),
+			).rejects.toThrow(NotFoundError);
+			await expect(
+				removeProjectMember("project-id", user, memberId),
+			).rejects.toThrow("User not found");
+		});
+
+		it("should throw NotFoundError on CastError (invalid ID)", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "invalid-id";
+
+			// If memberId is invalid, new mongoose.Types.ObjectId(memberId) might throw or it might be handled in service
+			// The service does `new mongoose.Types.ObjectId(member_id)`, which throws BSONError (usually wrapped or treated as such)
+			// But the catch block handles CastError.
+
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				members: [],
+			};
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+
+			// We can trigger CastError by mocking the project code to fail or relying on actual behavior if we weren't mocking everything.
+			// Since we mock, let's look at the catch block in service:
+			// if (error.name === "BSONError") throw NotFoundError("User not found")
+			// if (error.name === "CastError") throw NotFoundError("Project not found")
+
+			// Actually, `new mongoose.Types.ObjectId` throws BSONError if invalid string.
+			// Let's verify what we want to test.
+			// If we pass an invalid ID string, getProjectForUser might fail if project id is invalid.
+			// If member ID is invalid, line `new mongoose.Types.ObjectId(member_id)` throws.
+
+			// Let's rely on the service logic.
+			// The service code catches any error.
+
+			// We can simulate an error thrown by logic inside
+			vi.mocked(Project).findOne = vi
+				.fn()
+				.mockRejectedValue({ name: "CastError" });
+
+			await expect(
+				removeProjectMember("invalid-project-id", user, memberId),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw NotFoundError if user is not authorized (not manager/creator)", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "creator-id",
+				members: ["user-id", memberId], // User is a member
+				save: vi.fn(),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+
+			await expect(
+				removeProjectMember("project-id", user, memberId),
+			).rejects.toThrow(NotFoundError);
+		});
+
+		it("should throw NotFoundError if user is not authorized (not manager/creator)", async () => {
+			const user = {
+				_id: "user-id",
+				roles: [Roles.ROLE_USER],
+			} as unknown as IUser;
+			const memberId = "507f1f77bcf86cd799439011";
+			const projectMock = {
+				_id: "project-id",
+				created_by: "creator-id", // Different from user-id
+				members: ["user-id", memberId], // User is a member
+				save: vi.fn(),
+			};
+
+			// getProjectForUser returns project because user is a member
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+
+			await expect(
+				removeProjectMember("project-id", user, memberId),
+			).rejects.toThrow(NotFoundError);
 		});
 	});
 });

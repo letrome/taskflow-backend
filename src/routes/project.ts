@@ -1,5 +1,6 @@
 import * as projectCtrl from "@src/controllers/project.js";
 import {
+	addProjectMemberSchema,
 	createOrUpdateProjectSchema,
 	patchProjectSchema,
 } from "@src/controllers/schemas/project.js";
@@ -30,5 +31,16 @@ router.patch(
 	projectCtrl.patchProject,
 );
 router.delete("/:id", jwtAuth, projectCtrl.deleteProject);
+router.post(
+	"/:id/members",
+	jwtAuth,
+	validate(addProjectMemberSchema),
+	projectCtrl.addProjectMember,
+);
+router.delete(
+	"/:id/members/:memberId",
+	jwtAuth,
+	projectCtrl.removeProjectMember,
+);
 
 export default router;

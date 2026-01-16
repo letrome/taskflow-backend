@@ -1,4 +1,5 @@
 import type {
+	AddProjectMemberDTO,
 	CreateOrUpdateProjectDTO,
 	PatchProjectDTO,
 } from "@src/controllers/schemas/project.js";
@@ -241,6 +242,59 @@ export const deleteProject = async (
 	}
 };
 
+export const addProjectMember = async (
+	id: string,
+	user: IUser,
+	data: AddProjectMemberDTO,
+): Promise<IProject> => {
+	try {
+		const project = await getProjectForUser(id, user);
+		if (!canUserEditProject(user, project)) {
+			throw new NotFoundError("Project not found");
+		}
+		const projectMembers = await fetchProjectMembers(data.members);
+
+		project.members.push(...projectMembers.map((member) => member._id));
+		return await project.save();
+		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
+	} catch (error: any) {
+		if (error instanceof NotFoundError) {
+			throw error;
+		}
+
+		logger.error(error, "Error adding project member");
+		throw new InternalServerError("Internal server error");
+	}
+};
+
+export const removeProjectMember = async (
+	id: string,
+	user: IUser,
+	member_id: string,
+): Promise<IProject> => {
+	try {
+		const project = await getProjectForUser(id, user);
+		if (!canUserEditProject(user, project)) {
+			throw new NotFoundError("Project not found");
+		}
+		if (!project.members.some((member) => member.toString() === member_id)) {
+			throw new NotFoundError("User not found");
+		}
+		project.members = project.members.filter(
+			(member) => member.toString() !== member_id,
+		);
+		return await project.save();
+		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
+	} catch (error: any) {
+		if (error instanceof NotFoundError) {
+			throw error;
+		}
+
+		logger.error(error, "Error removing project member");
+		throw new InternalServerError("Internal server error");
+	}
+};
+
 const canUserEditProject = (user: IUser, project: IProject) => {
 	return (
 		user.roles.includes(Roles.ROLE_MANAGER) ||
@@ -250,8 +304,9 @@ const canUserEditProject = (user: IUser, project: IProject) => {
 
 const fetchProjectMembers = async (members: string[]) => {
 	if (members && members.length > 0) {
-		await Promise.all(members.map((member_id) => getUser(member_id)));
+		return await Promise.all(members.map((member_id) => getUser(member_id)));
 	}
+	return [];
 };
 
 const isUserIDFormatError = (error: Error) => {

@@ -8,11 +8,21 @@ import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { postUser } from "../helpers/user.js";
 
+interface TestUser {
+	_id: string;
+	id?: string;
+	email: string;
+	password?: string;
+	first_name: string;
+	last_name: string;
+	roles: string[];
+}
+
 describe("Integration Tests Project", () => {
 	let mongoContainer: StartedMongoDBContainer;
 	let token: string;
-	// biome-ignore lint/suspicious/noExplicitAny: Integration tests
-	let user: any;
+	let user: TestUser;
+	let memberUser: TestUser;
 	let createdProjectId: string;
 
 	beforeAll(async () => {
@@ -21,12 +31,15 @@ describe("Integration Tests Project", () => {
 		await mongoose.connect(uri, { directConnection: true });
 
 		// Create user and get token
-		user = await postUser(app);
+		user = (await postUser(app)) as unknown as TestUser;
 		const loginResponse = await request(app).post("/auth/login").send({
 			email: user.email,
 			password: user.password,
 		});
 		token = loginResponse.body.token;
+
+		// Create member user
+		memberUser = (await postUser(app)) as unknown as TestUser;
 	}, 120_000);
 
 	afterAll(async () => {
@@ -118,6 +131,7 @@ describe("Integration Tests Project", () => {
 			expect(project).toBeDefined();
 		});
 	});
+
 	describe("PUT /projects/:id", () => {
 		it("should update project", async () => {
 			const response = await request(app)
@@ -182,6 +196,83 @@ describe("Integration Tests Project", () => {
 		it("should return 404 for deleted project", async () => {
 			const response = await request(app)
 				.get(`/projects/${createdProjectId}`)
+				.set("Authorization", `Bearer ${token}`);
+
+			expect(response.status).toBe(404);
+		});
+	});
+
+	describe("POST /projects/:id/members", () => {
+		it("should add a member to the project", async () => {
+			// Need to recreate project since it was deleted in previous tests
+			const projectResp = await request(app)
+				.post("/projects")
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					title: "New Project",
+					description: "Desc",
+					start_date: new Date(Date.now() + 86400000).toISOString(),
+				});
+			createdProjectId = projectResp.body.id;
+
+			const response = await request(app)
+				.post(`/projects/${createdProjectId}/members`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					members: [memberUser.id],
+				});
+
+			expect(response.status).toBe(200);
+			expect(response.body.members).toContain(memberUser.id);
+		});
+
+		it("should return 404 for invalid project ID", async () => {
+			const fakeId = new mongoose.Types.ObjectId();
+			const response = await request(app)
+				.post(`/projects/${fakeId}/members`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					members: [memberUser.id],
+				});
+
+			expect(response.status).toBe(404);
+		});
+
+		it("should return 400/404 for non-existent member ID", async () => {
+			const fakeUserId = new mongoose.Types.ObjectId();
+			const response = await request(app)
+				.post(`/projects/${createdProjectId}/members`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					members: [fakeUserId.toString()],
+				});
+
+			expect(response.status).toBe(404);
+		});
+	});
+
+	describe("DELETE /projects/:id/members/:memberId", () => {
+		it("should remove a member from the project", async () => {
+			const response = await request(app)
+				.delete(`/projects/${createdProjectId}/members/${memberUser.id}`)
+				.set("Authorization", `Bearer ${token}`);
+
+			expect(response.status).toBe(200);
+			expect(response.body.members).not.toContain(memberUser.id);
+		});
+
+		it("should return 404 for invalid project ID", async () => {
+			const fakeId = new mongoose.Types.ObjectId();
+			const response = await request(app)
+				.delete(`/projects/${fakeId}/members/${memberUser.id}`)
+				.set("Authorization", `Bearer ${token}`);
+
+			expect(response.status).toBe(404);
+		});
+
+		it("should return 404 for member not in project", async () => {
+			const response = await request(app)
+				.delete(`/projects/${createdProjectId}/members/${memberUser.id}`)
 				.set("Authorization", `Bearer ${token}`);
 
 			expect(response.status).toBe(404);

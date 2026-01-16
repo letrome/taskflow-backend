@@ -36,7 +36,7 @@ export const getUser = async (id: string): Promise<IUser> => {
 	try {
 		const user = await User.findById(id);
 		if (!user) {
-			throw new NotFoundError();
+			throw new NotFoundError("User not found");
 		}
 		return user;
 	} catch (error) {

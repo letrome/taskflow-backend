@@ -11,10 +11,10 @@ export const postUser = async (app: Application) => {
 		roles: ["ROLE_USER"],
 	};
 
-	await request(app)
+	const response = await request(app)
 		.post("/admin/users")
 		.set("Authorization", `Basic ${auth}`)
 		.send(user);
 
-	return user;
+	return { ...user, ...response.body };
 };

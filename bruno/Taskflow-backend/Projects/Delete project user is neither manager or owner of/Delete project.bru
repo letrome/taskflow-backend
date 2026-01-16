@@ -1,0 +1,26 @@
+meta {
+  name: Delete project
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseurl}}/projects/{{project_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Project not found
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

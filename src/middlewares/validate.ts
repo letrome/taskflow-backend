@@ -7,6 +7,10 @@ export const validate = (schema: ZodType) => {
 			req.body = schema.parse(req.body);
 			next();
 		} catch (error) {
+			console.error(
+				"Validation Error details:",
+				JSON.stringify(error, null, 2),
+			);
 			next(error);
 		}
 	};

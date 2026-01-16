@@ -44,7 +44,7 @@ describe("Integration Tests Project", () => {
 				.send({
 					title: "Integration Project",
 					description: "Description",
-					start_date: new Date().toISOString(),
+					start_date: new Date(Date.now() + 86400000).toISOString(),
 				});
 
 			expect(response.status).toBe(201);
@@ -116,6 +116,75 @@ describe("Integration Tests Project", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Integration tests
 			const project = response.body.find((p: any) => p.id === createdProjectId);
 			expect(project).toBeDefined();
+		});
+	});
+	describe("PUT /projects/:id", () => {
+		it("should update project", async () => {
+			const response = await request(app)
+				.put(`/projects/${createdProjectId}`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					title: "Updated Title",
+					description: "Updated Description",
+					start_date: new Date(Date.now() + 86400000).toISOString(),
+					status: "ACTIVE",
+					members: [],
+				});
+
+			expect(response.status).toBe(200);
+			expect(response.body.title).toBe("Updated Title");
+			expect(response.body.description).toBe("Updated Description");
+		});
+
+		it("should return 404 for non-existent project", async () => {
+			const fakeId = new mongoose.Types.ObjectId();
+			const response = await request(app)
+				.put(`/projects/${fakeId}`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					title: "Updated Title",
+					description: "Desc",
+					start_date: new Date(Date.now() + 86400000).toISOString(),
+					status: "ACTIVE",
+					members: [],
+				});
+
+			expect(response.status).toBe(404);
+		});
+	});
+
+	describe("PATCH /projects/:id", () => {
+		it("should patch project", async () => {
+			const response = await request(app)
+				.patch(`/projects/${createdProjectId}`)
+				.set("Authorization", `Bearer ${token}`)
+				.send({
+					title: "Patched Title",
+				});
+
+			expect(response.status).toBe(200);
+			expect(response.body.title).toBe("Patched Title");
+			// Description should remain unchanged
+			expect(response.body.description).toBe("Updated Description");
+		});
+	});
+
+	describe("DELETE /projects/:id", () => {
+		it("should delete project", async () => {
+			const response = await request(app)
+				.delete(`/projects/${createdProjectId}`)
+				.set("Authorization", `Bearer ${token}`);
+
+			expect(response.status).toBe(200);
+			expect(response.body.id).toBe(createdProjectId);
+		});
+
+		it("should return 404 for deleted project", async () => {
+			const response = await request(app)
+				.get(`/projects/${createdProjectId}`)
+				.set("Authorization", `Bearer ${token}`);
+
+			expect(response.status).toBe(404);
 		});
 	});
 });

@@ -1,7 +1,10 @@
 import {
 	createProject,
+	deleteProject,
 	getProject,
 	getProjects,
+	patchProject,
+	updateProject,
 } from "@src/controllers/project.js";
 import * as projectService from "@src/services/project.js";
 import * as userService from "@src/services/user.js";
@@ -16,6 +19,7 @@ describe("Project Controller", () => {
 		const res = {} as Response;
 		res.status = vi.fn().mockReturnValue(res);
 		res.json = vi.fn().mockReturnValue(res);
+		res.send = vi.fn().mockReturnValue(res);
 		return res;
 	};
 
@@ -144,6 +148,11 @@ describe("Project Controller", () => {
 			const res = mockResponse();
 
 			const projects = [{ _id: "p1" }, { _id: "p2" }];
+
+			const user = { _id: "user-id" };
+			// biome-ignore lint/suspicious/noExplicitAny: Mock implementation needs access to this
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+
 			vi.mocked(projectService.getProjectsForUser).mockResolvedValue(
 				// biome-ignore lint/suspicious/noExplicitAny: Mock implementation needs access to this
 				projects as any,
@@ -152,7 +161,8 @@ describe("Project Controller", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			await getProjects(req as any, res, mockNext);
 
-			expect(projectService.getProjectsForUser).toHaveBeenCalledWith("user-id");
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.getProjectsForUser).toHaveBeenCalledWith(user);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith(projects);
 		});
@@ -180,6 +190,173 @@ describe("Project Controller", () => {
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			await getProjects(req as any, res, mockNext);
+
+			expect(mockNext).toHaveBeenCalledWith(error);
+		});
+	});
+
+	describe("updateProject", () => {
+		it("should update project and return 200", async () => {
+			const req = {
+				params: { id: "p1" },
+				body: { title: "Updated" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			const user = { _id: "user-id" } as any;
+			vi.mocked(userService.getUser).mockResolvedValue(user);
+			vi.mocked(projectService.updateProject).mockResolvedValue({
+				_id: "p1",
+				title: "Updated",
+				// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			} as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await updateProject(req as any, res, mockNext);
+
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.updateProject).toHaveBeenCalledWith(
+				"p1",
+				user,
+				req.body,
+			);
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalled();
+		});
+
+		it("should throw error if params missing", async () => {
+			const req = {
+				params: {},
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await updateProject(req as any, res, mockNext);
+			expect(mockNext).toHaveBeenCalledWith(
+				new Error("User ID and project_id are required"),
+			);
+		});
+	});
+
+	describe("patchProject", () => {
+		it("should patch project and return 200", async () => {
+			const req = {
+				params: { id: "p1" },
+				body: { title: "Patched" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			const user = { _id: "user-id" } as any;
+			vi.mocked(userService.getUser).mockResolvedValue(user);
+			vi.mocked(projectService.patchProject).mockResolvedValue({
+				_id: "p1",
+				title: "Patched",
+				// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			} as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await patchProject(req as any, res, mockNext);
+
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.patchProject).toHaveBeenCalledWith(
+				"p1",
+				user,
+				req.body,
+			);
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalled();
+		});
+
+		it("should throw error if user ID is missing", async () => {
+			const req = {
+				params: { id: "p1" },
+				body: { title: "Patched" },
+				auth: {},
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await patchProject(req as any, res, mockNext);
+
+			expect(mockNext).toHaveBeenCalledWith(
+				new Error("User ID and project_id are required"),
+			);
+		});
+
+		it("should call next with error if service fails", async () => {
+			const req = {
+				params: { id: "p1" },
+				body: { title: "Patched" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const error = new Error("Service Error");
+			vi.mocked(userService.getUser).mockRejectedValue(error);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await patchProject(req as any, res, mockNext);
+
+			expect(mockNext).toHaveBeenCalledWith(error);
+		});
+	});
+
+	describe("deleteProject", () => {
+		it("should delete project and return 200", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			vi.mocked(projectService.deleteProject).mockResolvedValue({
+				_id: "p1",
+				// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			} as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await deleteProject(req as any, res, mockNext);
+
+			expect(projectService.deleteProject).toHaveBeenCalledWith(
+				"p1",
+				"user-id",
+			);
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalled();
+		});
+
+		it("should throw error if user ID is missing", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: {},
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await deleteProject(req as any, res, mockNext);
+
+			expect(mockNext).toHaveBeenCalledWith(
+				new Error("User ID and project_id are required"),
+			);
+		});
+
+		it("should call next with error if service fails", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const error = new Error("Service Error");
+			vi.mocked(projectService.deleteProject).mockRejectedValue(error);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+			await deleteProject(req as any, res, mockNext);
 
 			expect(mockNext).toHaveBeenCalledWith(error);
 		});

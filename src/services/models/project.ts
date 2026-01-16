@@ -10,7 +10,7 @@ export interface IProject extends mongoose.Document {
 	title: string;
 	description: string;
 	start_date: Date;
-	end_date: Date;
+	end_date?: Date | undefined;
 	status: Status;
 	created_by: mongoose.Types.ObjectId;
 	members: mongoose.Types.ObjectId[];

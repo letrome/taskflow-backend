@@ -1,4 +1,7 @@
-import type { CreateOrUpdateProjectDTO } from "@src/controllers/schemas/project.js";
+import type {
+	AddProjectMemberDTO,
+	CreateOrUpdateProjectDTO,
+} from "@src/controllers/schemas/project.js";
 import * as projectService from "@src/services/project.js";
 import * as userService from "@src/services/user.js";
 import type { NextFunction, Request, Response } from "express";
@@ -126,6 +129,53 @@ export const deleteProject = async (
 			user_id,
 		);
 		res.status(200).json(deletedProject);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const addProjectMember = async (
+	req: Request<{ id: string }, Record<string, never>, AddProjectMemberDTO>,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const project_id = req.params.id;
+		const user_id = req.auth?.userId;
+		if (!user_id || !project_id) {
+			throw new Error("User ID and project_id are required");
+		}
+		const user = await userService.getUser(user_id);
+		const updatedProject = await projectService.addProjectMember(
+			project_id,
+			user,
+			req.body,
+		);
+		res.status(200).json(updatedProject);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const removeProjectMember = async (
+	req: Request<{ id: string; memberId: string }>,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const projectId = req.params.id;
+		const memberId = req.params.memberId;
+		const userId = req.auth?.userId;
+		if (!userId || !projectId) {
+			throw new Error("User ID and project_id are required");
+		}
+		const user = await userService.getUser(userId);
+		const updatedProject = await projectService.removeProjectMember(
+			projectId,
+			user,
+			memberId,
+		);
+		res.status(200).json(updatedProject);
 	} catch (error) {
 		next(error);
 	}

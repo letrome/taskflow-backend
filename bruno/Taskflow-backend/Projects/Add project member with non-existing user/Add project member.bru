@@ -1,0 +1,41 @@
+meta {
+  name: Add project member
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/members
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "members": ["{{user_id_b}}", "696aaff9425a7725925285d3"]
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq User not found
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

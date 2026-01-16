@@ -65,7 +65,13 @@ export const patchProjectSchema = z.object({
 	members: z.array(z.string()).optional(),
 });
 
+export const addProjectMemberSchema = z.object({
+	members: z.array(z.string()).default([]),
+});
+
 export type CreateOrUpdateProjectDTO = z.infer<
 	typeof createOrUpdateProjectSchema
 >;
 export type PatchProjectDTO = z.infer<typeof patchProjectSchema>;
+
+export type AddProjectMemberDTO = z.infer<typeof addProjectMemberSchema>;

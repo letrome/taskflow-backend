@@ -200,6 +200,26 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Auth**: Bearer Token
   - **Response**: `204 No Content`.
 
+### Project Members
+
+- **Add Member**
+  - **URL**: `/projects/:id/members`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "members": ["60d5ecb8b48734356891fd41"]
+    }
+    ```
+  - **Response**: `200 OK` with updated project details.
+
+- **Remove Member**
+  - **URL**: `/projects/:id/members/:memberId`
+  - **Method**: `DELETE`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with updated project details.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

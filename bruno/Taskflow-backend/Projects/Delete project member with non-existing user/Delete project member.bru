@@ -1,0 +1,35 @@
+meta {
+  name: Delete project member
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseurl}}/projects/{{project_id}}/members/invalid
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq User not found
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

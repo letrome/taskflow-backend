@@ -1,9 +1,8 @@
 import * as authController from "@src/controllers/auth.js";
 import * as authService from "@src/services/auth.js";
+import type { Request } from "express";
 import { describe, expect, it, vi } from "vitest";
 import { createMockRequest, createMockResponse } from "../test-utils.js";
-import type { Request } from "express";
-
 
 vi.mock("@src/services/auth.js");
 
@@ -18,9 +17,21 @@ describe("Auth Controller", () => {
 				roles: ["ROLE_USER"],
 			};
 
+			// biome-ignore lint/suspicious/noExplicitAny: Mock implementation needs access to this
 			vi.mocked(authService.register).mockResolvedValue(mockUser as any);
 
-			const request = createMockRequest<Request<Record<string, never>, Record<string, never>, { email: string; password: string; first_name: string; last_name: string }>>({
+			const request = createMockRequest<
+				Request<
+					Record<string, never>,
+					Record<string, never>,
+					{
+						email: string;
+						password: string;
+						first_name: string;
+						last_name: string;
+					}
+				>
+			>({
 				body: {
 					email: "test@example.com",
 					password: "password123",
@@ -42,7 +53,18 @@ describe("Auth Controller", () => {
 			const error = new Error("Registration failed");
 			vi.mocked(authService.register).mockRejectedValue(error);
 
-			const request = createMockRequest<Request<Record<string, never>, Record<string, never>, { email: string; password: string; first_name: string; last_name: string }>>({
+			const request = createMockRequest<
+				Request<
+					Record<string, never>,
+					Record<string, never>,
+					{
+						email: string;
+						password: string;
+						first_name: string;
+						last_name: string;
+					}
+				>
+			>({
 				body: {
 					email: "test@example.com",
 					password: "password123",
@@ -68,7 +90,13 @@ describe("Auth Controller", () => {
 
 			vi.mocked(authService.login).mockResolvedValue(mockLoginInfo);
 
-			const request = createMockRequest<Request<Record<string, never>, Record<string, never>, { email: string; password: string }>>({
+			const request = createMockRequest<
+				Request<
+					Record<string, never>,
+					Record<string, never>,
+					{ email: string; password: string }
+				>
+			>({
 				body: {
 					email: "test@example.com",
 					password: "password123",
@@ -88,7 +116,13 @@ describe("Auth Controller", () => {
 			const error = new Error("Login failed");
 			vi.mocked(authService.login).mockRejectedValue(error);
 
-			const request = createMockRequest<Request<Record<string, never>, Record<string, never>, { email: string; password: string }>>({
+			const request = createMockRequest<
+				Request<
+					Record<string, never>,
+					Record<string, never>,
+					{ email: string; password: string }
+				>
+			>({
 				body: {
 					email: "test@example.com",
 					password: "password123",

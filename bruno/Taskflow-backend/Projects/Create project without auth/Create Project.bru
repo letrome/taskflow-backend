@@ -1,0 +1,42 @@
+meta {
+  name: Create Project
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/projects
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Project title",
+    "description": "Project description",
+    "start_date": "{{start_date}}",
+    "end_date": "{{end_date}}",
+    "status": "ACTIVE",
+    "members": ["{{user_id_b}}"]
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

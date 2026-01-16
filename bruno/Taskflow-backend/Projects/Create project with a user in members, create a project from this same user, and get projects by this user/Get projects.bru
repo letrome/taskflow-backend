@@ -1,0 +1,40 @@
+meta {
+  name: Get projects
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseurl}}/projects
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body[0].title: eq Project title 1
+  res.body[1].title: eq Project title 2
+  res.body[0].description: eq Project description 1
+  res.body[1].description: eq Project description 2
+  res.body[0].start_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body[1].start_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body[0].status: eq ACTIVE
+  res.body[1].status: eq ACTIVE
+  res.body[0].created_by: eq {{user_id_1}}
+  res.body[1].created_by: eq {{user_id_2}}
+  res.body[0].members: isArray
+  res.body[1].members: isArray
+  res.body[0].members[0]: eq {{user_id_2}}
+  res.body[1].members.length: eq 0
+  res.body[0].id: eq {{project_id_1}}
+  res.body[1].id: eq {{project_id_2}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

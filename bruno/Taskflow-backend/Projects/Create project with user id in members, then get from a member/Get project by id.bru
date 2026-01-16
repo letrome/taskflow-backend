@@ -1,0 +1,32 @@
+meta {
+  name: Get project by id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq Project title
+  res.body.description: eq Project description
+  res.body.start_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.status: eq ACTIVE
+  res.body.created_by: eq {{user_id_a}}
+  res.body.members: isArray
+  res.body.members[0]: eq {{user_id_b}}
+  res.body.id: eq {{project_id}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -17,7 +17,6 @@ describe("Integration Tests Auth", () => {
 		await mongoose.connect(uri, { directConnection: true });
 	}, 120_000);
 
-
 	afterAll(async () => {
 		await mongoose.disconnect();
 		if (mongoContainer) {

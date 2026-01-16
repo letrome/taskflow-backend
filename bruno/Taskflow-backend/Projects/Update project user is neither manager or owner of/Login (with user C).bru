@@ -1,0 +1,27 @@
+meta {
+  name: Login (with user C)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email_user_c}}",
+    "password": "{{unique_password_user_c}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("token", res.body.token);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

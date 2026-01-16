@@ -1,0 +1,45 @@
+meta {
+  name: Update Project
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseurl}}/projects/{{project_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Project title",
+    "description": "Project description",
+    "end_date": "{{end_date}}",
+    "status": "ARCHIVED",
+    "members": ["{{user_id_b}}"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.status: eq error
+  res.body.message: eq Start date is required
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

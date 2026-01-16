@@ -28,7 +28,7 @@
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/mongoose-unique-validator": "^1.0.9",
-		"@types/node": "^25.0.8",
+		"@types/node": "^25.0.9",
 		"@types/supertest": "^6.0.3",
 		"@usebruno/cli": "^3.0.2",
 		"@vitest/coverage-v8": "^4.0.17",

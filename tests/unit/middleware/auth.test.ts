@@ -1,8 +1,8 @@
 import { UnauthorizedError } from "@src/core/errors.js";
 import { basicAuth, jwtAuth } from "@src/middlewares/auth.js";
+import jwt from "jsonwebtoken";
 import { describe, expect, it, vi } from "vitest";
 import { createMockRequest, createMockResponse } from "../test-utils.js";
-import jwt from "jsonwebtoken";
 
 vi.mock("jsonwebtoken");
 
@@ -92,7 +92,7 @@ describe("basicAuth", () => {
 });
 
 describe("jwtAuth", () => {
-		it("should add auth object to request when authorization is valid", () => {
+	it("should add auth object to request when authorization is valid", () => {
 		const request = createMockRequest({
 			headers: {
 				authorization: "Bearer test-secret",

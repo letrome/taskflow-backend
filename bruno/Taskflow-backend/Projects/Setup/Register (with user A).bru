@@ -1,0 +1,35 @@
+meta {
+  name: Register (with user A)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email_user_a}}",
+    "password": "{{unique_password_user_a}}",
+    "first_name": "endt",
+    "last_name": "oend"
+  }
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("unique_email_user_a", `${uuid}@example.com`);
+  bru.setVar("unique_password_user_a", `${uuid}`);
+}
+
+script:post-response {
+  bru.setVar("user_id_a", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

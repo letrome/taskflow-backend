@@ -6,6 +6,7 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import { metricsMiddleware } from "./middlewares/metrics.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
+import projectRoutes from "./routes/project.js";
 import userRoutes from "./routes/user.js";
 
 const app: express.Application = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/", userRoutes);
+app.use("/projects", projectRoutes);
 
 app.use(errorHandler);
 

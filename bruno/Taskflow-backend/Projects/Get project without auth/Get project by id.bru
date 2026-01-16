@@ -1,0 +1,27 @@
+meta {
+  name: Get project by id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseurl}}/projects/{{non_existing_project_id}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  const randomId = Math.floor(Math.random() * 1000000);
+  bru.setVar("non_existing_project_id", `${randomId}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

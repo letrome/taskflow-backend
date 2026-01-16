@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2026-01-16
+
+### Added
+
+- Project management endpoints:
+  - `POST /projects`: Create a new project.
+  - `GET /projects`: Retrieve all projects.
+  - `GET /projects/:id`: Retrieve a specific project by ID.
+  - `PUT /projects/:id`: Update an existing project (full replacement).
+  - `PATCH /projects/:id`: Partially update an existing project.
+  - `DELETE /projects/:id`: Delete a project.
+
+### Fixed
+
+- Added missing environment variables in the deploy workflow.
+
+### Changed
+
+- Updated dependencies: `mongoose` (9.1.4), `pino` (10.2.0), `@types/node`.
+
 ## [0.1.6] - 2026-01-14
 
 ### Fixed

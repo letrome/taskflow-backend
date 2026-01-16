@@ -142,6 +142,64 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Auth**: Bearer Token
   - **Response**: `200 OK` with user profile.
 
+### Projects
+
+- **Create Project**
+  - **URL**: `/projects`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "title": "Project Alpha",
+      "description": "A new ambitious project",
+      "start_date": "2026-02-01",
+      "end_date": "2026-12-31",
+      "status": "active",
+      "members": ["60d5ecb8b48734356891fd41"]
+    }
+    ```
+  - **Response**: `201 Created` with project details.
+
+- **Get All Projects**
+  - **URL**: `/projects`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with a list of projects.
+
+- **Get Project by ID**
+  - **URL**: `/projects/:id`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with project details.
+
+- **Update Project**
+  - **URL**: `/projects/:id`
+  - **Method**: `PUT`
+  - **Description**: Fully replaces an existing project.
+  - **Auth**: Bearer Token
+  - **Body**: Same as Create Project.
+  - **Response**: `200 OK` with updated project details.
+
+- **Patch Project**
+  - **URL**: `/projects/:id`
+  - **Method**: `PATCH`
+  - **Description**: Partially updates an existing project.
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "status": "completed"
+    }
+    ```
+  - **Response**: `200 OK` with updated project details.
+
+- **Delete Project**
+  - **URL**: `/projects/:id`
+  - **Method**: `DELETE`
+  - **Auth**: Bearer Token
+  - **Response**: `204 No Content`.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

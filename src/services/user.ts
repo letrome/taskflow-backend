@@ -1,11 +1,7 @@
 import type { CreateUserDTO } from "@src/controllers/schemas/user.js";
-import {
-	ConflictError,
-	InternalServerError,
-	NotFoundError,
-} from "@src/core/errors.js";
+import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
-import { isDuplicateError } from "@src/core/utils.js";
+import { isDatabaseIDFormatError, isDuplicateError } from "@src/core/utils.js";
 import * as bcrypt from "bcrypt";
 import User, { type IUser } from "./models/user.js";
 
@@ -27,8 +23,7 @@ export const createUser = async (userData: CreateUserDTO): Promise<IUser> => {
 			logger.warn(error, "Duplicate email - Conflict");
 			throw new ConflictError("Email already exists");
 		}
-		logger.error(error, "Error creating user");
-		throw new InternalServerError("Error creating user");
+		throw error;
 	}
 };
 
@@ -39,20 +34,12 @@ export const getUser = async (id: string): Promise<IUser> => {
 			throw new NotFoundError("User not found");
 		}
 		return user;
-	} catch (error) {
-		if (error instanceof NotFoundError) {
-			throw error;
-		}
-		// If ID is invalid (CastError), treat as User not found
-		if (
-			error &&
-			typeof error === "object" &&
-			"name" in error &&
-			error.name === "CastError"
-		) {
+		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
+	} catch (error: any) {
+		if (isDatabaseIDFormatError(error)) {
 			throw new NotFoundError("User not found");
 		}
-		logger.error(error, "Error getting user");
-		throw new InternalServerError("Error getting user");
+
+		throw error;
 	}
 };

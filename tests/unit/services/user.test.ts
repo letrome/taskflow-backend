@@ -1,6 +1,5 @@
 import {
 	ConflictError,
-	InternalServerError,
 	NotFoundError,
 } from "@src/core/errors.js";
 import type { IUser } from "@src/services/models/user.js";
@@ -101,9 +100,7 @@ describe("User Service", () => {
 				return mockInstance as unknown as IUser;
 			} as unknown as typeof User);
 
-			await expect(createUser(mockUserData)).rejects.toThrow(
-				InternalServerError,
-			);
+			await expect(createUser(mockUserData)).rejects.toThrow("DB Error");
 		});
 	});
 
@@ -137,7 +134,7 @@ describe("User Service", () => {
 				new Error("DB Connection Failed"),
 			);
 
-			await expect(getUser("user-id")).rejects.toThrow(InternalServerError);
+			await expect(getUser("user-id")).rejects.toThrow("DB Connection Failed");
 		});
 	});
 });

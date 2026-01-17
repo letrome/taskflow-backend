@@ -314,6 +314,10 @@ describe("Project Controller", () => {
 			} as unknown as Request;
 			const res = mockResponse();
 
+			const user = { _id: "user-id" };
+			// biome-ignore lint/suspicious/noExplicitAny: Mock implementation needs access to this
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+
 			vi.mocked(projectService.deleteProject).mockResolvedValue({
 				_id: "p1",
 				// biome-ignore lint/suspicious/noExplicitAny: Unit tests
@@ -322,9 +326,10 @@ describe("Project Controller", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			await deleteProject(req as any, res, mockNext);
 
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.deleteProject).toHaveBeenCalledWith(
 				"p1",
-				"user-id",
+				user,
 			);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalled();

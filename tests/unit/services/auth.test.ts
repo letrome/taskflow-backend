@@ -1,4 +1,4 @@
-import { InternalServerError } from "@src/core/errors.js";
+
 import * as authService from "@src/services/auth.js";
 import User from "@src/services/models/user.js";
 import bcrypt from "bcrypt";
@@ -63,7 +63,7 @@ describe("Auth Service", () => {
 					first_name: "John",
 					last_name: "Doe",
 				}),
-			).rejects.toThrowError("Internal server error");
+			).rejects.toEqual({ code: 10000 });
 		});
 	});
 
@@ -135,7 +135,7 @@ describe("Auth Service", () => {
 					email: "test@example.com",
 					password: "password123",
 				}),
-			).rejects.toThrowError(InternalServerError);
+			).rejects.toThrowError("JWT sign failed");
 		});
 	});
 });

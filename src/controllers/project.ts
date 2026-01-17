@@ -20,6 +20,11 @@ export const createProject = async (
 		if (!user_id) {
 			throw new Error("User ID is required");
 		}
+
+		// Check if user and members exists
+		await userService.getUser(user_id);
+		await fetchProjectMembers(req.body.members);
+
 		const savedProject = await projectService.createProject(req.body, user_id);
 		res.status(201).json(savedProject);
 	} catch (error) {
@@ -101,7 +106,11 @@ export const patchProject = async (
 		if (!user_id || !project_id) {
 			throw new Error("User ID and project_id are required");
 		}
+
+		// Check if user and members exists
 		const user = await userService.getUser(user_id);
+		await fetchProjectMembers(req.body.members);
+
 		const patchedProject = await projectService.patchProject(
 			project_id,
 			user,
@@ -124,10 +133,9 @@ export const deleteProject = async (
 		if (!user_id || !project_id) {
 			throw new Error("User ID and project_id are required");
 		}
-		const deletedProject = await projectService.deleteProject(
-			project_id,
-			user_id,
-		);
+
+		const user = await userService.getUser(user_id);
+		const deletedProject = await projectService.deleteProject(project_id, user);
 		res.status(200).json(deletedProject);
 	} catch (error) {
 		next(error);
@@ -146,10 +154,11 @@ export const addProjectMember = async (
 			throw new Error("User ID and project_id are required");
 		}
 		const user = await userService.getUser(user_id);
+		const projectMembers = await fetchProjectMembers(req.body.members);
 		const updatedProject = await projectService.addProjectMember(
 			project_id,
 			user,
-			req.body,
+			projectMembers,
 		);
 		res.status(200).json(updatedProject);
 	} catch (error) {
@@ -179,4 +188,13 @@ export const removeProjectMember = async (
 	} catch (error) {
 		next(error);
 	}
+};
+
+const fetchProjectMembers = async (members: string[]) => {
+	if (members && members.length > 0) {
+		return await Promise.all(
+			members.map((member_id) => userService.getUser(member_id)),
+		);
+	}
+	return [];
 };

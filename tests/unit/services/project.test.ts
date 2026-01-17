@@ -1,7 +1,5 @@
 import type { CreateOrUpdateProjectDTO } from "@src/controllers/schemas/project.js";
 import {
-	BadRequestError,
-	InternalServerError,
 	NotFoundError,
 } from "@src/core/errors.js";
 import Project from "@src/services/models/project.js";
@@ -36,35 +34,7 @@ vi.mock("@src/services/models/project.js", async (importOriginal) => {
 
 describe("Project Service", () => {
 	describe("createProject", () => {
-		it("should throw BadRequestError when a member does not exist", async () => {
-			// Mock getUser to succeed for creator
-			vi.mocked(getUser).mockResolvedValueOnce({
-				_id: "creator-id",
-			} as unknown as IUser);
-			// Mock getUser to fail for member
-			vi.mocked(getUser).mockRejectedValueOnce(
-				new NotFoundError("User not found"),
-			);
 
-			const projectData = {
-				title: "Test Project",
-				description: "Desc",
-				start_date: new Date(),
-				end_date: new Date(),
-				status: "active",
-				members: ["invalid-member-id"],
-			};
-
-			await expect(
-				createProject(
-					projectData as unknown as CreateOrUpdateProjectDTO,
-					"creator-id",
-				),
-			).rejects.toThrow(BadRequestError);
-
-			// Verify getUser was called for the member
-			expect(getUser).toHaveBeenCalledWith("invalid-member-id");
-		});
 
 		it("should succeed when all users exist", async () => {
 			// Mock getUser to succeed for creator and member
@@ -119,13 +89,7 @@ describe("Project Service", () => {
 					projectData as unknown as CreateOrUpdateProjectDTO,
 					"creator-id",
 				),
-			).rejects.toThrow(BadRequestError);
-			await expect(
-				createProject(
-					projectData as unknown as CreateOrUpdateProjectDTO,
-					"creator-id",
-				),
-			).rejects.toThrow(/Validation Error: Path `title` is required./);
+			).rejects.toEqual(validationError);
 		});
 
 		it("should throw InternalServerError on generic error", async () => {
@@ -150,7 +114,7 @@ describe("Project Service", () => {
 					projectData as unknown as CreateOrUpdateProjectDTO,
 					"creator-id",
 				),
-			).rejects.toThrow(InternalServerError);
+			).rejects.toThrow(genericError);
 		});
 	});
 
@@ -243,7 +207,7 @@ describe("Project Service", () => {
 			vi.mocked(Project).findOne = vi.fn().mockRejectedValue(genericError);
 
 			await expect(getProjectForUser("project-id", user)).rejects.toThrow(
-				InternalServerError,
+				genericError,
 			);
 		});
 	});
@@ -387,35 +351,11 @@ describe("Project Service", () => {
 				user,
 				projectData as unknown as CreateOrUpdateProjectDTO,
 			);
-			expect(getUser).toHaveBeenCalledWith(memberId);
+
 			expect(result.members).toEqual([memberId]);
 		});
 
-		it("should throw BadRequestError if updating with non-existent member", async () => {
-			const user = {
-				_id: "user-id",
-				roles: [Roles.ROLE_USER],
-			} as unknown as IUser;
-			const projectData = { title: "Updated", members: ["invalid-id"] };
 
-			// getUser throws NotFoundError for invalid-id
-			vi.mocked(getUser).mockRejectedValue(new NotFoundError("User not found"));
-
-			await expect(
-				updateProject(
-					"project-id",
-					user,
-					projectData as unknown as CreateOrUpdateProjectDTO,
-				),
-			).rejects.toThrow(BadRequestError);
-			await expect(
-				updateProject(
-					"project-id",
-					user,
-					projectData as unknown as CreateOrUpdateProjectDTO,
-				),
-			).rejects.toThrow("One or more members do not exist");
-		});
 
 		it("should throw BadRequestError on Mongoose validation error during update", async () => {
 			const user = {
@@ -446,14 +386,12 @@ describe("Project Service", () => {
 					user,
 					projectData as unknown as CreateOrUpdateProjectDTO,
 				),
-			).rejects.toThrow(BadRequestError);
-			await expect(
-				updateProject(
-					"project-id",
-					user,
-					projectData as unknown as CreateOrUpdateProjectDTO,
-				),
-			).rejects.toThrow(/Validation Error: Title invalid/);
+			).rejects.toMatchObject({
+					name: "ValidationError",
+					errors: {
+						title: { message: "Title invalid" },
+					},
+			});
 		});
 
 		it("should throw NotFoundError on CastError", async () => {
@@ -509,7 +447,7 @@ describe("Project Service", () => {
 				updateProject("project-id", user, {
 					title: "New",
 				} as unknown as CreateOrUpdateProjectDTO),
-			).rejects.toThrow(InternalServerError);
+			).rejects.toThrow(genericError);
 		});
 	});
 
@@ -568,7 +506,7 @@ describe("Project Service", () => {
 			const result = await patchProject("project-id", user, {
 				members: [memberId],
 			});
-			expect(getUser).toHaveBeenCalledWith(memberId);
+
 			expect(result.members).toEqual([memberId]);
 		});
 
@@ -617,7 +555,7 @@ describe("Project Service", () => {
 			vi.mocked(Project).findById = vi.fn().mockRejectedValue(genericError);
 
 			await expect(patchProject("p1", user, { title: "New" })).rejects.toThrow(
-				InternalServerError,
+				genericError,
 			);
 		});
 	});
@@ -638,7 +576,7 @@ describe("Project Service", () => {
 			vi.mocked(getUser).mockResolvedValue(user);
 			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
 
-			const result = await deleteProject("project-id", "user-id");
+			const result = await deleteProject("project-id", user);
 			expect(result).toEqual(projectMock);
 			expect(deleteOneMock).toHaveBeenCalled();
 		});
@@ -651,7 +589,7 @@ describe("Project Service", () => {
 			vi.mocked(getUser).mockResolvedValue(user);
 			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(null);
 
-			await expect(deleteProject("project-id", "user-id")).rejects.toThrow(
+			await expect(deleteProject("project-id", user)).rejects.toThrow(
 				NotFoundError,
 			);
 		});
@@ -666,7 +604,7 @@ describe("Project Service", () => {
 			const castError = { name: "CastError" };
 			vi.mocked(getUser).mockRejectedValueOnce(castError);
 
-			await expect(deleteProject("p1", "invalid-user-id")).rejects.toThrow(
+			await expect(deleteProject("p1", user)).rejects.toThrow(
 				NotFoundError,
 			);
 		});
@@ -681,8 +619,8 @@ describe("Project Service", () => {
 			const genericError = new Error("Database failure");
 			vi.mocked(Project).findOne = vi.fn().mockRejectedValue(genericError);
 
-			await expect(deleteProject("p1", "user-id")).rejects.toThrow(
-				InternalServerError,
+			await expect(deleteProject("p1", user)).rejects.toThrow(
+				genericError,
 			);
 		});
 	});
@@ -709,10 +647,9 @@ describe("Project Service", () => {
 				_id: memberId,
 			} as unknown as IUser);
 
-			const result = await addProjectMember("project-id", user, {
-				members: [memberId],
-			});
-			expect(getUser).toHaveBeenCalledWith(memberId);
+			const memberUser = { _id: memberId } as unknown as IUser;
+			const result = await addProjectMember("project-id", user, [memberUser]);
+			// expect(getUser).toHaveBeenCalledWith(memberId); // getUser no longer called
 			expect(result.members).toEqual([memberId]);
 			expect(projectMock.members).toContain(memberId);
 			expect(projectMock.save).toHaveBeenCalled();
@@ -728,8 +665,9 @@ describe("Project Service", () => {
 			// Mock findOne to return null (project not found)
 			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(null);
 
+			const memberUser = { _id: memberId } as unknown as IUser;
 			await expect(
-				addProjectMember("project-id", user, { members: [memberId] }),
+				addProjectMember("project-id", user, [memberUser]),
 			).rejects.toThrow(NotFoundError);
 		});
 
@@ -748,30 +686,13 @@ describe("Project Service", () => {
 
 			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
 
+			const memberUser = { _id: memberId } as unknown as IUser;
 			await expect(
-				addProjectMember("project-id", user, { members: [memberId] }),
+				addProjectMember("project-id", user, [memberUser]),
 			).rejects.toThrow(NotFoundError);
 		});
 
-		it("should throw NotFoundError if member user does not exist", async () => {
-			const user = {
-				_id: "user-id",
-				roles: [Roles.ROLE_USER],
-			} as unknown as IUser;
-			const memberId = "invalid-member-id";
-			const projectMock = {
-				_id: "project-id",
-				created_by: "user-id",
-				members: [],
-			};
 
-			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
-			vi.mocked(getUser).mockRejectedValue(new NotFoundError("User not found"));
-
-			await expect(
-				addProjectMember("project-id", user, { members: [memberId] }),
-			).rejects.toThrow(NotFoundError);
-		});
 
 		it("should throw InternalServerError on generic error", async () => {
 			const user = {
@@ -784,9 +705,10 @@ describe("Project Service", () => {
 				.fn()
 				.mockRejectedValue(new Error("DB Error"));
 
+			const memberUser = { _id: memberId } as unknown as IUser;
 			await expect(
-				addProjectMember("project-id", user, { members: [memberId] }),
-			).rejects.toThrow(InternalServerError);
+				addProjectMember("project-id", user, [memberUser]),
+			).rejects.toThrow(new Error("DB Error"));
 		});
 	});
 

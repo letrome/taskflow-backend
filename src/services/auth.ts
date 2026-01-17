@@ -3,11 +3,7 @@ import type {
 	RegisterSchemaDto,
 } from "@src/controllers/schemas/auth.js";
 import { EXPIRES_IN_SECONDS, JWT_SECRET } from "@src/core/config.js";
-import {
-	ConflictError,
-	InternalServerError,
-	UnauthorizedError,
-} from "@src/core/errors.js";
+import { ConflictError, UnauthorizedError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import { isDuplicateError } from "@src/core/utils.js";
 import * as bcrypt from "bcrypt";
@@ -33,8 +29,7 @@ export const register = async (userData: RegisterSchemaDto): Promise<IUser> => {
 			logger.warn(error, "Duplicate email - Conflict");
 			throw new ConflictError("Email already exists");
 		}
-		logger.error(error, "Error creating user");
-		throw new InternalServerError("Internal server error");
+		throw error;
 	}
 };
 
@@ -63,7 +58,6 @@ export const login = async (
 			logger.debug(error);
 			throw error;
 		}
-		logger.error(error);
-		throw new InternalServerError("Internal server error");
+		throw error;
 	}
 };

@@ -106,6 +106,6 @@ jobs:
           SLACK_CHANNEL: taskflow-backend-deploy
           SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "Deploy finished with status: ${{ job.status }}"
-          SLACK_TITLE: Deploy Status
+          SLACK_MESSAGE: "Release finished with status: ${{ job.status }}"
+          SLACK_TITLE: Release Status
           SLACK_USERNAME: GitHub Actions

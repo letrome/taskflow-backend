@@ -2,11 +2,11 @@
 .DS_Store
 sonar-project.properties
 radar.xml
+.infisical.json
+bruno/Taskflow-backend/environments/development.bru
 
 node_modules/
 dist/
 coverage/
 .scannerwork/
 .vscode/
-
-!.env.example

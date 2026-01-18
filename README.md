@@ -9,6 +9,7 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
 - [Node.js](https://nodejs.org/) (Latest LTS version recommended)
 - [pnpm](https://pnpm.io/) (Package manager)
 - [MongoDB](https://www.mongodb.com/) (Database)
+- [Infisical](https://infisical.com/) (Secrets Management)
 
 ### Installation
 
@@ -25,9 +26,20 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
    pnpm install
    ```
 
-3. Create the `.env` file:
+3. Setup Infisical for secrets management:
+
    ```bash
-   cp .env.example .env
+   # Install Infisical
+   brew install infisical/get/infisical
+
+   # Login
+   infisical login
+
+   # Initialize project (select existing project if prompted)
+   infisical init
+
+   # Run the application
+   pnpm run dev
    ```
 
 ## 🛠️ Scripts

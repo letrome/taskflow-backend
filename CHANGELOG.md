@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10] - 2026-01-18
+
+### Changed
+
+- Replaced local `.env` file management with **Infisical** for better secrets security and synchronization.
+- Updated `README.md` with new setup instructions using Infisical CLI.
+
+### Fixed
+
+- Fixed a regression in `deploy` workflow where `docker login` failed due to missing `$GITHUB_ACTOR` context. Now using direct interpolation `${{ github.actor }}`.
+
 ## [0.1.9] - 2026-01-18
 
 ### Added

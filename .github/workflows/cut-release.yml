@@ -21,9 +21,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          # Note: If your main branch is protected, you may need to use a Personal Access Token (PAT)
-          # by uncommenting the line below and adding the secret.
-          # token: ${{ secrets.PAT }}
 
       - name: Configure Git
         run: |

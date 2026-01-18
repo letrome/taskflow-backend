@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2026-01-18
+
+### Added
+
+- Tag management endpoints:
+  - `POST /projects/:id/tags`: Create a new tag for a project.
+  - `GET /projects/:id/tags`: Retrieve all tags for a project.
+  - `PATCH /tags/:id`: Update an existing tag (rename or move to another project).
+  - `DELETE /tags/:id`: Delete a tag.
+
+### Changed
+
+- Updated `vitest.config.ts` to improve CI stability by disabling file parallelism and increasing timeouts.
+
 ## [0.1.8] - 2026-01-16
 
 ### Added

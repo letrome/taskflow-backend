@@ -220,6 +220,45 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Auth**: Bearer Token
   - **Response**: `200 OK` with updated project details.
 
+### Tags
+
+- **Create Project Tag**
+  - **URL**: `/projects/:id/tags`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "name": "Bug"
+    }
+    ```
+  - **Response**: `201 Created` with tag details.
+
+- **Get Project Tags**
+  - **URL**: `/projects/:id/tags`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with list of tags.
+
+- **Patch Tag**
+  - **URL**: `/tags/:id`
+  - **Method**: `PATCH`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "name": "Defect",
+      "project": "60d5ecb8b48734356891fd41"
+    }
+    ```
+  - **Response**: `200 OK` with updated tag details.
+
+- **Delete Tag**
+  - **URL**: `/tags/:id`
+  - **Method**: `DELETE`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with deleted tag details.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

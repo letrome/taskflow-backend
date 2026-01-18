@@ -1,4 +1,3 @@
-
 import * as authService from "@src/services/auth.js";
 import User from "@src/services/models/user.js";
 import bcrypt from "bcrypt";

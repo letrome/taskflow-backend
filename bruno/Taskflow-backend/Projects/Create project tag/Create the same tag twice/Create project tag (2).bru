@@ -1,0 +1,32 @@
+meta {
+  name: Create project tag (2)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tags
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Tag1"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body.status: eq error
+  res.body.message: eq Tag name already exists for this project
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

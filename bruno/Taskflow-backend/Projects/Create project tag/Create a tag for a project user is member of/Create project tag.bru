@@ -1,0 +1,33 @@
+meta {
+  name: Create project tag
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tags
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Tag1"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.name: eq Tag1
+  res.body.project: eq {{project_id}}
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

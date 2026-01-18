@@ -7,6 +7,7 @@ import { metricsMiddleware } from "./middlewares/metrics.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
+import tagRoutes from "./routes/tag.js";
 import userRoutes from "./routes/user.js";
 
 const app: express.Application = express();
@@ -26,6 +27,7 @@ app.use("/", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/", userRoutes);
 app.use("/projects", projectRoutes);
+app.use("/tags", tagRoutes);
 
 app.use(errorHandler);
 

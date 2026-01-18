@@ -29,16 +29,15 @@ export const createProject = async (
 export const getProjectForUser = async (
 	id: string,
 	user: IUser,
+	includeMembers: boolean = true,
 ): Promise<IProject> => {
 	try {
-		const user_id = user._id.toString();
-
-		const project = user.roles.includes(Roles.ROLE_MANAGER)
-			? await Project.findById(id)
-			: await Project.findOne({
-					_id: id,
-					$or: [{ created_by: user_id }, { members: user_id }],
-				});
+		const project = await buildGetProjectQuery(
+			id,
+			user._id.toString(),
+			user.roles,
+			includeMembers,
+		);
 
 		if (!project) {
 			throw new NotFoundError("Project not found");
@@ -186,4 +185,27 @@ const canUserEditProject = (user: IUser, project: IProject) => {
 		user.roles.includes(Roles.ROLE_MANAGER) ||
 		project.created_by.toString() === user._id.toString()
 	);
+};
+
+const buildGetProjectQuery = async (
+	project_id: string,
+	user_id: string,
+	roles: string[],
+	includeMembers: boolean = true,
+) => {
+	if (roles.includes(Roles.ROLE_MANAGER)) {
+		return await Project.findById(project_id);
+	}
+
+	if (includeMembers) {
+		return await Project.findOne({
+			_id: project_id,
+			$or: [{ created_by: user_id }, { members: user_id }],
+		});
+	}
+
+	return await Project.findOne({
+		_id: project_id,
+		created_by: user_id,
+	});
 };

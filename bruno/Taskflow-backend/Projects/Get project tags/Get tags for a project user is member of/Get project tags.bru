@@ -1,0 +1,32 @@
+meta {
+  name: Get project tags
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tags
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].name: eq Tag1
+  res.body[0].project: eq {{project_id}}
+  res.body[0].id: eq {{tag_id}}
+}
+
+script:pre-request {
+  bru.setVar("invalid_project_id", "invalid")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

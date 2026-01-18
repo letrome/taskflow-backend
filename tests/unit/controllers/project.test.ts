@@ -1,18 +1,22 @@
 import {
 	createProject,
+	createProjectTag,
 	deleteProject,
 	getProject,
 	getProjects,
+	getProjectTags,
 	patchProject,
 	updateProject,
 } from "@src/controllers/project.js";
 import * as projectService from "@src/services/project.js";
+import * as tagService from "@src/services/tag.js";
 import * as userService from "@src/services/user.js";
 import type { Request, Response } from "express";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@src/services/project.js");
 vi.mock("@src/services/user.js");
+vi.mock("@src/services/tag.js");
 
 describe("Project Controller", () => {
 	const mockResponse = () => {
@@ -327,10 +331,7 @@ describe("Project Controller", () => {
 			await deleteProject(req as any, res, mockNext);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
-			expect(projectService.deleteProject).toHaveBeenCalledWith(
-				"p1",
-				user,
-			);
+			expect(projectService.deleteProject).toHaveBeenCalledWith("p1", user);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalled();
 		});
@@ -363,6 +364,114 @@ describe("Project Controller", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			await deleteProject(req as any, res, mockNext);
 
+			expect(mockNext).toHaveBeenCalledWith(error);
+		});
+	});
+
+	describe("createProjectTag", () => {
+		it("should create a tag and return 201", async () => {
+			const req = {
+				params: { id: "p1" },
+				body: { name: "Bug" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const user = { _id: "user-id" };
+			const tag = { _id: "t1", name: "Bug" };
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+			vi.mocked(projectService.getProjectForUser).mockResolvedValue({
+				_id: "p1",
+				// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			} as any);
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(tagService.createTag).mockResolvedValue(tag as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await createProjectTag(req as any, res, mockNext);
+
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.getProjectForUser).toHaveBeenCalledWith("p1", user);
+			expect(tagService.createTag).toHaveBeenCalledWith(req.body, "p1");
+			expect(res.status).toHaveBeenCalledWith(201);
+			expect(res.json).toHaveBeenCalledWith(tag);
+		});
+
+		it("should throw error if user/project ID is missing", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: {},
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await createProjectTag(req as any, res, mockNext);
+			expect(mockNext).toHaveBeenCalledWith(
+				new Error("User ID and project_id are required"),
+			);
+		});
+
+		it("should call next with error if service fails", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const error = new Error("Service Error");
+			vi.mocked(userService.getUser).mockRejectedValue(error);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await createProjectTag(req as any, res, mockNext);
+			expect(mockNext).toHaveBeenCalledWith(error);
+		});
+	});
+
+	describe("getProjectTags", () => {
+		it("should return tags and 200", async () => {
+			const req = {
+				params: { id: "p1" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const tags = [{ _id: "t1" }];
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(tagService.getTagsForProject).mockResolvedValue(tags as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await getProjectTags(req as any, res, mockNext);
+
+			expect(tagService.getTagsForProject).toHaveBeenCalledWith("p1");
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith(tags);
+		});
+
+		it("should throw error if project ID is missing", async () => {
+			const req = {
+				params: {},
+			} as unknown as Request;
+			const res = mockResponse();
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await getProjectTags(req as any, res, mockNext);
+			expect(mockNext).toHaveBeenCalledWith(
+				new Error("Project ID is required"),
+			);
+		});
+
+		it("should call next with error if service fails", async () => {
+			const req = {
+				params: { id: "p1" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const error = new Error("Service Error");
+			vi.mocked(tagService.getTagsForProject).mockRejectedValue(error);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await getProjectTags(req as any, res, mockNext);
 			expect(mockNext).toHaveBeenCalledWith(error);
 		});
 	});

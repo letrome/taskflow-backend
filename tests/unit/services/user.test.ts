@@ -1,7 +1,4 @@
-import {
-	ConflictError,
-	NotFoundError,
-} from "@src/core/errors.js";
+import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import type { IUser } from "@src/services/models/user.js";
 import User, { Roles } from "@src/services/models/user.js";
 import { createUser, getUser } from "@src/services/user.js";

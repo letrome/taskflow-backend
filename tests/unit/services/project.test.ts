@@ -1,7 +1,5 @@
 import type { CreateOrUpdateProjectDTO } from "@src/controllers/schemas/project.js";
-import {
-	NotFoundError,
-} from "@src/core/errors.js";
+import { NotFoundError } from "@src/core/errors.js";
 import Project from "@src/services/models/project.js";
 import { type IUser, Roles } from "@src/services/models/user.js";
 import {
@@ -34,8 +32,6 @@ vi.mock("@src/services/models/project.js", async (importOriginal) => {
 
 describe("Project Service", () => {
 	describe("createProject", () => {
-
-
 		it("should succeed when all users exist", async () => {
 			// Mock getUser to succeed for creator and member
 			vi.mocked(getUser).mockResolvedValue({
@@ -355,8 +351,6 @@ describe("Project Service", () => {
 			expect(result.members).toEqual([memberId]);
 		});
 
-
-
 		it("should throw BadRequestError on Mongoose validation error during update", async () => {
 			const user = {
 				_id: "user-id",
@@ -387,10 +381,10 @@ describe("Project Service", () => {
 					projectData as unknown as CreateOrUpdateProjectDTO,
 				),
 			).rejects.toMatchObject({
-					name: "ValidationError",
-					errors: {
-						title: { message: "Title invalid" },
-					},
+				name: "ValidationError",
+				errors: {
+					title: { message: "Title invalid" },
+				},
 			});
 		});
 
@@ -604,9 +598,7 @@ describe("Project Service", () => {
 			const castError = { name: "CastError" };
 			vi.mocked(getUser).mockRejectedValueOnce(castError);
 
-			await expect(deleteProject("p1", user)).rejects.toThrow(
-				NotFoundError,
-			);
+			await expect(deleteProject("p1", user)).rejects.toThrow(NotFoundError);
 		});
 
 		it("should throw InternalServerError on generic error", async () => {
@@ -619,9 +611,7 @@ describe("Project Service", () => {
 			const genericError = new Error("Database failure");
 			vi.mocked(Project).findOne = vi.fn().mockRejectedValue(genericError);
 
-			await expect(deleteProject("p1", user)).rejects.toThrow(
-				genericError,
-			);
+			await expect(deleteProject("p1", user)).rejects.toThrow(genericError);
 		});
 	});
 
@@ -691,8 +681,6 @@ describe("Project Service", () => {
 				addProjectMember("project-id", user, [memberUser]),
 			).rejects.toThrow(NotFoundError);
 		});
-
-
 
 		it("should throw InternalServerError on generic error", async () => {
 			const user = {

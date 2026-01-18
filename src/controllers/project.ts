@@ -3,8 +3,10 @@ import type {
 	CreateOrUpdateProjectDTO,
 } from "@src/controllers/schemas/project.js";
 import * as projectService from "@src/services/project.js";
+import * as tagService from "@src/services/tag.js";
 import * as userService from "@src/services/user.js";
 import type { NextFunction, Request, Response } from "express";
+import type { CreateTagDTO } from "./schemas/tag.js";
 
 export const createProject = async (
 	req: Request<
@@ -197,4 +199,45 @@ const fetchProjectMembers = async (members: string[]) => {
 		);
 	}
 	return [];
+};
+
+export const createProjectTag = async (
+	req: Request<{ id: string }, Record<string, never>, CreateTagDTO>,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const project_id = req.params.id;
+		const user_id = req.auth?.userId;
+		if (!user_id || !project_id) {
+			throw new Error("User ID and project_id are required");
+		}
+
+		// Check if user has the right to create a tag (must be creator, member or manager)
+		const user = await userService.getUser(user_id);
+		await projectService.getProjectForUser(project_id, user);
+
+		const createdTag = await tagService.createTag(req.body, project_id);
+		res.status(201).json(createdTag);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getProjectTags = async (
+	req: Request<{ id: string }>,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const project_id = req.params.id;
+		if (!project_id) {
+			throw new Error("Project ID is required");
+		}
+
+		const tags = await tagService.getTagsForProject(project_id);
+		res.status(200).json(tags);
+	} catch (error) {
+		next(error);
+	}
 };

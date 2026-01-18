@@ -1,0 +1,31 @@
+meta {
+  name: Create project tag
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tags
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.status: eq error
+  res.body.message: eq Name is required
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

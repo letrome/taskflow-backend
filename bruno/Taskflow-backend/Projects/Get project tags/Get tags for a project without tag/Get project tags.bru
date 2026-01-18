@@ -1,0 +1,26 @@
+meta {
+  name: Get project tags
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tags
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body.length: eq 0
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

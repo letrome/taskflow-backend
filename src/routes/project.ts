@@ -4,6 +4,9 @@ import {
 	createOrUpdateProjectSchema,
 	patchProjectSchema,
 } from "@src/controllers/schemas/project.js";
+
+import { createTagSchema } from "@src/controllers/schemas/tag.js";
+
 import { jwtAuth } from "@src/middlewares/auth.js";
 import { validate } from "@src/middlewares/validate.js";
 import express from "express";
@@ -42,5 +45,14 @@ router.delete(
 	jwtAuth,
 	projectCtrl.removeProjectMember,
 );
+
+router.post(
+	"/:id/tags",
+	jwtAuth,
+	validate(createTagSchema),
+	projectCtrl.createProjectTag,
+);
+
+router.get("/:id/tags", jwtAuth, projectCtrl.getProjectTags);
 
 export default router;

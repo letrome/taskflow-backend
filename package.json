@@ -5,7 +5,7 @@
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/index.ts",
+		"dev": "infisical run --env=dev tsx watch src/index.ts",
 		"test": "vitest run && pnpm run test:e2e",
 		"test:coverage": "vitest run --coverage",
 		"test:unit": "vitest tests/unit",

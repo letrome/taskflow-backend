@@ -83,8 +83,7 @@ describe("createUser", () => {
 		});
 		const response = createMockResponse();
 
-		const next = vi.fn();
-		await createUser(request, response, next);
+		await createUser(request, response);
 
 		expect(response.status).toHaveBeenCalledWith(201);
 		expect(response.json).toHaveBeenCalledWith(
@@ -110,17 +109,13 @@ describe("createUser", () => {
 				roles: [Roles.ROLE_USER],
 			},
 		});
-		const response = createMockResponse();
-		const next = vi.fn();
-
-		// Update service mock to throw error that will be caught
-		vi.mocked(adminService.createUser).mockRejectedValueOnce(
+		vi.mocked(adminService.createUser).mockRejectedValue(
 			new Error("email is empty"),
 		);
-
-		await createUser(request, response, next);
-
-		expect(next).toHaveBeenCalledWith(expect.any(Error));
+		const response = createMockResponse();
+		await expect(createUser(request, response)).rejects.toThrow(
+			"email is empty",
+		);
 	});
 });
 
@@ -142,8 +137,7 @@ describe("getUser", () => {
 
 		const response = createMockResponse();
 
-		const next = vi.fn();
-		await getUser(request, response, next);
+		await getUser(request, response);
 
 		expect(response.status).toHaveBeenCalledWith(200);
 		expect(response.json).toHaveBeenCalledWith(
@@ -168,9 +162,6 @@ describe("getUser", () => {
 
 		const response = createMockResponse();
 
-		const next = vi.fn();
-		await getUser(request, response, next);
-
-		expect(next).toHaveBeenCalledWith(expect.any(Error));
+		await expect(getUser(request, response)).rejects.toThrow("not found");
 	});
 });

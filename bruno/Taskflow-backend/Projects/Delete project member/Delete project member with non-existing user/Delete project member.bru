@@ -17,7 +17,7 @@ auth:bearer {
 assert {
   res.status: eq 404
   res.body.status: eq error
-  res.body.message: eq User not found
+  res.body.message: eq Member not found
 }
 
 script:pre-request {

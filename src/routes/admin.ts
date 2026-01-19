@@ -1,7 +1,10 @@
 import * as adminCtrl from "@src/controllers/admin.js";
-import { createUserSchema } from "@src/controllers/schemas/user.js";
+import {
+	createUserSchema,
+	userIdSchema,
+} from "@src/controllers/schemas/user.js";
 import { basicAuth } from "@src/middlewares/auth.js";
-import { validate } from "@src/middlewares/validate.js";
+import { validate, validateParams } from "@src/middlewares/validate.js";
 import express from "express";
 
 const router: express.Router = express.Router();
@@ -15,6 +18,11 @@ router.post(
 	validate(createUserSchema),
 	adminCtrl.createUser,
 );
-router.get("/admin/users/:id", basicAuth, adminCtrl.getUser);
+router.get(
+	"/admin/users/:id",
+	basicAuth,
+	validateParams(userIdSchema),
+	adminCtrl.getUser,
+);
 
 export default router;

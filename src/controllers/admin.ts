@@ -31,26 +31,16 @@ export const createUser = async (
 		CreateUserDTO
 	>,
 	res: express.Response,
-	next: express.NextFunction,
 ) => {
-	try {
-		const savedUser = await adminService.createUser(req.body);
-		res.status(201).json(savedUser);
-	} catch (error) {
-		next(error);
-	}
+	const savedUser = await adminService.createUser(req.body);
+	res.status(201).json(savedUser);
 };
 
 export const getUser = async (
 	req: express.Request<{ id: string }>,
 	res: express.Response,
-	next: express.NextFunction,
 ) => {
-	try {
-		const id: string = req.params.id;
-		const user = await adminService.getUser(id);
-		res.status(200).json(user);
-	} catch (error) {
-		next(error);
-	}
+	const id: string = req.params.id;
+	const user = await adminService.getUser(id);
+	res.status(200).json(user);
 };

@@ -1,19 +1,12 @@
 import * as userService from "@src/services/user.js";
-import type { NextFunction, Request, Response } from "express";
+import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
+import type { Response } from "express";
 
 export const getUser = async (
-	req: Request<{ id: string }>,
+	req: AuthenticatedRequest<{ id: string }>,
 	res: Response,
-	next: NextFunction,
 ) => {
-	try {
-		const id = req.params.id ?? req.auth?.userId;
-		if (!id) {
-			throw new Error("User ID is required");
-		}
-		const user = await userService.getUser(id);
-		res.status(200).json(user);
-	} catch (error) {
-		next(error);
-	}
+	const id = req.auth.userId;
+	const user = await userService.getUser(id);
+	res.status(200).json(user);
 };

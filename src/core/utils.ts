@@ -52,12 +52,3 @@ export const isDuplicateError = (error: unknown): boolean => {
 	}
 	return false;
 };
-
-export const isDatabaseIDFormatError = (error: Error) => {
-	return (
-		error &&
-		typeof error === "object" &&
-		"name" in error &&
-		error.name === "CastError"
-	);
-};

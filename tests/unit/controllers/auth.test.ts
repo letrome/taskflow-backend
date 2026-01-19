@@ -40,9 +40,7 @@ describe("Auth Controller", () => {
 				},
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
-
-			await authController.register(request, response, next);
+			await authController.register(request, response);
 
 			expect(authService.register).toHaveBeenCalledWith(request.body);
 			expect(response.status).toHaveBeenCalledWith(201);
@@ -73,11 +71,9 @@ describe("Auth Controller", () => {
 				},
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
-
-			await authController.register(request, response, next);
-
-			expect(next).toHaveBeenCalledWith(error);
+			await expect(authController.register(request, response)).rejects.toThrow(
+				error,
+			);
 		});
 	});
 
@@ -103,9 +99,7 @@ describe("Auth Controller", () => {
 				},
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
-
-			await authController.login(request, response, next);
+			await authController.login(request, response);
 
 			expect(authService.login).toHaveBeenCalledWith(request.body);
 			expect(response.status).toHaveBeenCalledWith(200);
@@ -129,11 +123,9 @@ describe("Auth Controller", () => {
 				},
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
-
-			await authController.login(request, response, next);
-
-			expect(next).toHaveBeenCalledWith(error);
+			await expect(authController.login(request, response)).rejects.toThrow(
+				error,
+			);
 		});
 	});
 });

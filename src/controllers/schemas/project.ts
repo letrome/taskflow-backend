@@ -1,5 +1,6 @@
 import { Status } from "@src/services/models/project.js";
 import z from "zod";
+import { createIdParamSchema } from "./common.js";
 
 const transformToDate =
 	(fieldName: string) => (str: string | undefined, ctx: z.RefinementCtx) => {
@@ -33,7 +34,7 @@ export const createOrUpdateProjectSchema = z.object({
 		.transform(transformToDate("End date"))
 		.pipe(futureDateSchema("End date").optional()),
 	status: z.enum(Status).default(Status.ACTIVE),
-	members: z.array(z.string()).default([]),
+	members: z.array(z.string("Member does not exist")).default([]),
 });
 
 export const patchProjectSchema = z.object({
@@ -62,11 +63,11 @@ export const patchProjectSchema = z.object({
 		.refine((val) => val !== "", { message: "Status is required" })
 		.pipe(z.enum(Status))
 		.optional(),
-	members: z.array(z.string()).optional(),
+	members: z.array(z.string("Member does not exist")).optional(),
 });
 
 export const addProjectMemberSchema = z.object({
-	members: z.array(z.string()).default([]),
+	members: z.array(z.string("Member does not exist")).default([]),
 });
 
 export type CreateOrUpdateProjectDTO = z.infer<
@@ -75,3 +76,9 @@ export type CreateOrUpdateProjectDTO = z.infer<
 export type PatchProjectDTO = z.infer<typeof patchProjectSchema>;
 
 export type AddProjectMemberDTO = z.infer<typeof addProjectMemberSchema>;
+
+export const projectIdSchema = createIdParamSchema("Project not found");
+export const memberIdSchema = createIdParamSchema(
+	"Member not found",
+	"memberId",
+);

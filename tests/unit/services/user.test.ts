@@ -119,13 +119,6 @@ describe("User Service", () => {
 			await expect(getUser("non-existent-id")).rejects.toThrow(NotFoundError);
 		});
 
-		it("should throw NotFoundError on CastError (invalid ID)", async () => {
-			const castError = { name: "CastError" };
-			vi.mocked(User.findById).mockRejectedValue(castError);
-
-			await expect(getUser("invalid-id")).rejects.toThrow(NotFoundError);
-		});
-
 		it("should throw InternalServerError on generic DB error", async () => {
 			vi.mocked(User.findById).mockRejectedValue(
 				new Error("DB Connection Failed"),

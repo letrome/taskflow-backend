@@ -4,7 +4,7 @@ import type {
 } from "@src/controllers/schemas/tag.js";
 import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
-import { isDatabaseIDFormatError, isDuplicateError } from "@src/core/utils.js";
+import { isDuplicateError } from "@src/core/utils.js";
 import Tag, { type ITag } from "@src/services/models/tag.js";
 import mongoose from "mongoose";
 
@@ -30,34 +30,15 @@ export const createTag = async (
 };
 
 export const getTag = async (tagId: string): Promise<ITag> => {
-	try {
-		const tag = await Tag.findById(tagId);
-		if (!tag) {
-			throw new NotFoundError("Tag not found");
-		}
-		return tag;
-
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Tag not found");
-		}
-
-		throw error;
+	const tag = await Tag.findById(tagId);
+	if (!tag) {
+		throw new NotFoundError("Tag not found");
 	}
+	return tag;
 };
 
 export const getTagsForProject = async (projectId: string): Promise<ITag[]> => {
-	try {
-		return await Tag.find({ project: projectId });
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Project not found");
-		}
-
-		throw error;
-	}
+	return await Tag.find({ project: projectId });
 };
 
 export const patchTag = async (
@@ -76,12 +57,7 @@ export const patchTag = async (
 			throw new NotFoundError("Tag not found");
 		}
 		return updatedTag;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Tag not found");
-		}
-
+	} catch (error) {
 		if (isDuplicateError(error)) {
 			logger.warn(error, "Duplicate tag name x project - Conflict");
 			throw new ConflictError("Tag name already exists for this project");
@@ -92,18 +68,9 @@ export const patchTag = async (
 };
 
 export const deleteTag = async (tagId: string): Promise<ITag> => {
-	try {
-		const tag = await Tag.findByIdAndDelete(tagId);
-		if (!tag) {
-			throw new NotFoundError("Tag not found");
-		}
-		return tag;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Tag not found");
-		}
-
-		throw error;
+	const tag = await Tag.findByIdAndDelete(tagId);
+	if (!tag) {
+		throw new NotFoundError("Tag not found");
 	}
+	return tag;
 };

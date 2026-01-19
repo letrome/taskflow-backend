@@ -2,28 +2,44 @@ import type {
 	CreateOrUpdateProjectDTO,
 	PatchProjectDTO,
 } from "@src/controllers/schemas/project.js";
-import { NotFoundError } from "@src/core/errors.js";
-import { isDatabaseIDFormatError } from "@src/core/utils.js";
+import { BadRequestError, NotFoundError } from "@src/core/errors.js";
+import logger from "@src/core/logger.js";
 import mongoose from "mongoose";
-import Project, { type IProject } from "./models/project.js";
+import Project, {
+	type IProject,
+	isCreatorDoesNotExistError,
+	isMemberDoesNotExistError,
+} from "./models/project.js";
 import { type IUser, Roles } from "./models/user.js";
 
 export const createProject = async (
 	projectData: CreateOrUpdateProjectDTO,
 	user_id: string,
 ): Promise<IProject> => {
-	const project = new Project({
-		title: projectData.title,
-		description: projectData.description,
-		start_date: projectData.start_date,
-		end_date: projectData.end_date,
-		status: projectData.status,
-		created_by: user_id,
-		members: projectData.members,
-	});
+	try {
+		const project = new Project({
+			title: projectData.title,
+			description: projectData.description,
+			start_date: projectData.start_date,
+			end_date: projectData.end_date,
+			status: projectData.status,
+			created_by: user_id,
+			members: projectData.members,
+		});
 
-	const savedProject = await project.save();
-	return savedProject;
+		const savedProject = await project.save();
+		return savedProject;
+	} catch (error: unknown) {
+		if (isMemberDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Member does not exist");
+		}
+		if (isCreatorDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Creator does not exist");
+		}
+		throw error;
+	}
 };
 
 export const getProjectForUser = async (
@@ -31,27 +47,13 @@ export const getProjectForUser = async (
 	user: IUser,
 	includeMembers: boolean = true,
 ): Promise<IProject> => {
-	try {
-		const project = await buildGetProjectQuery(
-			id,
-			user._id.toString(),
-			user.roles,
-			includeMembers,
-		);
+	const project = await getProject(id, user._id, user.roles, includeMembers);
 
-		if (!project) {
-			throw new NotFoundError("Project not found");
-		}
-
-		return project;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Project not found");
-		}
-
-		throw error;
+	if (!project) {
+		throw new NotFoundError("Project not found");
 	}
+
+	return project;
 };
 
 export const getProjectsForUser = async (user: IUser): Promise<IProject[]> => {
@@ -68,30 +70,29 @@ export const updateProject = async (
 	projectData: CreateOrUpdateProjectDTO,
 ): Promise<IProject> => {
 	try {
-		const oldProject: IProject | null = await Project.findById(id);
-		if (!oldProject || !canUserEditProject(user, oldProject)) {
-			throw new NotFoundError("Project not found");
-		}
+		const includeMembers = false;
+		const project = await getProjectForUser(id, user, includeMembers);
 
-		oldProject.title = projectData.title;
-		oldProject.description = projectData.description;
-		oldProject.start_date = projectData.start_date;
+		project.title = projectData.title;
+		project.description = projectData.description;
+		project.start_date = projectData.start_date;
 		if (projectData.end_date) {
-			oldProject.end_date = projectData.end_date;
+			project.end_date = projectData.end_date;
 		} else {
-			oldProject.end_date = undefined;
+			project.end_date = undefined;
 		}
-		oldProject.status = projectData.status;
-		oldProject.members = projectData.members.map(
+		project.status = projectData.status;
+
+		const uniqueMembers = [...new Set(projectData.members)];
+		project.members = uniqueMembers.map(
 			(id) => new mongoose.Types.ObjectId(id),
 		);
 
-		const updatedProject = await oldProject.save();
-		return updatedProject;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Project not found");
+		return await project.save();
+	} catch (error) {
+		if (isMemberDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Member does not exist");
 		}
 		throw error;
 	}
@@ -103,29 +104,27 @@ export const patchProject = async (
 	projectData: PatchProjectDTO,
 ): Promise<IProject> => {
 	try {
-		const project = await Project.findById(id);
-		if (
-			!project ||
-			(!user.roles.includes(Roles.ROLE_MANAGER) &&
-				project.created_by.toString() !== user._id.toString())
-		) {
-			throw new NotFoundError("Project not found");
-		}
+		const includeMembers = false;
+		const project = await getProjectForUser(id, user, includeMembers);
 
 		project.title = projectData.title ?? project.title;
 		project.description = projectData.description ?? project.description;
 		project.start_date = projectData.start_date ?? project.start_date;
 		project.end_date = projectData.end_date ?? project.end_date;
 		project.status = projectData.status ?? project.status;
-		project.members = projectData.members
-			? projectData.members.map((id) => new mongoose.Types.ObjectId(id))
-			: project.members;
+
+		if (projectData.members) {
+			const uniqueMembers = [...new Set(projectData.members)];
+			project.members = uniqueMembers.map(
+				(id) => new mongoose.Types.ObjectId(id),
+			);
+		}
 
 		return await project.save();
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Project not found");
+	} catch (error) {
+		if (isMemberDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Member does not exist");
 		}
 		throw error;
 	}
@@ -135,76 +134,80 @@ export const deleteProject = async (
 	id: string,
 	user: IUser,
 ): Promise<IProject> => {
-	try {
-		const project = await getProjectForUser(id, user);
-		await project.deleteOne();
-		return project;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("Project not found");
-		}
-		throw error;
-	}
+	const includeMembers = false;
+	const project = await getProjectForUser(id, user, includeMembers);
+	await project.deleteOne();
+	return project;
 };
 
 export const addProjectMember = async (
 	id: string,
 	user: IUser,
-	projectMembers: IUser[],
-): Promise<IProject> => {
-	const project = await getProjectForUser(id, user);
-	if (!canUserEditProject(user, project)) {
-		throw new NotFoundError("Project not found");
-	}
+	projectMembers: string[],
+): Promise<string[]> => {
+	try {
+		const includeMembers = false;
+		const project = await getProjectForUser(id, user, includeMembers);
+		if (!project) {
+			throw new NotFoundError("Project not found");
+		}
 
-	project.members.push(...projectMembers.map((member) => member._id));
-	return await project.save();
+		const existingMembersSet = new Set(
+			project.members.map((m) => m.toString()),
+		);
+		const uniqueNewMembers = projectMembers.filter(
+			(m) => !existingMembersSet.has(m),
+		);
+		const uniqueNewMembersSet = new Set(uniqueNewMembers);
+
+		project.members.push(
+			...Array.from(uniqueNewMembersSet).map(
+				(member) => new mongoose.Types.ObjectId(member),
+			),
+		);
+		const updatedProject = await project.save();
+		return updatedProject.members.map((member) => member.toString());
+	} catch (error) {
+		if (isMemberDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Member does not exist");
+		}
+		throw error;
+	}
 };
 
 export const removeProjectMember = async (
 	id: string,
 	user: IUser,
 	memberId: string,
-): Promise<IProject> => {
-	const project = await getProjectForUser(id, user);
-	if (!canUserEditProject(user, project)) {
-		throw new NotFoundError("Project not found");
-	}
-	if (!project.members.some((member) => member.toString() === memberId)) {
-		throw new NotFoundError("User not found");
-	}
+): Promise<string[]> => {
+	const includeMembers = false;
+	const project = await getProjectForUser(id, user, includeMembers);
+
 	project.members = project.members.filter(
 		(member) => member.toString() !== memberId,
 	);
-	return await project.save();
+	const updatedProject = await project.save();
+	return updatedProject.members.map((member) => member.toString());
 };
 
-const canUserEditProject = (user: IUser, project: IProject) => {
-	return (
-		user.roles.includes(Roles.ROLE_MANAGER) ||
-		project.created_by.toString() === user._id.toString()
-	);
-};
-
-const buildGetProjectQuery = async (
+const getProject = async (
 	project_id: string,
-	user_id: string,
+	user_id: mongoose.Types.ObjectId,
 	roles: string[],
-	includeMembers: boolean = true,
+	includeMembers: boolean,
 ) => {
 	if (roles.includes(Roles.ROLE_MANAGER)) {
-		return await Project.findById(project_id);
+		return Project.findById(project_id);
 	}
 
 	if (includeMembers) {
-		return await Project.findOne({
+		return Project.findOne({
 			_id: project_id,
 			$or: [{ created_by: user_id }, { members: user_id }],
 		});
 	}
-
-	return await Project.findOne({
+	return Project.findOne({
 		_id: project_id,
 		created_by: user_id,
 	});

@@ -110,7 +110,7 @@ describe("Patch Project Schema Validation", () => {
 			start_date: new Date(Date.now() + 10000).toString(),
 			end_date: new Date(Date.now() + 20000).toString(),
 			status: "ACTIVE",
-			members: ["member-id"],
+			members: ["507f1f77bcf86cd799439011"],
 		};
 		const result = patchProjectSchema.safeParse(input);
 		if (!result.success) {

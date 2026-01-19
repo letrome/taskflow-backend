@@ -11,23 +11,19 @@ import {
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
 import * as userService from "@src/services/user.js";
-import type { Request, Response } from "express";
+import type { Request } from "express";
 import { describe, expect, it, vi } from "vitest";
+import { createMockRequest, createMockResponse } from "../test-utils.js";
 
 vi.mock("@src/services/project.js");
 vi.mock("@src/services/user.js");
 vi.mock("@src/services/tag.js");
 
 describe("Project Controller", () => {
-	const mockResponse = () => {
-		const res = {} as Response;
-		res.status = vi.fn().mockReturnValue(res);
-		res.json = vi.fn().mockReturnValue(res);
-		res.send = vi.fn().mockReturnValue(res);
-		return res;
-	};
+	const mockResponse = createMockResponse;
 
 	const mockNext = vi.fn();
+	const next = mockNext;
 
 	describe("createProject", () => {
 		it("should create a project and return 201", async () => {
@@ -40,7 +36,7 @@ describe("Project Controller", () => {
 			const createdProject = { _id: "project-id", ...req.body };
 			vi.mocked(projectService.createProject).mockResolvedValue(createdProject);
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await createProject(req as any, res, mockNext);
+			await createProject(req as any, res);
 
 			expect(projectService.createProject).toHaveBeenCalledWith(
 				req.body,
@@ -48,19 +44,6 @@ describe("Project Controller", () => {
 			);
 			expect(res.status).toHaveBeenCalledWith(201);
 			expect(res.json).toHaveBeenCalledWith(createdProject);
-		});
-
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				body: { title: "Test Project" },
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await createProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(new Error("User ID is required"));
 		});
 
 		it("should call next with error if service fails", async () => {
@@ -74,9 +57,7 @@ describe("Project Controller", () => {
 			vi.mocked(projectService.createProject).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await createProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(createProject(req as any, res)).rejects.toThrow(error);
 		});
 	});
 
@@ -99,7 +80,7 @@ describe("Project Controller", () => {
 			);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProject(req as any, res, mockNext);
+			await getProject(req as any, res);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.getProjectForUser).toHaveBeenCalledWith(
@@ -108,21 +89,6 @@ describe("Project Controller", () => {
 			);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith(project);
-		});
-
-		it("should throw error if params missing", async () => {
-			const req = {
-				params: {},
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and project_id are required"),
-			);
 		});
 
 		it("should call next with error if service fails", async () => {
@@ -138,18 +104,16 @@ describe("Project Controller", () => {
 			vi.mocked(projectService.getProjectForUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(getProject(req as any, res)).rejects.toThrow(error);
 		});
 	});
 
 	describe("getProjects", () => {
 		it("should return projects and 200", async () => {
-			const req = {
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+			const request = createMockRequest({
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			const projects = [{ _id: "p1" }, { _id: "p2" }];
 
@@ -163,50 +127,40 @@ describe("Project Controller", () => {
 			);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProjects(req as any, res, mockNext);
+			await getProjects(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.getProjectsForUser).toHaveBeenCalledWith(user);
-			expect(res.status).toHaveBeenCalledWith(200);
-			expect(res.json).toHaveBeenCalledWith(projects);
-		});
-
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProjects(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(new Error("User ID is required"));
+			expect(response.status).toHaveBeenCalledWith(200);
+			expect(response.json).toHaveBeenCalledWith(projects);
+			expect(next).not.toHaveBeenCalled();
 		});
 
 		it("should call next with error if service fails", async () => {
-			const req = {
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+			const request = createMockRequest({
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			const error = new Error("Service Error");
 			vi.mocked(projectService.getProjectsForUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await getProjects(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(getProjects(request as any, response)).rejects.toThrow(
+				error,
+			);
+			expect(next).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("updateProject", () => {
 		it("should update project and return 200", async () => {
-			const req = {
+			const request = createMockRequest({
 				params: { id: "p1" },
 				body: { title: "Updated" },
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			const user = { _id: "user-id" } as any;
@@ -218,41 +172,46 @@ describe("Project Controller", () => {
 			} as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await updateProject(req as any, res, mockNext);
+			await updateProject(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.updateProject).toHaveBeenCalledWith(
 				"p1",
 				user,
-				req.body,
+				request.body,
 			);
-			expect(res.status).toHaveBeenCalledWith(200);
-			expect(res.json).toHaveBeenCalled();
+			expect(response.status).toHaveBeenCalledWith(200);
+			expect(response.json).toHaveBeenCalled();
+			expect(next).not.toHaveBeenCalled();
 		});
 
-		it("should throw error if params missing", async () => {
-			const req = {
-				params: {},
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+		it("should call next with error if service fails", async () => {
+			const request = createMockRequest({
+				params: { id: "p1" },
+				body: { title: "Updated" },
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
+
+			const error = new Error("Service Error");
+			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await updateProject(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and project_id are required"),
+			await expect(updateProject(request as any, response)).rejects.toThrow(
+				error,
 			);
+			expect(next).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("patchProject", () => {
 		it("should patch project and return 200", async () => {
-			const req = {
+			const request = createMockRequest({
 				params: { id: "p1" },
 				body: { title: "Patched" },
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
 			const user = { _id: "user-id" } as any;
@@ -264,59 +223,45 @@ describe("Project Controller", () => {
 			} as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await patchProject(req as any, res, mockNext);
+			await patchProject(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.patchProject).toHaveBeenCalledWith(
 				"p1",
 				user,
-				req.body,
+				request.body,
 			);
-			expect(res.status).toHaveBeenCalledWith(200);
-			expect(res.json).toHaveBeenCalled();
-		});
-
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				params: { id: "p1" },
-				body: { title: "Patched" },
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await patchProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and project_id are required"),
-			);
+			expect(response.status).toHaveBeenCalledWith(200);
+			expect(response.json).toHaveBeenCalled();
+			expect(next).not.toHaveBeenCalled();
 		});
 
 		it("should call next with error if service fails", async () => {
-			const req = {
+			const request = createMockRequest({
 				params: { id: "p1" },
 				body: { title: "Patched" },
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			const error = new Error("Service Error");
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await patchProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(patchProject(request as any, response)).rejects.toThrow(
+				error,
+			);
+			expect(next).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("deleteProject", () => {
 		it("should delete project and return 200", async () => {
-			const req = {
+			const request = createMockRequest({
 				params: { id: "p1" },
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			const user = { _id: "user-id" };
 			// biome-ignore lint/suspicious/noExplicitAny: Mock implementation needs access to this
@@ -328,53 +273,40 @@ describe("Project Controller", () => {
 			} as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await deleteProject(req as any, res, mockNext);
+			await deleteProject(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.deleteProject).toHaveBeenCalledWith("p1", user);
-			expect(res.status).toHaveBeenCalledWith(200);
-			expect(res.json).toHaveBeenCalled();
-		});
-
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				params: { id: "p1" },
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await deleteProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and project_id are required"),
-			);
+			expect(response.status).toHaveBeenCalledWith(200);
+			expect(response.json).toHaveBeenCalled();
+			expect(next).not.toHaveBeenCalled();
 		});
 
 		it("should call next with error if service fails", async () => {
-			const req = {
+			const request = createMockRequest({
 				params: { id: "p1" },
-				auth: { userId: "user-id" },
-			} as unknown as Request;
-			const res = mockResponse();
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
+			});
+			const response = createMockResponse();
 
 			const error = new Error("Service Error");
 			vi.mocked(projectService.deleteProject).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await deleteProject(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(deleteProject(request as any, response)).rejects.toThrow(
+				error,
+			);
+			expect(next).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("createProjectTag", () => {
 		it("should create a tag and return 201", async () => {
-			const req = {
+			const req = createMockRequest({
 				params: { id: "p1" },
 				body: { name: "Bug" },
 				auth: { userId: "user-id" },
-			} as unknown as Request;
+			} as unknown as Request);
 			const res = mockResponse();
 
 			const user = { _id: "user-id" };
@@ -390,7 +322,7 @@ describe("Project Controller", () => {
 			vi.mocked(tagService.createTag).mockResolvedValue(tag as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await createProjectTag(req as any, res, mockNext);
+			await createProjectTag(req as any, res);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.getProjectForUser).toHaveBeenCalledWith("p1", user);
@@ -407,10 +339,7 @@ describe("Project Controller", () => {
 			const res = mockResponse();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await createProjectTag(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and project_id are required"),
-			);
+			await expect(createProjectTag(req as any, res)).rejects.toThrow();
 		});
 
 		it("should call next with error if service fails", async () => {
@@ -424,8 +353,7 @@ describe("Project Controller", () => {
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await createProjectTag(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(createProjectTag(req as any, res)).rejects.toThrow(error);
 		});
 	});
 
@@ -441,7 +369,7 @@ describe("Project Controller", () => {
 			vi.mocked(tagService.getTagsForProject).mockResolvedValue(tags as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await getProjectTags(req as any, res, mockNext);
+			await getProjectTags(req as any, res);
 
 			expect(tagService.getTagsForProject).toHaveBeenCalledWith("p1");
 			expect(res.status).toHaveBeenCalledWith(200);
@@ -455,10 +383,7 @@ describe("Project Controller", () => {
 			const res = mockResponse();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await getProjectTags(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("Project ID is required"),
-			);
+			await expect(getProjectTags(req as any, res)).rejects.toThrow();
 		});
 
 		it("should call next with error if service fails", async () => {
@@ -471,8 +396,7 @@ describe("Project Controller", () => {
 			vi.mocked(tagService.getTagsForProject).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await getProjectTags(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(getProjectTags(req as any, res)).rejects.toThrow(error);
 		});
 	});
 });

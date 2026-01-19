@@ -1,0 +1,57 @@
+meta {
+  name: Create Project
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/projects
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Project title",
+    "description": "Project description",
+    "start_date": "{{start_date}}",
+    "end_date": "{{end_date}}",
+    "status": "ACTIVE",
+    "members": ["{{user_id_b}}"]
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.title: eq Project title
+  res.body.description: eq Project description
+  res.body.start_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.end_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.status: eq ACTIVE
+  res.body.created_by: eq {{user_id_a}}
+  res.body.members: isArray
+  res.body.members[0]: eq {{user_id_b}}
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  const now = new Date();
+  const nextMonth = new Date(now);
+  nextMonth.setMonth(now.getMonth() + 1);
+  
+  bru.setVar("start_date", `${now}`);
+  bru.setVar("end_date", `${nextMonth}`);
+}
+
+script:post-response {
+  bru.setVar("project_id", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

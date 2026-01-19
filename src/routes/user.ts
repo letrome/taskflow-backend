@@ -1,9 +1,15 @@
 import * as userCtrl from "@src/controllers/user.js";
 import { jwtAuth } from "@src/middlewares/auth.js";
-import express from "express";
+import { type RequestHandler, Router } from "express";
 
-const router: express.Router = express.Router();
+const router: Router = Router();
 
-router.get(["/users/me", "/me"], jwtAuth, userCtrl.getUser);
+// "me" routes should come before :id routes
+router.get(
+	["/users/me", "/me"],
+	jwtAuth,
+	userCtrl.getUser as unknown as RequestHandler,
+);
+// No ID param here as it uses the token's user ID
 
 export default router;

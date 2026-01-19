@@ -2,57 +2,80 @@ import * as projectCtrl from "@src/controllers/project.js";
 import {
 	addProjectMemberSchema,
 	createOrUpdateProjectSchema,
+	memberIdSchema,
 	patchProjectSchema,
+	projectIdSchema,
 } from "@src/controllers/schemas/project.js";
 
 import { createTagSchema } from "@src/controllers/schemas/tag.js";
 
 import { jwtAuth } from "@src/middlewares/auth.js";
-import { validate } from "@src/middlewares/validate.js";
-import express from "express";
+import { validate, validateParams } from "@src/middlewares/validate.js";
+import { type RequestHandler, Router } from "express";
 
-const router: express.Router = express.Router();
+const router: Router = Router();
 
-router.get("/:id", jwtAuth, projectCtrl.getProject);
-router.get("/", jwtAuth, projectCtrl.getProjects);
+router.get(
+	"/:id",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	projectCtrl.getProject as unknown as RequestHandler,
+);
+router.get("/", jwtAuth, projectCtrl.getProjects as unknown as RequestHandler);
 router.post(
 	"/",
 	jwtAuth,
 	validate(createOrUpdateProjectSchema),
-	projectCtrl.createProject,
+	projectCtrl.createProject as unknown as RequestHandler,
 );
 router.put(
 	"/:id",
 	jwtAuth,
+	validateParams(projectIdSchema),
 	validate(createOrUpdateProjectSchema),
-	projectCtrl.updateProject,
+	projectCtrl.updateProject as unknown as RequestHandler,
 );
 router.patch(
 	"/:id",
 	jwtAuth,
+	validateParams(projectIdSchema),
 	validate(patchProjectSchema),
-	projectCtrl.patchProject,
+	projectCtrl.patchProject as unknown as RequestHandler,
 );
-router.delete("/:id", jwtAuth, projectCtrl.deleteProject);
+router.delete(
+	"/:id",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	projectCtrl.deleteProject as unknown as RequestHandler,
+);
 router.post(
 	"/:id/members",
 	jwtAuth,
+	validateParams(projectIdSchema),
 	validate(addProjectMemberSchema),
-	projectCtrl.addProjectMember,
+	projectCtrl.addProjectMember as unknown as RequestHandler,
 );
 router.delete(
 	"/:id/members/:memberId",
 	jwtAuth,
-	projectCtrl.removeProjectMember,
+	validateParams(projectIdSchema),
+	validateParams(memberIdSchema),
+	projectCtrl.removeProjectMember as unknown as RequestHandler,
 );
 
 router.post(
 	"/:id/tags",
 	jwtAuth,
+	validateParams(projectIdSchema),
 	validate(createTagSchema),
-	projectCtrl.createProjectTag,
+	projectCtrl.createProjectTag as unknown as RequestHandler,
 );
 
-router.get("/:id/tags", jwtAuth, projectCtrl.getProjectTags);
+router.get(
+	"/:id/tags",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	projectCtrl.getProjectTags as unknown as RequestHandler,
+);
 
 export default router;

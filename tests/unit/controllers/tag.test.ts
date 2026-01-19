@@ -82,20 +82,6 @@ describe("Tag Controller", () => {
 			);
 		});
 
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				params: { id: "tag-id" },
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await patchTag(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and tag ID are required"),
-			);
-		});
-
 		it("should call next with error if service fails", async () => {
 			const req = {
 				params: { id: "tag-id" },
@@ -107,9 +93,8 @@ describe("Tag Controller", () => {
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await patchTag(req as any, res, mockNext);
-
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(patchTag(req as any, res, mockNext)).rejects.toThrow(error);
+			expect(mockNext).not.toHaveBeenCalled();
 		});
 	});
 
@@ -145,20 +130,6 @@ describe("Tag Controller", () => {
 			expect(res.json).toHaveBeenCalledWith(tag);
 		});
 
-		it("should throw error if user ID is missing", async () => {
-			const req = {
-				params: { id: "tag-id" },
-				auth: {},
-			} as unknown as Request;
-			const res = mockResponse();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await deleteTag(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(
-				new Error("User ID and tag ID are required"),
-			);
-		});
-
 		it("should call next with error if service fails", async () => {
 			const req = {
 				params: { id: "tag-id" },
@@ -170,8 +141,8 @@ describe("Tag Controller", () => {
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await deleteTag(req as any, res, mockNext);
-			expect(mockNext).toHaveBeenCalledWith(error);
+			await expect(deleteTag(req as any, res, mockNext)).rejects.toThrow(error);
+			expect(mockNext).not.toHaveBeenCalled();
 		});
 	});
 });

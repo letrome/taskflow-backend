@@ -9,7 +9,7 @@ export interface ITag extends mongoose.Document {
 const tagSchema = new mongoose.Schema<ITag>(
 	{
 		name: { type: String, required: true },
-		project: { type: mongoose.Types.ObjectId, required: true },
+		project: { type: mongoose.Types.ObjectId, ref: "Project", required: true },
 	},
 	{
 		toJSON: {

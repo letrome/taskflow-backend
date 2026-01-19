@@ -1,7 +1,7 @@
 import type { CreateUserDTO } from "@src/controllers/schemas/user.js";
 import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
-import { isDatabaseIDFormatError, isDuplicateError } from "@src/core/utils.js";
+import { isDuplicateError } from "@src/core/utils.js";
 import * as bcrypt from "bcrypt";
 import User, { type IUser } from "./models/user.js";
 
@@ -28,18 +28,9 @@ export const createUser = async (userData: CreateUserDTO): Promise<IUser> => {
 };
 
 export const getUser = async (id: string): Promise<IUser> => {
-	try {
-		const user = await User.findById(id);
-		if (!user) {
-			throw new NotFoundError("User not found");
-		}
-		return user;
-		// biome-ignore lint/suspicious/noExplicitAny: Error handling needs access to this
-	} catch (error: any) {
-		if (isDatabaseIDFormatError(error)) {
-			throw new NotFoundError("User not found");
-		}
-
-		throw error;
+	const user = await User.findById(id);
+	if (!user) {
+		throw new NotFoundError("User not found");
 	}
+	return user;
 };

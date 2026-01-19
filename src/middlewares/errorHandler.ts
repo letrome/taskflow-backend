@@ -17,7 +17,19 @@ export const errorHandler = (
 		message = error.message;
 	} else if (error instanceof ZodError) {
 		statusCode = 400;
-		message = error.issues[0]?.message || "Validation error";
+		const issue = error.issues[0];
+		message = issue?.message || "Validation error";
+
+		if (
+			issue &&
+			typeof issue === "object" &&
+			"params" in issue &&
+			issue.params &&
+			typeof issue.params === "object" &&
+			"statusCode" in issue.params
+		) {
+			statusCode = (issue.params as { statusCode: number }).statusCode;
+		}
 	} else if (
 		"statusCode" in error &&
 		typeof (error as Record<string, unknown>).statusCode === "number"

@@ -10,14 +10,9 @@ export const register = async (
 		RegisterSchemaDto
 	>,
 	res: express.Response,
-	next: express.NextFunction,
 ) => {
-	try {
-		const user = await authService.register(req.body);
-		res.status(201).json(user);
-	} catch (error) {
-		next(error);
-	}
+	const user = await authService.register(req.body);
+	res.status(201).json(user);
 };
 
 export const login = async (
@@ -27,12 +22,7 @@ export const login = async (
 		LoginSchemaDto
 	>,
 	res: express.Response,
-	next: express.NextFunction,
 ) => {
-	try {
-		const loginInfo = await authService.login(req.body);
-		res.status(200).json(loginInfo);
-	} catch (error) {
-		next(error);
-	}
+	const loginInfo = await authService.login(req.body);
+	res.status(200).json(loginInfo);
 };

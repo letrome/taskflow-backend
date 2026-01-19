@@ -27,8 +27,32 @@ const projectSchema = new mongoose.Schema<IProject>(
 			enum: Object.values(Status),
 			default: Status.ACTIVE,
 		},
-		created_by: { type: mongoose.Types.ObjectId, required: true },
-		members: { type: [mongoose.Types.ObjectId], required: true },
+		created_by: {
+			type: mongoose.Types.ObjectId,
+			ref: "User",
+			required: true,
+			validate: {
+				validator: async (created_by: mongoose.Types.ObjectId) => {
+					const User = mongoose.model("User");
+					const count = await User.countDocuments({ _id: created_by });
+					return count === 1;
+				},
+				message: "User does not exist",
+			},
+		},
+		members: {
+			type: [mongoose.Types.ObjectId],
+			ref: "User",
+			required: true,
+			validate: {
+				validator: async (members: mongoose.Types.ObjectId[]) => {
+					const User = mongoose.model("User");
+					const count = await User.countDocuments({ _id: { $in: members } });
+					return count === members.length;
+				},
+				message: "One or more members do not exist",
+			},
+		},
 	},
 	{
 		toJSON: {
@@ -44,3 +68,15 @@ const projectSchema = new mongoose.Schema<IProject>(
 projectSchema.plugin(uniqueValidator);
 
 export default mongoose.model<IProject>("Project", projectSchema);
+
+export const isMemberDoesNotExistError = (error: Error) => {
+	return (
+		error instanceof mongoose.Error.ValidationError && error.errors.members
+	);
+};
+
+export const isCreatorDoesNotExistError = (error: Error) => {
+	return (
+		error instanceof mongoose.Error.ValidationError && error.errors.created_by
+	);
+};

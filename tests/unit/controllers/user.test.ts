@@ -19,12 +19,12 @@ describe("User Controller", () => {
 
 			const request = createMockRequest({
 				params: { id: "user-id" },
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await userController.getUser(request as any, response, next);
+			await userController.getUser(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(response.status).toHaveBeenCalledWith(200);
@@ -46,27 +46,13 @@ describe("User Controller", () => {
 				auth: { userId: "user-id", roles: ["ROLE_USER"] },
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
 
 			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await userController.getUser(request as any, response, next);
+			await userController.getUser(request as any, response);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(response.status).toHaveBeenCalledWith(200);
 			expect(response.json).toHaveBeenCalledWith(mockUser);
-		});
-
-		it("should call next with error if no id provided", async () => {
-			const request = createMockRequest({
-				params: {},
-			});
-			const response = createMockResponse();
-			const next = vi.fn();
-
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await userController.getUser(request as any, response, next);
-
-			expect(next).toHaveBeenCalledWith(expect.any(Error));
 		});
 
 		it("should call next with error if service fails", async () => {
@@ -75,14 +61,14 @@ describe("User Controller", () => {
 
 			const request = createMockRequest({
 				params: { id: "user-id" },
+				auth: { userId: "user-id", roles: ["ROLE_USER"] },
 			});
 			const response = createMockResponse();
-			const next = vi.fn();
 
-			// biome-ignore lint/suspicious/noExplicitAny: Unit tests
-			await userController.getUser(request as any, response, next);
-
-			expect(next).toHaveBeenCalledWith(error);
+			await expect(
+				// biome-ignore lint/suspicious/noExplicitAny: Unit tests
+				userController.getUser(request as any, response),
+			).rejects.toThrow(error);
 		});
 	});
 });

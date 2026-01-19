@@ -97,12 +97,6 @@ describe("Tag Service", () => {
 			await expect(getTag("tag-id")).rejects.toThrow(NotFoundError);
 		});
 
-		it("should throw NotFoundError on CastError (invalid ID)", async () => {
-			const castError = { name: "CastError" };
-			vi.mocked(Tag).findById = vi.fn().mockRejectedValue(castError);
-			await expect(getTag("invalid-id")).rejects.toThrow(NotFoundError);
-		});
-
 		it("should rethrow other errors", async () => {
 			const error = new Error("DB Error");
 			vi.mocked(Tag).findById = vi.fn().mockRejectedValue(error);
@@ -121,14 +115,6 @@ describe("Tag Service", () => {
 			const result = await getTagsForProject("project-id");
 			expect(result).toEqual(tags);
 			expect(Tag.find).toHaveBeenCalledWith({ project: "project-id" });
-		});
-
-		it("should throw NotFoundError on CastError (invalid project ID)", async () => {
-			const castError = { name: "CastError" };
-			vi.mocked(Tag).find = vi.fn().mockRejectedValue(castError);
-			await expect(getTagsForProject("invalid-id")).rejects.toThrow(
-				NotFoundError,
-			);
 		});
 
 		it("should rethrow other errors", async () => {
@@ -188,17 +174,6 @@ describe("Tag Service", () => {
 				ConflictError,
 			);
 		});
-
-		it("should throw NotFoundError on CastError", async () => {
-			const tagMock = {
-				name: "Old",
-				save: vi.fn().mockRejectedValue({ name: "CastError" }),
-			} as unknown as ITag;
-
-			await expect(patchTag(tagMock, { name: "New" })).rejects.toThrow(
-				NotFoundError,
-			);
-		});
 	});
 
 	describe("deleteTag", () => {
@@ -213,13 +188,6 @@ describe("Tag Service", () => {
 		it("should throw NotFoundError if tag not found", async () => {
 			vi.mocked(Tag).findByIdAndDelete = vi.fn().mockResolvedValue(null);
 			await expect(deleteTag("tag-id")).rejects.toThrow(NotFoundError);
-		});
-
-		it("should throw NotFoundError on CastError", async () => {
-			vi.mocked(Tag).findByIdAndDelete = vi
-				.fn()
-				.mockRejectedValue({ name: "CastError" });
-			await expect(deleteTag("invalid-id")).rejects.toThrow(NotFoundError);
 		});
 	});
 });

@@ -1,7 +1,7 @@
 meta {
-  name: Create project tag (1)
+  name: Create project tag (2)
   type: http
-  seq: 3
+  seq: 4
 }
 
 post {
@@ -16,15 +16,19 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Tag1"
+    "name": "Tag2"
   }
 }
 
 assert {
   res.status: eq 201
-  res.body.name: eq Tag1
+  res.body.name: eq Tag2
   res.body.project: eq {{project_id}}
   res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:post-response {
+  bru.setVar("tag_id_2", res.body.id);
 }
 
 settings {

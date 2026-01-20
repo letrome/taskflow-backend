@@ -1,0 +1,51 @@
+meta {
+  name: Create task
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "due_date": "{{start_date}}",
+    "priority": "LOW",
+    "assignee": "{{user_id_b}}",
+    "tags": ["{{tag_id_1}}", "{{tag_id_2}}"]
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.title: eq Task title
+  res.body.description: eq Task description
+  res.body.due_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.priority: eq LOW
+  res.body.state: eq OPEN
+  res.body.project: eq {{project_id}}
+  res.body.assignee: eq {{user_id_b}}
+  res.body.tags: isArray
+  res.body.tags[0]: eq {{tag_id_1}}
+  res.body.tags[1]: eq {{tag_id_2}}
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

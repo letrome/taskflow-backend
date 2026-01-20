@@ -36,3 +36,4 @@ export const createTaskSchema = z.object({
 export type CreateTaskDTO = z.infer<typeof createTaskSchema>;
 
 export const projectIdSchema = createIdParamSchema("Project not found");
+export const taskIdSchema = createIdParamSchema("Task not found");

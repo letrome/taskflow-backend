@@ -8,6 +8,7 @@ import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
 import tagRoutes from "./routes/tag.js";
+import taskRoutes from "./routes/task.js";
 import userRoutes from "./routes/user.js";
 
 const app: express.Application = express();
@@ -28,6 +29,7 @@ app.use("/auth", authRoutes);
 app.use("/", userRoutes);
 app.use("/projects", projectRoutes);
 app.use("/tags", tagRoutes);
+app.use("/tasks", taskRoutes);
 
 app.use(errorHandler);
 

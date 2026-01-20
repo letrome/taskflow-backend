@@ -1,4 +1,4 @@
-import { BadRequestError } from "@src/core/errors.js";
+import { BadRequestError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import type { CreateTaskDTO } from "../../dist/controllers/schemas/task.js";
 import Task, {
@@ -41,4 +41,13 @@ export const getTasksForProject = async (
 	project_id: string,
 ): Promise<ITask[]> => {
 	return await Task.find({ project: project_id });
+};
+
+export const getTask = async (task_id: string): Promise<ITask> => {
+	const task = await Task.findById(task_id);
+	if (!task) {
+		throw new NotFoundError("Task not found");
+	}
+
+	return task;
 };

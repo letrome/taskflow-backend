@@ -194,7 +194,7 @@ export const createProjectTask = async (
 };
 
 export const getProjectTasks = async (
-	req: AuthenticatedRequest<{ id: string }>, 
+	req: AuthenticatedRequest<{ id: string }>,
 	res: Response,
 ) => {
 	const project_id = req.params.id;

@@ -192,3 +192,18 @@ export const createProjectTask = async (
 	const createdTask = await taskService.createTask(req.body, project_id);
 	res.status(201).json(createdTask);
 };
+
+export const getProjectTasks = async (
+	req: AuthenticatedRequest<{ id: string }>, 
+	res: Response,
+) => {
+	const project_id = req.params.id;
+	const user_id = req.auth.userId;
+
+	// Check if user has the right to create a task (must be creator, member or manager)
+	const user = await userService.getUser(user_id);
+	await projectService.getProjectForUser(project_id, user);
+
+	const tasks = await taskService.getTasksForProject(project_id);
+	res.status(200).json(tasks);
+};

@@ -86,4 +86,11 @@ router.post(
 	projectCtrl.createProjectTask as unknown as RequestHandler,
 );
 
+router.get(
+	"/:id/tasks",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	projectCtrl.getProjectTasks as unknown as RequestHandler,
+);
+
 export default router;

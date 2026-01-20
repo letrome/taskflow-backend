@@ -1,0 +1,46 @@
+meta {
+  name: Get tasks
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body.length: eq 2
+  res.body[0].title: eq Task title 1
+  res.body[1].title: eq Task title 2
+  res.body[0].description: eq Task description 1
+  res.body[1].description: eq Task description 2
+  res.body[0].priority: eq MEDIUM
+  res.body[1].priority: eq MEDIUM
+  res.body[0].state: eq OPEN
+  res.body[1].state: eq OPEN
+  res.body[0].project: eq {{project_id}}
+  res.body[1].project: eq {{project_id}}
+  res.body[0].tags: isArray
+  res.body[1].tags: isArray
+  res.body[0].tags.length: eq 0
+  res.body[1].tags.length: eq 0
+  res.body[0].id: matches ^[0-9a-f]{24}$
+  res.body[1].id: matches ^[0-9a-f]{24}$
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -36,3 +36,9 @@ export const createTask = async (
 		throw error;
 	}
 };
+
+export const getTasksForProject = async (
+	project_id: string,
+): Promise<ITask[]> => {
+	return await Task.find({ project: project_id });
+};

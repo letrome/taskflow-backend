@@ -1,4 +1,3 @@
-import logger from "@src/core/logger.js";
 import mongoose from "mongoose";
 
 export enum State {
@@ -33,31 +32,31 @@ const taskSchema = new mongoose.Schema<ITask>(
 		state: { type: String, enum: State, required: true },
 		project: { type: mongoose.Types.ObjectId, ref: "Project", required: true },
 		assignee: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "User",
-                    required: false,
-                    validate: {
-                        validator: async (assignee: mongoose.Types.ObjectId) => {
-                            const User = mongoose.model("User");
-                            const count = await User.countDocuments({ _id: assignee });
-                            return count === 1;
-                        },
-                        message: "Assignee does not exist",
-                    },
-                },
+			type: mongoose.Types.ObjectId,
+			ref: "User",
+			required: false,
+			validate: {
+				validator: async (assignee: mongoose.Types.ObjectId) => {
+					const User = mongoose.model("User");
+					const count = await User.countDocuments({ _id: assignee });
+					return count === 1;
+				},
+				message: "Assignee does not exist",
+			},
+		},
 		tags: {
-                    type: [mongoose.Types.ObjectId],
-                    ref: "Tag",
-                    required: true,
-                    validate: {
-                        validator: async (tags: mongoose.Types.ObjectId[]) => {
-                            const Tag = mongoose.model("Tag");
-                            const count = await Tag.countDocuments({ _id: { $in: tags } });
-                            return count === tags.length;
-                        },
-                        message: "One or more tags do not exist",
-                    },
-                },
+			type: [mongoose.Types.ObjectId],
+			ref: "Tag",
+			required: true,
+			validate: {
+				validator: async (tags: mongoose.Types.ObjectId[]) => {
+					const Tag = mongoose.model("Tag");
+					const count = await Tag.countDocuments({ _id: { $in: tags } });
+					return count === tags.length;
+				},
+				message: "One or more tags do not exist",
+			},
+		},
 	},
 	{
 		toJSON: {

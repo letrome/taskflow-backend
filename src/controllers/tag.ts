@@ -1,3 +1,4 @@
+import logger from "@src/core/logger.js";
 import type { IUser } from "@src/services/models/user.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
@@ -5,7 +6,6 @@ import { getUser } from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
 import type { Response } from "express";
 import type { PatchTagDTO } from "./schemas/tag.js";
-import logger from "@src/core/logger.js";
 
 export const patchTag = async (
 	req: AuthenticatedRequest<{ id: string }, Record<string, never>, PatchTagDTO>,
@@ -23,7 +23,7 @@ export const patchTag = async (
 	if (req.body.project) {
 		logger.info(`req.body.project: ${req.body.project}`);
 		await checkUserCanUpdateProject(req.body.project, user);
-		logger.info("next line")
+		logger.info("next line");
 	}
 
 	const patchedTag = await tagService.patchTag(tag, req.body);

@@ -1,0 +1,40 @@
+meta {
+  name: Patch project tag
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseurl}}/tags/{{invalid_tag_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Tag_modified"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Tag not found
+}
+
+script:pre-request {
+  bru.setVar("invalid_tag_id", "696f7cf71657204368432084");
+}
+
+script:post-response {
+  bru.setVar("tag_id_1", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,52 @@
+meta {
+  name: (Admin) Create user manager
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/admin/users/
+  body: json
+  auth: basic
+}
+
+auth:basic {
+  username: admin
+  password: {{basic_secret}}
+}
+
+body:json {
+  {
+    "email": "{{unique_email_user_manager}}",
+    "password": "{{unique_password_user_manager}}",
+    "first_name": "manager",
+    "last_name": "manager",
+    "roles": ["ROLE_MANAGER"]
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body: isJson
+  res.body.email: eq {{unique_email_user_manager}}
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.first_name: eq manager
+  res.body.last_name: eq manager
+  res.body.roles[0]: eq ROLE_MANAGER
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("unique_email_user_manager", `${uuid}@example.com`);
+  bru.setVar("unique_password_user_manager", `${uuid}`);
+}
+
+script:post-response {
+  bru.setVar("user_id", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

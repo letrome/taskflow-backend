@@ -5,6 +5,7 @@ import { getUser } from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
 import type { Response } from "express";
 import type { PatchTagDTO } from "./schemas/tag.js";
+import logger from "@src/core/logger.js";
 
 export const patchTag = async (
 	req: AuthenticatedRequest<{ id: string }, Record<string, never>, PatchTagDTO>,
@@ -18,8 +19,11 @@ export const patchTag = async (
 
 	await checkUserCanUpdateProject(tag.project.toString(), user);
 
+	logger.info(`User ${user_id} is updating tag ${tag_id}`);
 	if (req.body.project) {
+		logger.info(`req.body.project: ${req.body.project}`);
 		await checkUserCanUpdateProject(req.body.project, user);
+		logger.info("next line")
 	}
 
 	const patchedTag = await tagService.patchTag(tag, req.body);
@@ -47,5 +51,5 @@ export const deleteTag = async (
 };
 
 const checkUserCanUpdateProject = async (project_id: string, user: IUser) => {
-	projectService.getProjectForUser(project_id, user);
+	await projectService.getProjectForUser(project_id, user);
 };

@@ -1,7 +1,7 @@
 meta {
-  name: Login (with user manager)
+  name: Login (with user C)
   type: http
-  seq: 4
+  seq: 6
 }
 
 post {
@@ -12,8 +12,8 @@ post {
 
 body:json {
   {
-    "email": "{{unique_email_user_manager}}",
-    "password": "{{unique_password_user_manager}}"
+    "email": "{{unique_email_user_c}}",
+    "password": "{{unique_password_user_c}}"
   }
 }
 

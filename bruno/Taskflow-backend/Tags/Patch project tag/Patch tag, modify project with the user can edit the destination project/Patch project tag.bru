@@ -1,0 +1,38 @@
+meta {
+  name: Patch project tag
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseurl}}/tags/{{tag_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Tag_modified",
+    "project": "{{project_id_2}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.name: eq Tag_modified
+  res.body.project: eq {{project_id_2}}
+  res.body.id: matches {{tag_id}}
+}
+
+script:post-response {
+  bru.setVar("tag_id_1", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

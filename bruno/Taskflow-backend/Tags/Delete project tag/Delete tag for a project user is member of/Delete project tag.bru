@@ -1,0 +1,31 @@
+meta {
+  name: Delete project tag
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseurl}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.name: eq Tag1
+  res.body.project: eq {{project_id}}
+  res.body.id: eq {{tag_id}}
+}
+
+script:post-response {
+  bru.setVar("tag_id_1", res.body.id);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

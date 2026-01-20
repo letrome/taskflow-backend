@@ -30,7 +30,7 @@
 		"@types/mongoose-unique-validator": "^1.0.9",
 		"@types/node": "^25.0.9",
 		"@types/supertest": "^6.0.3",
-		"@usebruno/cli": "^3.0.2",
+		"@usebruno/cli": "^3.0.3",
 		"@vitest/coverage-v8": "^4.0.17",
 		"sonarqube-scanner": "^4.3.4",
 		"start-server-and-test": "^2.1.3",

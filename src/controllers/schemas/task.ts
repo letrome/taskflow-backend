@@ -54,7 +54,47 @@ export const createTaskSchema = z.object({
 	tags: z.array(objectIdSchema("Tag not found")).default([]),
 });
 
+export const patchTaskSchema = z.object({
+	title: z
+		.string({ error: "Title is required" })
+		.min(1, "Title is required")
+		.optional(),
+	description: z
+		.string({ error: "Description is required" })
+		.min(1, "Description is required")
+		.optional(),
+	due_date: z
+		.string()
+		.min(1, "Due date is required")
+		.optional()
+		.transform(transformToDate("Due date"))
+		.pipe(z.date().optional()),
+	priority: z
+		.preprocess(
+			(val) => (typeof val === "string" ? val.toUpperCase() : val),
+			z.enum(TaskPriority),
+		)
+		.optional(),
+	state: z
+		.preprocess(
+			(val) => (typeof val === "string" ? val.toUpperCase() : val),
+			z.enum(TaskState),
+		)
+		.optional(),
+	assignee: objectIdSchema("Assignee not found").optional(),
+	tags: z.array(objectIdSchema("Tag not found")).optional(),
+});
+
 export type CreateTaskDTO = z.infer<typeof createTaskSchema>;
+export type PatchTaskDTO = z.infer<typeof patchTaskSchema>;
 
 export const projectIdSchema = createIdParamSchema("Project not found");
 export const taskIdSchema = createIdParamSchema("Task not found");
+export const statusSchema = z.enum(TaskState);
+
+export const taskStateParamSchema = z.object({
+	state: z.preprocess(
+		(val) => (typeof val === "string" ? val.toUpperCase() : val),
+		z.enum(TaskState),
+	),
+});

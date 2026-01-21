@@ -45,6 +45,11 @@ export const patchTag = async (
 	tag: ITag,
 	tagData: PatchTagDTO,
 ): Promise<ITag> => {
+
+	if (!tagData) {
+		return tag;
+	}
+	
 	try {
 		tag.name = tagData.name ?? tag.name;
 		if (tagData.project) {

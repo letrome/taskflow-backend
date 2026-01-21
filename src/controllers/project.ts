@@ -1,6 +1,7 @@
 import type {
 	AddProjectMemberDTO,
 	CreateOrUpdateProjectDTO,
+	PatchProjectDTO,
 } from "@src/controllers/schemas/project.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
@@ -8,8 +9,8 @@ import * as taskService from "@src/services/task.js";
 import * as userService from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
 import type { Response } from "express";
-import type { CreateTaskDTO } from "../../dist/controllers/schemas/task.js";
 import type { CreateTagDTO } from "./schemas/tag.js";
+import type { CreateTaskDTO } from "./schemas/task.js";
 
 export const createProject = async (
 	req: AuthenticatedRequest<
@@ -73,7 +74,7 @@ export const patchProject = async (
 	req: AuthenticatedRequest<
 		{ id: string },
 		Record<string, never>,
-		CreateOrUpdateProjectDTO
+		PatchProjectDTO
 	>,
 	res: Response,
 ) => {

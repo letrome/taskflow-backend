@@ -104,9 +104,14 @@ export const patchProject = async (
 	user: IUser,
 	projectData: PatchProjectDTO,
 ): Promise<IProject> => {
+
 	try {
 		const includeMembers = false;
 		const project = await getProjectForUser(id, user, includeMembers);
+
+		if (!projectData) {
+			return project;
+		}
 
 		project.title = projectData.title ?? project.title;
 		project.description = projectData.description ?? project.description;

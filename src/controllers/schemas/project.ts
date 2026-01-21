@@ -1,5 +1,5 @@
 import z from "zod";
-import { createIdParamSchema } from "./common.js";
+import { createIdParamSchema, objectIdSchema } from "./common.js";
 
 export enum ProjectStatus {
 	ACTIVE = "ACTIVE",
@@ -43,7 +43,7 @@ export const createOrUpdateProjectSchema = z.object({
 			z.enum(ProjectStatus),
 		)
 		.default(ProjectStatus.ACTIVE),
-	members: z.array(z.string("Member does not exist")).default([]),
+	members: z.array(objectIdSchema("Member not found")).default([]),
 });
 
 export const patchProjectSchema = z.object({
@@ -73,11 +73,11 @@ export const patchProjectSchema = z.object({
 		.transform((val) => val.toUpperCase())
 		.pipe(z.enum(ProjectStatus))
 		.optional(),
-	members: z.array(z.string("Member does not exist")).optional(),
+	members: z.array(objectIdSchema("Member not found")).optional(),
 });
 
 export const addProjectMemberSchema = z.object({
-	members: z.array(z.string("Member does not exist")).default([]),
+	members: z.array(objectIdSchema("Member not found")).default([]),
 });
 
 export type CreateOrUpdateProjectDTO = z.infer<

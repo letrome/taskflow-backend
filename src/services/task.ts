@@ -1,7 +1,12 @@
+import type {
+	CreateTaskDTO,
+	PatchTaskDTO,
+} from "@src/controllers/schemas/task.js";
 import { BadRequestError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
-import type { CreateTaskDTO } from "../../dist/controllers/schemas/task.js";
+
 import {
+	stringToObjectId,
 	taskPriorityToModelPriority,
 	taskStateToModelState,
 } from "./mapper.js";
@@ -54,4 +59,36 @@ export const getTask = async (task_id: string): Promise<ITask> => {
 	}
 
 	return task;
+};
+
+export const patchTask = async (
+	task_id: string,
+	taskData: PatchTaskDTO,
+): Promise<ITask> => {
+	const task = await Task.findById(task_id);
+	if (!task) {
+		throw new NotFoundError("Task not found");
+	}
+
+	if (!taskData) {
+		return task;
+	}
+
+	task.title = taskData.title || task.title;
+	task.description = taskData.description || task.description;
+	task.due_date = taskData.due_date || task.due_date;
+	task.priority = taskData.priority
+		? taskPriorityToModelPriority[taskData.priority]
+		: task.priority;
+	task.state = taskData.state
+		? taskStateToModelState[taskData.state]
+		: task.state;
+	if (taskData.assignee) {
+		task.assignee = stringToObjectId(taskData.assignee);
+	}
+	if (taskData.tags) {
+		task.tags = taskData.tags.map((tag) => stringToObjectId(tag));
+	}
+
+	return await task.save();
 };

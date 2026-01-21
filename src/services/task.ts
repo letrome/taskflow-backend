@@ -1,6 +1,10 @@
 import { BadRequestError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import type { CreateTaskDTO } from "../../dist/controllers/schemas/task.js";
+import {
+	taskPriorityToModelPriority,
+	taskStateToModelState,
+} from "./mapper.js";
 import Task, {
 	type ITask,
 	isAssigneeDoesNotExistError,
@@ -16,8 +20,8 @@ export const createTask = async (
 			title: taskData.title,
 			description: taskData.description,
 			due_date: taskData.due_date,
-			priority: taskData.priority,
-			state: taskData.state,
+			priority: taskPriorityToModelPriority[taskData.priority],
+			state: taskStateToModelState[taskData.state],
 			project: project_id,
 			assignee: taskData.assignee,
 			tags: taskData.tags,

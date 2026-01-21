@@ -5,6 +5,7 @@ import type {
 import { BadRequestError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import mongoose from "mongoose";
+import { projectStatusToModelStatus } from "./mapper.js";
 import Project, {
 	type IProject,
 	isCreatorDoesNotExistError,
@@ -22,7 +23,7 @@ export const createProject = async (
 			description: projectData.description,
 			start_date: projectData.start_date,
 			end_date: projectData.end_date,
-			status: projectData.status,
+			status: projectStatusToModelStatus[projectData.status],
 			created_by: user_id,
 			members: projectData.members,
 		});
@@ -81,7 +82,7 @@ export const updateProject = async (
 		} else {
 			project.end_date = undefined;
 		}
-		project.status = projectData.status;
+		project.status = projectStatusToModelStatus[projectData.status];
 
 		const uniqueMembers = [...new Set(projectData.members)];
 		project.members = uniqueMembers.map(
@@ -111,7 +112,9 @@ export const patchProject = async (
 		project.description = projectData.description ?? project.description;
 		project.start_date = projectData.start_date ?? project.start_date;
 		project.end_date = projectData.end_date ?? project.end_date;
-		project.status = projectData.status ?? project.status;
+		if (projectData.status) {
+			project.status = projectStatusToModelStatus[projectData.status];
+		}
 
 		if (projectData.members) {
 			const uniqueMembers = [...new Set(projectData.members)];

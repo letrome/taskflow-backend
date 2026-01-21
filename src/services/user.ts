@@ -3,6 +3,7 @@ import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import { isDuplicateError } from "@src/core/utils.js";
 import * as bcrypt from "bcrypt";
+import { userRoleToModelRole } from "./mapper.js";
 import User, { type IUser } from "./models/user.js";
 
 export const createUser = async (userData: CreateUserDTO): Promise<IUser> => {
@@ -13,7 +14,7 @@ export const createUser = async (userData: CreateUserDTO): Promise<IUser> => {
 			password_hash: hash,
 			first_name: userData.first_name,
 			last_name: userData.last_name,
-			roles: userData.roles,
+			roles: userData.roles.map((role) => userRoleToModelRole[role]),
 		});
 
 		const savedUser = await user.save();

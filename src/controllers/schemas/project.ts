@@ -1,6 +1,10 @@
-import { Status } from "@src/services/models/project.js";
 import z from "zod";
 import { createIdParamSchema } from "./common.js";
+
+export enum ProjectStatus {
+	ACTIVE = "ACTIVE",
+	ARCHIVED = "ARCHIVED",
+}
 
 const transformToDate =
 	(fieldName: string) => (str: string | undefined, ctx: z.RefinementCtx) => {
@@ -33,7 +37,12 @@ export const createOrUpdateProjectSchema = z.object({
 		.optional()
 		.transform(transformToDate("End date"))
 		.pipe(futureDateSchema("End date").optional()),
-	status: z.enum(Status).default(Status.ACTIVE),
+	status: z
+		.preprocess(
+			(val) => (typeof val === "string" ? val.toUpperCase() : val),
+			z.enum(ProjectStatus),
+		)
+		.default(ProjectStatus.ACTIVE),
 	members: z.array(z.string("Member does not exist")).default([]),
 });
 
@@ -61,7 +70,8 @@ export const patchProjectSchema = z.object({
 	status: z
 		.string()
 		.refine((val) => val !== "", { message: "Status is required" })
-		.pipe(z.enum(Status))
+		.transform((val) => val.toUpperCase())
+		.pipe(z.enum(ProjectStatus))
 		.optional(),
 	members: z.array(z.string("Member does not exist")).optional(),
 });

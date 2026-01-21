@@ -1,6 +1,17 @@
-import { Priority, State } from "@src/services/models/task.js";
 import z from "zod";
 import { createIdParamSchema, objectIdSchema } from "./common.js";
+
+export enum TaskPriority {
+	LOW = "LOW",
+	MEDIUM = "MEDIUM",
+	HIGH = "HIGH",
+}
+
+export enum TaskState {
+	OPEN = "OPEN",
+	IN_PROGRESS = "IN_PROGRESS",
+	CLOSED = "CLOSED",
+}
 
 const transformToDate =
 	(fieldName: string) => (str: string | undefined, ctx: z.RefinementCtx) => {
@@ -27,8 +38,18 @@ export const createTaskSchema = z.object({
 		.optional()
 		.transform(transformToDate("Due date"))
 		.pipe(z.date().optional()),
-	priority: z.enum(Priority).default(Priority.MEDIUM),
-	state: z.enum(State).default(State.OPEN),
+	priority: z
+		.preprocess(
+			(val) => (typeof val === "string" ? val.toUpperCase() : val),
+			z.enum(TaskPriority),
+		)
+		.default(TaskPriority.MEDIUM),
+	state: z
+		.preprocess(
+			(val) => (typeof val === "string" ? val.toUpperCase() : val),
+			z.enum(TaskState),
+		)
+		.default(TaskState.OPEN),
 	assignee: objectIdSchema("Assignee not found").optional(),
 	tags: z.array(objectIdSchema("Tag not found")).default([]),
 });

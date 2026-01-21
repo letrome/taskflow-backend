@@ -92,3 +92,12 @@ export const patchTask = async (
 
 	return await task.save();
 };
+
+export const deleteTask = async (task_id: string): Promise<ITask> => {
+	const task = await Task.findByIdAndDelete(task_id);
+	if (!task) {
+		throw new NotFoundError("Task not found");
+	}
+
+	return task;
+};

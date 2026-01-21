@@ -55,6 +55,21 @@ export const setTaskStatus = async (
 	res.status(200).json(updatedTask);
 };
 
+export const deleteTask = async (
+	req: AuthenticatedRequest<{ id: string }>,
+	res: Response,
+) => {
+	const task_id = req.params.id;
+	const user_id = req.auth.userId;
+
+	const task = await taskService.getTask(task_id);
+	await checkUserCanReadOrUpdateTask(task, user_id);
+
+	const deletedTask = await taskService.deleteTask(task_id);
+
+	res.status(200).json(deletedTask);
+};
+
 const checkUserCanReadOrUpdateTask = async (task: ITask, user_id: string) => {
 	try {
 		const user = await userService.getUser(user_id);

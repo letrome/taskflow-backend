@@ -34,4 +34,11 @@ router.patch(
 	taskCtrl.patchTask as unknown as RequestHandler,
 );
 
+router.delete(
+	"/:id",
+	jwtAuth,
+	validateParams(taskIdSchema),
+	taskCtrl.deleteTask as unknown as RequestHandler,
+);
+
 export default router;

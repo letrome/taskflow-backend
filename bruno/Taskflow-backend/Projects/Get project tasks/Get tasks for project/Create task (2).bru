@@ -1,0 +1,43 @@
+meta {
+  name: Create task (2)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Task title 2",
+    "description": "Task description 2"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.title: eq Task title 2
+  res.body.description: eq Task description 2
+  res.body.priority: eq MEDIUM
+  res.body.state: eq OPEN
+  res.body.project: eq {{project_id}}
+  res.body.tags: isArray
+  res.body.tags.length: eq 0
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  bru.setVar("invalid_project_id","696fe87ea2a5a9ace1ac169c")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

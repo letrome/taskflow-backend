@@ -8,7 +8,7 @@ import {
 } from "@src/controllers/schemas/project.js";
 
 import { createTagSchema } from "@src/controllers/schemas/tag.js";
-
+import { createTaskSchema } from "@src/controllers/schemas/task.js";
 import { jwtAuth } from "@src/middlewares/auth.js";
 import { validate, validateParams } from "@src/middlewares/validate.js";
 import { type RequestHandler, Router } from "express";
@@ -76,6 +76,21 @@ router.get(
 	jwtAuth,
 	validateParams(projectIdSchema),
 	projectCtrl.getProjectTags as unknown as RequestHandler,
+);
+
+router.post(
+	"/:id/tasks",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	validate(createTaskSchema),
+	projectCtrl.createProjectTask as unknown as RequestHandler,
+);
+
+router.get(
+	"/:id/tasks",
+	jwtAuth,
+	validateParams(projectIdSchema),
+	projectCtrl.getProjectTasks as unknown as RequestHandler,
 );
 
 export default router;

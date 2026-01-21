@@ -5,7 +5,8 @@ import {
 	getUser,
 	getVersion,
 } from "@src/controllers/admin.js";
-import type { CreateUserDTO } from "@src/controllers/schemas/user.js";
+import { type CreateUserDTO, UserRole } from "@src/controllers/schemas/user.js";
+import { userRoleToModelRole } from "@src/services/mapper.js";
 import { type IUser, Roles } from "@src/services/models/user.js";
 import * as adminService from "@src/services/user.js";
 import type { Request } from "express";
@@ -67,7 +68,7 @@ describe("createUser", () => {
 			password_hash: "hashed_password",
 			first_name: "First",
 			last_name: "Last",
-			roles: [Roles.ROLE_USER],
+			roles: [userRoleToModelRole[Roles.ROLE_USER]],
 		} as unknown as IUser);
 
 		const request = createMockRequest<
@@ -78,7 +79,7 @@ describe("createUser", () => {
 				password: "password",
 				first_name: "First",
 				last_name: "Last",
-				roles: [Roles.ROLE_USER],
+				roles: [UserRole.ROLE_USER],
 			},
 		});
 		const response = createMockResponse();

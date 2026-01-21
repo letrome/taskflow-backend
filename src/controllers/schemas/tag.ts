@@ -1,5 +1,5 @@
 import z from "zod";
-import { createIdParamSchema } from "./common.js";
+import { createIdParamSchema, objectIdSchema } from "./common.js";
 
 export const createTagSchema = z.object({
 	name: z.string({ error: "Name is required" }).min(1, "Name is required"),
@@ -8,9 +8,7 @@ export const createTagSchema = z.object({
 export const patchTagSchema = z
 	.object({
 		name: z.string({ error: "Name is required" }).min(1, "Name is required"),
-		project: z
-			.string({ error: "Project is required" })
-			.min(1, "Project is required"),
+		project: objectIdSchema("Project not found").optional(),
 	})
 	.partial();
 

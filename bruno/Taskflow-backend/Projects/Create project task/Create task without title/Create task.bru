@@ -1,0 +1,42 @@
+meta {
+  name: Create task
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "description": "Task description",
+    "due_date": "{{start_date}}",
+    "priority": "LOW",
+    "state": "IN_PROGRESS",
+    "assignee": "{{user_id_b}}",
+    "tags": ["{{tag_id_1}}", "{{tag_id_2}}"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.status: eq error
+  res.body.message: eq Title is required
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,54 @@
+meta {
+  name: Set task state
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/tasks/{{task_id}}/cLoSeD
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "due_date": "{{start_date}}",
+    "priority": "LOW",
+    "state": "IN_PROGRESS",
+    "assignee": "{{user_id_b}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq Task title
+  res.body.description: eq Task description
+  res.body.due_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.priority: eq LOW
+  res.body.state: eq CLOSED
+  res.body.project: eq {{project_id}}
+  res.body.assignee: eq {{user_id_b}}
+  res.body.tags: isArray
+  res.body.tags.length: eq 0
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+script:post-response {
+  bru.setVar("task_id",res.body.id)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

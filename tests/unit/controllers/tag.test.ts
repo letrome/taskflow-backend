@@ -40,7 +40,7 @@ describe("Tag Controller", () => {
 			vi.mocked(tagService.patchTag).mockResolvedValue(patchedTag as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await patchTag(req as any, res, mockNext);
+			await patchTag(req as any, res);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(tagService.getTag).toHaveBeenCalledWith("tag-id");
@@ -70,7 +70,7 @@ describe("Tag Controller", () => {
 			vi.mocked(tagService.getTag).mockResolvedValue(prevTag as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await patchTag(req as any, res, mockNext);
+			await patchTag(req as any, res);
 
 			expect(projectService.getProjectForUser).toHaveBeenCalledWith(
 				"old-project-id",
@@ -93,7 +93,7 @@ describe("Tag Controller", () => {
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await expect(patchTag(req as any, res, mockNext)).rejects.toThrow(error);
+			await expect(patchTag(req as any, res)).rejects.toThrow(error);
 			expect(mockNext).not.toHaveBeenCalled();
 		});
 	});
@@ -117,7 +117,7 @@ describe("Tag Controller", () => {
 			vi.mocked(tagService.deleteTag).mockResolvedValue(tag as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await deleteTag(req as any, res, mockNext);
+			await deleteTag(req as any, res);
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(tagService.getTag).toHaveBeenCalledWith("tag-id");
@@ -141,7 +141,7 @@ describe("Tag Controller", () => {
 			vi.mocked(userService.getUser).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			await expect(deleteTag(req as any, res, mockNext)).rejects.toThrow(error);
+			await expect(deleteTag(req as any, res)).rejects.toThrow(error);
 			expect(mockNext).not.toHaveBeenCalled();
 		});
 	});

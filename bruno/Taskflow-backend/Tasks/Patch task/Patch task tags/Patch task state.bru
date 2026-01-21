@@ -1,0 +1,44 @@
+meta {
+  name: Patch task state
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseurl}}/tasks/{{task_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "tags": ["{{tag_id_1}}", "{{tag_id_2}}"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq Task title
+  res.body.description: eq Task description
+  res.body.priority: eq MEDIUM
+  res.body.state: eq OPEN
+  res.body.project: eq {{project_id}}
+  res.body.tags: isArray
+  res.body.tags[0]: eq {{tag_id_1}}
+  res.body.tags[1]: eq {{tag_id_2}}
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

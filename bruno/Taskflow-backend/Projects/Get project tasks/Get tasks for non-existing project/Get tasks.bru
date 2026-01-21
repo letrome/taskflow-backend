@@ -1,0 +1,34 @@
+meta {
+  name: Get tasks
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseurl}}/projects/{{invalid_project_id}}/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Project not found
+}
+
+script:pre-request {
+  bru.setVar("invalid_project_id","696fe87ea2a5a9ace1ac169c")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -82,9 +82,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.17
         version: 4.0.17(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@25.0.9)(tsx@4.21.0)(yaml@2.8.2))
-      baseline-browser-mapping:
-        specifier: ^2.9.15
-        version: 2.9.15
       sonarqube-scanner:
         specifier: ^4.3.4
         version: 4.3.4
@@ -94,9 +91,6 @@ importers:
       supertest:
         specifier: ^7.2.2
         version: 7.2.2
-      testcontainers:
-        specifier: ^11.11.0
-        version: 11.11.0
       tsc-alias:
         specifier: ^1.8.16
         version: 1.8.16

@@ -65,11 +65,7 @@ describe("Integration Tests Tag", () => {
 			expect(response.status).toBe(201);
 			expect(response.body.name).toBe("Bug");
 			expect(response.body.project).toBe(projectId);
-			tagId = response.body.id; // Corrected: endpoint returns _id usually but serialized as id? Check controller.
-			// Controller returns `createdTag` which is ITag (Mongoose doc). `res.json(createdTag)`.
-			// Mongoose objects usually have `_id`. Express json might not transform it unless using a transformer.
-			// Let's assume standard object.
-			tagId = response.body._id || response.body.id;
+			tagId = response.body.id;
 		});
 
 		it("should return 409 for duplicate tag name in same project", async () => {

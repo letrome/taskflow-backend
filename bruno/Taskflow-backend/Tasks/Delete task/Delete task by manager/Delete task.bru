@@ -1,0 +1,36 @@
+meta {
+  name: Delete task
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseurl}}/tasks/{{task_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq Task title
+  res.body.description: eq Task description
+  res.body.priority: eq MEDIUM
+  res.body.state: eq OPEN
+  res.body.project: eq {{project_id}}
+  res.body.tags: isArray
+  res.body.tags.length: eq 0
+  res.body.id: matches ^[0-9a-f]{24}$
+}
+
+script:pre-request {
+  bru.setVar("invalid_task_id", "6961082914d673fca73a59e2");
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

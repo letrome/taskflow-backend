@@ -1,13 +1,16 @@
 import type {
 	AddProjectMemberDTO,
 	CreateOrUpdateProjectDTO,
+	PatchProjectDTO,
 } from "@src/controllers/schemas/project.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
+import * as taskService from "@src/services/task.js";
 import * as userService from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
 import type { Response } from "express";
 import type { CreateTagDTO } from "./schemas/tag.js";
+import type { CreateTaskDTO } from "./schemas/task.js";
 
 export const createProject = async (
 	req: AuthenticatedRequest<
@@ -71,7 +74,7 @@ export const patchProject = async (
 	req: AuthenticatedRequest<
 		{ id: string },
 		Record<string, never>,
-		CreateOrUpdateProjectDTO
+		PatchProjectDTO
 	>,
 	res: Response,
 ) => {
@@ -170,4 +173,38 @@ export const getProjectTags = async (
 
 	const tags = await tagService.getTagsForProject(project_id);
 	res.status(200).json(tags);
+};
+
+export const createProjectTask = async (
+	req: AuthenticatedRequest<
+		{ id: string },
+		Record<string, never>,
+		CreateTaskDTO
+	>,
+	res: Response,
+) => {
+	const project_id = req.params.id;
+	const user_id = req.auth.userId;
+
+	// Check if user has the right to create a task (must be creator, member or manager)
+	const user = await userService.getUser(user_id);
+	await projectService.getProjectForUser(project_id, user);
+
+	const createdTask = await taskService.createTask(req.body, project_id);
+	res.status(201).json(createdTask);
+};
+
+export const getProjectTasks = async (
+	req: AuthenticatedRequest<{ id: string }>,
+	res: Response,
+) => {
+	const project_id = req.params.id;
+	const user_id = req.auth.userId;
+
+	// Check if user has the right to create a task (must be creator, member or manager)
+	const user = await userService.getUser(user_id);
+	await projectService.getProjectForUser(project_id, user);
+
+	const tasks = await taskService.getTasksForProject(project_id);
+	res.status(200).json(tasks);
 };

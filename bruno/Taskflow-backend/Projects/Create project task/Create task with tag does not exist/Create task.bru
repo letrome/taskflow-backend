@@ -1,0 +1,38 @@
+meta {
+  name: Create task
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "tags": ["{{invalid_tag_id}}"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.status: eq error
+  res.body.message: eq Tag does not exist
+}
+
+script:pre-request {
+  bru.setVar("invalid_tag_id","696fe87ea2a5a9ace1ac169c")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

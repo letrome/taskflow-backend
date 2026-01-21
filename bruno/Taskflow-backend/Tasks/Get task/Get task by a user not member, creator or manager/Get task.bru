@@ -1,0 +1,31 @@
+meta {
+  name: Get task
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseurl}}/tasks/{{task_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Task not found
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

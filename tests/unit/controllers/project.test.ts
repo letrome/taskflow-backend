@@ -5,11 +5,13 @@ import {
 	getProject,
 	getProjects,
 	getProjectTags,
+	getProjectTasks,
 	patchProject,
 	updateProject,
 } from "@src/controllers/project.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
+import * as taskService from "@src/services/task.js";
 import * as userService from "@src/services/user.js";
 import type { Request } from "express";
 import { describe, expect, it, vi } from "vitest";
@@ -18,6 +20,7 @@ import { createMockRequest, createMockResponse } from "../test-utils.js";
 vi.mock("@src/services/project.js");
 vi.mock("@src/services/user.js");
 vi.mock("@src/services/tag.js");
+vi.mock("@src/services/task.js");
 
 describe("Project Controller", () => {
 	const mockResponse = createMockResponse;
@@ -397,6 +400,37 @@ describe("Project Controller", () => {
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await expect(getProjectTags(req as any, res)).rejects.toThrow(error);
+		});
+	});
+
+	describe("getProjectTasks", () => {
+		it("should return project tasks and 200", async () => {
+			const req = {
+				params: { id: "p1" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const user = { _id: "user-id" };
+			const tasks = [{ _id: "task1" }];
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+			vi.mocked(projectService.getProjectForUser).mockResolvedValue({
+				_id: "p1",
+				// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			} as any);
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(taskService.getTasksForProject).mockResolvedValue(tasks as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await getProjectTasks(req as any, res);
+
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.getProjectForUser).toHaveBeenCalledWith("p1", user);
+			expect(taskService.getTasksForProject).toHaveBeenCalledWith("p1");
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith(tasks);
 		});
 	});
 });

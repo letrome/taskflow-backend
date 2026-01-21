@@ -47,7 +47,8 @@ const taskSchema = new mongoose.Schema<ITask>(
 		tags: {
 			type: [mongoose.Types.ObjectId],
 			ref: "Tag",
-			required: true,
+			required: false,
+			default: [],
 			validate: {
 				validator: async (tags: mongoose.Types.ObjectId[]) => {
 					const Tag = mongoose.model("Tag");

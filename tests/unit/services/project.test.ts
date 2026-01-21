@@ -1,6 +1,9 @@
 import type { CreateOrUpdateProjectDTO } from "@src/controllers/schemas/project.js";
 import { NotFoundError } from "@src/core/errors.js";
-import Project from "@src/services/models/project.js";
+import Project, {
+	isCreatorDoesNotExistError,
+	isMemberDoesNotExistError,
+} from "@src/services/models/project.js";
 import { type IUser, Roles } from "@src/services/models/user.js";
 import {
 	addProjectMember,
@@ -27,12 +30,16 @@ vi.mock("@src/services/models/project.js", async (importOriginal) => {
 	return {
 		...actual,
 		default: ProjectMock,
+		isMemberDoesNotExistError: vi.fn(),
+		isCreatorDoesNotExistError: vi.fn(),
 	};
 });
 
 describe("Project Service", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		(isMemberDoesNotExistError as unknown as vi.Mock).mockReturnValue(false);
+		(isCreatorDoesNotExistError as unknown as vi.Mock).mockReturnValue(false);
 	});
 
 	describe("createProject", () => {
@@ -114,6 +121,22 @@ describe("Project Service", () => {
 					"creator-id",
 				),
 			).rejects.toThrow(genericError);
+		});
+		it("should throw BadRequestError if creator does not exist", async () => {
+			vi.mocked(getUser).mockResolvedValue({ _id: "creator-id" } as unknown as IUser);
+			vi.mocked(Project).mockImplementation(
+				class {
+					save = vi.fn().mockRejectedValue(new Error("Validation Error"));
+				} as unknown as typeof Project,
+			);
+			(isCreatorDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+
+			await expect(
+				createProject(
+					{ title: "Test" } as unknown as CreateOrUpdateProjectDTO,
+					"creator-id",
+				),
+			).rejects.toThrow("Creator does not exist");
 		});
 	});
 
@@ -375,6 +398,29 @@ describe("Project Service", () => {
 			});
 		});
 
+		it("should throw BadRequestError if member does not exist during update", async () => {
+			const user = { _id: "user-id", roles: [Roles.ROLE_USER] } as unknown as IUser;
+			const projectData = { title: "Updated", members: ["invalid-id"] };
+
+			const projectMock = {
+				_id: "project-id",
+				created_by: "user-id",
+				save: vi.fn().mockRejectedValue(new Error("Validation Error")),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue(user);
+			(isMemberDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+
+			await expect(
+				updateProject(
+					"project-id",
+					user,
+					projectData as unknown as CreateOrUpdateProjectDTO,
+				),
+			).rejects.toThrow("Member does not exist");
+		});
+
 		it("should throw NotFoundError if project not found or not authorized", async () => {
 			const user = {
 				_id: "user-id",
@@ -442,6 +488,52 @@ describe("Project Service", () => {
 			expect(result.title).toBe("New Title");
 			expect(projectMock.title).toBe("New Title");
 			expect(projectMock.save).toHaveBeenCalled();
+		});
+
+
+
+		it("should patch project status", async () => {
+			const user = { _id: "user-id", roles: [Roles.ROLE_USER] } as unknown as IUser;
+			const projectMock = {
+				_id: "project-id",
+				status: "planned",
+				save: vi.fn().mockResolvedValue({ _id: "project-id", status: "in_progress" }),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue(user);
+
+			// @ts-ignore
+			const result = await patchProject("project-id", user, { status: "in_progress" });
+			expect(result.status).toBe("in_progress");
+		});
+
+		it("should return project if no data provided", async () => {
+			const user = { _id: "user-id", roles: [Roles.ROLE_USER] } as unknown as IUser;
+			const projectMock = { _id: "project-id" };
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue(user);
+
+			// @ts-ignore
+			const result = await patchProject("project-id", user, null);
+			expect(result).toBe(projectMock);
+		});
+
+		it("should throw BadRequestError if member does not exist during patch", async () => {
+			const user = { _id: "user-id", roles: [Roles.ROLE_USER] } as unknown as IUser;
+			const projectMock = {
+				_id: "project-id",
+				save: vi.fn().mockRejectedValue(new Error("Validation Error")),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue(user);
+			(isMemberDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+
+			await expect(
+				patchProject("project-id", user, { members: ["invalid"] }),
+			).rejects.toThrow("Member does not exist");
 		});
 
 		it("should patch project members", async () => {
@@ -661,6 +753,24 @@ describe("Project Service", () => {
 			await expect(
 				addProjectMember("project-id", user, [memberId]),
 			).rejects.toThrow(new Error("DB Error"));
+		});
+
+		it("should throw BadRequestError if member does not exist during add", async () => {
+			const user = { _id: "user-id", roles: [Roles.ROLE_USER] } as unknown as IUser;
+			const memberId = "invalid-id";
+			const projectMock = {
+				_id: "project-id",
+				members: [],
+				save: vi.fn().mockRejectedValue(new Error("Validation Error")),
+			};
+
+			vi.mocked(Project).findOne = vi.fn().mockResolvedValue(projectMock);
+			vi.mocked(getUser).mockResolvedValue({ _id: memberId } as unknown as IUser);
+			(isMemberDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+
+			await expect(
+				addProjectMember("project-id", user, [memberId]),
+			).rejects.toThrow("Member does not exist");
 		});
 	});
 

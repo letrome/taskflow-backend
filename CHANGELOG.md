@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.13] - 2026-01-21
+
+### Added
+
+- Task management endpoints:
+  - `POST /projects/:id/tasks`: Create a new task in a project.
+  - `GET /projects/:id/tasks`: Retrieve all tasks for a project.
+  - `GET /tasks/:id`: Retrieve a specific task by ID.
+  - `POST /tasks/:id/:state`: Update the status of a task.
+  - `PATCH /tasks/:id`: Partially update a task.
+  - `DELETE /tasks/:id`: Delete a task.
+
+### Changed
+
+- Updated dependency `mongoose` to 9.1.5.
+
+### Fixed
+
+- Resolved issues in Task Controller exception handling.
 
 ## [0.1.12] - 2026-01-20
 

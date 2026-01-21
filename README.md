@@ -271,6 +271,62 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Auth**: Bearer Token
   - **Response**: `200 OK` with deleted tag details.
 
+### Tasks
+
+- **Create Project Task**
+  - **URL**: `/projects/:id/tasks`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "title": "Implement feature X",
+      "description": "Details about feature X",
+      "status": "todo",
+      "priority": "high",
+      "due_date": "2026-03-01",
+      "assignee": "60d5ecb8b48734356891fd41"
+    }
+    ```
+  - **Response**: `201 Created` with task details.
+
+- **Get Project Tasks**
+  - **URL**: `/projects/:id/tasks`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with list of tasks.
+
+- **Get Task by ID**
+  - **URL**: `/tasks/:id`
+  - **Method**: `GET`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with task details.
+
+- **Set Task Status**
+  - **URL**: `/tasks/:id/:state`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Description**: Update the status of a task (e.g., todo, in_progress, done).
+  - **Response**: `200 OK` with updated task details.
+
+- **Patch Task**
+  - **URL**: `/tasks/:id`
+  - **Method**: `PATCH`
+  - **Auth**: Bearer Token
+  - **Body**:
+    ```json
+    {
+      "title": "Updated title"
+    }
+    ```
+  - **Response**: `200 OK` with updated task details.
+
+- **Delete Task**
+  - **URL**: `/tasks/:id`
+  - **Method**: `DELETE`
+  - **Auth**: Bearer Token
+  - **Response**: `204 No Content`.
+
 ## 🧰 Tech Stack
 
 - **Runtime**: Node.js

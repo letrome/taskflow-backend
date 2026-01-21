@@ -123,7 +123,7 @@ describe("Integration Tests Auth", () => {
 				password: "password",
 			});
 
-			expect(response.status).toBe(401); // Or 404 depending on implementation, usually 401/403 for security to not leak user existence
+			expect(response.status).toBe(401);
 		});
 
 		it("should return 400 Bad Request for missing fields", async () => {

@@ -15,12 +15,13 @@ import {
 	patchTask,
 } from "@src/services/task.js";
 import mongoose from "mongoose";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 // Mock the Task model
 vi.mock("@src/services/models/task.js", async () => {
 	const actual = await vi.importActual("@src/services/models/task.js");
-	const MockTask = vi.fn();
+	// biome-ignore lint/suspicious/noExplicitAny: Mocking static (mongoose model) methods requires casting to any or a complex type
+	const MockTask = vi.fn() as any;
 	MockTask.find = vi.fn();
 	MockTask.findById = vi.fn();
 	MockTask.findByIdAndDelete = vi.fn();
@@ -49,7 +50,7 @@ describe("Task Service", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		// Reset MockTask implementation for constructor
-		(Task as unknown as vi.Mock).mockImplementation(function (this: unknown) {
+		(Task as unknown as Mock).mockImplementation(function (this: unknown) {
 			return mockTaskInstance;
 		});
 	});
@@ -82,7 +83,7 @@ describe("Task Service", () => {
 		it("should throw BadRequestError if assignee does not exist", async () => {
 			const error = new Error("Validation Error");
 			mockSave.mockRejectedValue(error);
-			(isAssigneeDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+			(isAssigneeDoesNotExistError as unknown as Mock).mockReturnValue(true);
 
 			await expect(createTask(validTaskData, projectId)).rejects.toThrow(
 				BadRequestError,
@@ -95,10 +96,8 @@ describe("Task Service", () => {
 		it("should throw BadRequestError if tag does not exist", async () => {
 			const error = new Error("Validation Error");
 			mockSave.mockRejectedValue(error);
-			(isAssigneeDoesNotExistError as unknown as vi.Mock).mockReturnValue(
-				false,
-			);
-			(isTagDoesNotExistError as unknown as vi.Mock).mockReturnValue(true);
+			(isAssigneeDoesNotExistError as unknown as Mock).mockReturnValue(false);
+			(isTagDoesNotExistError as unknown as Mock).mockReturnValue(true);
 
 			await expect(createTask(validTaskData, projectId)).rejects.toThrow(
 				BadRequestError,
@@ -111,10 +110,8 @@ describe("Task Service", () => {
 		it("should throw other errors", async () => {
 			const error = new Error("Database Error");
 			mockSave.mockRejectedValue(error);
-			(isAssigneeDoesNotExistError as unknown as vi.Mock).mockReturnValue(
-				false,
-			);
-			(isTagDoesNotExistError as unknown as vi.Mock).mockReturnValue(false);
+			(isAssigneeDoesNotExistError as unknown as Mock).mockReturnValue(false);
+			(isTagDoesNotExistError as unknown as Mock).mockReturnValue(false);
 
 			await expect(createTask(validTaskData, projectId)).rejects.toThrow(
 				"Database Error",
@@ -125,7 +122,7 @@ describe("Task Service", () => {
 	describe("getTasksForProject", () => {
 		it("should return tasks for a project", async () => {
 			const tasks = [mockTaskInstance];
-			(Task.find as vi.Mock).mockResolvedValue(tasks);
+			(Task.find as Mock).mockResolvedValue(tasks);
 			const projectId = "project-id";
 
 			const result = await getTasksForProject(projectId);
@@ -137,7 +134,7 @@ describe("Task Service", () => {
 
 	describe("getTask", () => {
 		it("should return a task by id", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(mockTaskInstance);
+			(Task.findById as Mock).mockResolvedValue(mockTaskInstance);
 			const taskId = "task-id";
 
 			const result = await getTask(taskId);
@@ -147,7 +144,7 @@ describe("Task Service", () => {
 		});
 
 		it("should throw NotFoundError if task not found", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(null);
+			(Task.findById as Mock).mockResolvedValue(null);
 			const taskId = "task-id";
 
 			await expect(getTask(taskId)).rejects.toThrow(NotFoundError);
@@ -158,7 +155,7 @@ describe("Task Service", () => {
 		const taskId = "task-id";
 
 		it("should patch and save task", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(mockTaskInstance);
+			(Task.findById as Mock).mockResolvedValue(mockTaskInstance);
 			mockSave.mockResolvedValue(mockTaskInstance);
 
 			const patchData = {
@@ -177,14 +174,14 @@ describe("Task Service", () => {
 		});
 
 		it("should return task if no data provided", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(mockTaskInstance);
-			// @ts-ignore
+			(Task.findById as Mock).mockResolvedValue(mockTaskInstance);
+			// @ts-expect-error
 			const result = await patchTask(taskId, null);
 			expect(result).toBe(mockTaskInstance);
 		});
 
 		it("should handle assignee and tags", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(mockTaskInstance);
+			(Task.findById as Mock).mockResolvedValue(mockTaskInstance);
 			mockSave.mockResolvedValue(mockTaskInstance);
 			const patchData = {
 				assignee: new mongoose.Types.ObjectId().toString(),
@@ -200,7 +197,7 @@ describe("Task Service", () => {
 		});
 
 		it("should throw NotFoundError if task to patch not found", async () => {
-			(Task.findById as vi.Mock).mockResolvedValue(null);
+			(Task.findById as Mock).mockResolvedValue(null);
 
 			await expect(patchTask(taskId, {})).rejects.toThrow(NotFoundError);
 		});
@@ -209,7 +206,7 @@ describe("Task Service", () => {
 	describe("deleteTask", () => {
 		const taskId = "task-id";
 		it("should delete task", async () => {
-			(Task.findByIdAndDelete as vi.Mock).mockResolvedValue(mockTaskInstance);
+			(Task.findByIdAndDelete as Mock).mockResolvedValue(mockTaskInstance);
 
 			const result = await deleteTask(taskId);
 
@@ -218,7 +215,7 @@ describe("Task Service", () => {
 		});
 
 		it("should throw NotFoundError if task to delete not found", async () => {
-			(Task.findByIdAndDelete as vi.Mock).mockResolvedValue(null);
+			(Task.findByIdAndDelete as Mock).mockResolvedValue(null);
 
 			await expect(deleteTask(taskId)).rejects.toThrow(NotFoundError);
 		});

@@ -1,4 +1,4 @@
-import { TaskState } from "@src/controllers/schemas/task.js";
+import { type PatchTaskDTO, TaskState } from "@src/controllers/schemas/task.js";
 import {
 	deleteTask,
 	getTask,
@@ -58,7 +58,7 @@ describe("Task Controller", () => {
 			status: statusMock,
 		};
 		req = {
-			auth: { userId: "user-id" },
+			auth: { userId: "user-id", roles: [] },
 			params: {},
 			body: {},
 		};
@@ -82,26 +82,16 @@ describe("Task Controller", () => {
 				mockProject as unknown as IProject,
 			);
 
-			await getTask(req as AuthenticatedRequest, res as Response);
+			await getTask(
+				req as unknown as AuthenticatedRequest<{ id: string }>,
+				res as Response,
+			);
 
 			expect(taskService.getTask).toHaveBeenCalledWith("task-id");
 			expect(res.json).toHaveBeenCalledWith(mockTask);
 		});
 
 		it("should throw ForbiddenError if user checks fail (simulated by failing getProjectForUser)", async () => {
-			// If getProjectForUser returns null, usually ForbiddenError is thrown by the helper
-			// But wait, getProjectForUser returns project or null.
-			// Logic in controller:
-			// const task = await taskService.getTask(req.params.id);
-			// await checkUserCanReadOrUpdateTask(req.auth.userId, task);
-
-			// checkUserCanReadOrUpdateTask:
-			// const user = await userService.getUser(userId);
-			// const project = await projectService.getProjectForUser(task.project.toString(), userId);
-			// if (!project) throw new ForbiddenError("User is not a member of the project");
-
-			// If user is assignee, they have access regardless of project membership (based on implementation found)
-			// So we must ensure user is NOT assignee
 			const anotherUserId = "another-user-id";
 			req.auth = { userId: anotherUserId, roles: [] };
 
@@ -110,7 +100,7 @@ describe("Task Controller", () => {
 			const taskWithDifferentAssignee = { ...mockTask, assignee: "user-id" };
 
 			vi.mocked(taskService.getTask).mockResolvedValue(
-				taskWithDifferentAssignee as ITask,
+				taskWithDifferentAssignee as unknown as ITask,
 			);
 
 			vi.mocked(userService.getUser).mockResolvedValue(
@@ -121,7 +111,10 @@ describe("Task Controller", () => {
 			);
 
 			await expect(
-				getTask(req as AuthenticatedRequest, res as Response),
+				getTask(
+					req as unknown as AuthenticatedRequest<{ id: string }>,
+					res as Response,
+				),
 			).rejects.toThrow(ForbiddenError);
 		});
 	});
@@ -134,7 +127,7 @@ describe("Task Controller", () => {
 			vi.mocked(userService.getUser).mockResolvedValue(
 				mockUser as unknown as IUser,
 			);
-			vi.mocked(taskService.getTask).mockResolvedValue(mockTask); // For check permission
+			vi.mocked(taskService.getTask).mockResolvedValue(mockTask);
 
 			vi.mocked(projectService.getProjectForUser).mockResolvedValue(
 				mockProject as unknown as IProject,
@@ -144,7 +137,14 @@ describe("Task Controller", () => {
 				title: "New Title",
 			} as ITask);
 
-			await patchTask(req as AuthenticatedRequest, res as Response);
+			await patchTask(
+				req as unknown as AuthenticatedRequest<
+					{ id: string },
+					Record<string, never>,
+					PatchTaskDTO
+				>,
+				res as Response,
+			);
 
 			expect(taskService.patchTask).toHaveBeenCalledWith("task-id", req.body);
 			expect(res.json).toHaveBeenCalledWith(
@@ -171,7 +171,13 @@ describe("Task Controller", () => {
 			} as ITask); // setTaskStatus calls patchTask internally or uses specific method?
 			// Checking controller implementation: setTaskStatus calls taskService.patchTask(id, { state })
 
-			await setTaskStatus(req as AuthenticatedRequest, res as Response);
+			await setTaskStatus(
+				req as unknown as AuthenticatedRequest<{
+					id: string;
+					state: TaskState;
+				}>,
+				res as Response,
+			);
 
 			expect(taskService.patchTask).toHaveBeenCalledWith("task-id", {
 				state: TaskState.IN_PROGRESS,
@@ -194,7 +200,10 @@ describe("Task Controller", () => {
 			);
 			vi.mocked(taskService.deleteTask).mockResolvedValue(mockTask);
 
-			await deleteTask(req as AuthenticatedRequest, res as Response);
+			await deleteTask(
+				req as unknown as AuthenticatedRequest<{ id: string }>,
+				res as Response,
+			);
 
 			expect(taskService.deleteTask).toHaveBeenCalledWith("task-id");
 			expect(res.json).toHaveBeenCalledWith(mockTask);

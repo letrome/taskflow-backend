@@ -138,7 +138,7 @@ describe("Integration Tests Task", () => {
 
 			expect(response.status).toBe(200);
 			expect(response.body.title).toBe("Patched Task Title");
-			expect(response.body.description).toBe("Task Description"); // Unchanged
+			expect(response.body.description).toBe("Task Description");
 		});
 
 		it("should update task status via PATCH", async () => {
@@ -172,7 +172,7 @@ describe("Integration Tests Task", () => {
 				.post(`/tasks/${createdTaskId}/closed`) // State param case insensitive?
 				.set("Authorization", `Bearer ${token}`);
 
-			expect(response.status).toBe(200); // Or 200/204? Controller returns task json, so 200.
+			expect(response.status).toBe(200);
 			expect(response.body.state).toBe("CLOSED");
 		});
 

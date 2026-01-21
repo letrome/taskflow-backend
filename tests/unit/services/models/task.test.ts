@@ -1,4 +1,9 @@
-import Task, { Priority, State, isAssigneeDoesNotExistError, isTagDoesNotExistError } from "@src/services/models/task.js";
+import Task, {
+	isAssigneeDoesNotExistError,
+	isTagDoesNotExistError,
+	Priority,
+	State,
+} from "@src/services/models/task.js";
 import mongoose from "mongoose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -153,23 +158,34 @@ describe("Task Model", () => {
 	});
 });
 
-	describe("Error Helpers", () => {
-		it("should identify assignee error", () => {
-			const error = new mongoose.Error.ValidationError();
-			error.addError("assignee", new mongoose.Error.ValidatorError({ path: "assignee", message: "Assignee does not exist" }));
-			expect(isAssigneeDoesNotExistError(error)).toBeTruthy();
-		});
-
-		it("should identify tag error", () => {
-			const error = new mongoose.Error.ValidationError();
-			error.addError("tags", new mongoose.Error.ValidatorError({ path: "tags", message: "One or more tags do not exist" }));
-			expect(isTagDoesNotExistError(error)).toBeTruthy();
-		});
-
-		it("should return false for unrelated errors", () => {
-			const error = new Error("Some other error");
-			expect(isAssigneeDoesNotExistError(error)).toBeFalsy();
-			expect(isTagDoesNotExistError(error)).toBeFalsy();
-		});
+describe("Error Helpers", () => {
+	it("should identify assignee error", () => {
+		const error = new mongoose.Error.ValidationError();
+		error.addError(
+			"assignee",
+			new mongoose.Error.ValidatorError({
+				path: "assignee",
+				message: "Assignee does not exist",
+			}),
+		);
+		expect(isAssigneeDoesNotExistError(error)).toBeTruthy();
 	});
 
+	it("should identify tag error", () => {
+		const error = new mongoose.Error.ValidationError();
+		error.addError(
+			"tags",
+			new mongoose.Error.ValidatorError({
+				path: "tags",
+				message: "One or more tags do not exist",
+			}),
+		);
+		expect(isTagDoesNotExistError(error)).toBeTruthy();
+	});
+
+	it("should return false for unrelated errors", () => {
+		const error = new Error("Some other error");
+		expect(isAssigneeDoesNotExistError(error)).toBeFalsy();
+		expect(isTagDoesNotExistError(error)).toBeFalsy();
+	});
+});

@@ -1,6 +1,7 @@
+import { UserRole } from "@src/controllers/schemas/user.js";
 import { ConflictError, NotFoundError } from "@src/core/errors.js";
 import type { IUser } from "@src/services/models/user.js";
-import User, { Roles } from "@src/services/models/user.js";
+import User from "@src/services/models/user.js";
 import { createUser, getUser } from "@src/services/user.js";
 import bcrypt from "bcrypt";
 import { describe, expect, it, vi } from "vitest";
@@ -26,7 +27,7 @@ describe("User Service", () => {
 			password: "password123",
 			first_name: "John",
 			last_name: "Doe",
-			roles: [Roles.ROLE_USER],
+			roles: [UserRole.ROLE_USER],
 		};
 
 		it("should hash password and create user", async () => {

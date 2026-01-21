@@ -7,13 +7,12 @@ import {
 	getProjectTags,
 	getProjectTasks,
 	patchProject,
-	removeProjectMember,
 	updateProject,
 } from "@src/controllers/project.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
-import * as userService from "@src/services/user.js";
 import * as taskService from "@src/services/task.js";
+import * as userService from "@src/services/user.js";
 import type { Request } from "express";
 import { describe, expect, it, vi } from "vitest";
 import { createMockRequest, createMockResponse } from "../test-utils.js";
@@ -402,7 +401,6 @@ describe("Project Controller", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await expect(getProjectTags(req as any, res)).rejects.toThrow(error);
 		});
-
 	});
 
 	describe("getProjectTasks", () => {

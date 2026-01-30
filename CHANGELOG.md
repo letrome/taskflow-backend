@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.14] - 2026-01-30
+
+### Added
+
+- User profile management endpoints:
+  - `PUT /users/me`: Update user information.
+  - `PATCH /users/me`: Partially update user information.
+  - `PUT /users/me/email`: Update user email.
+  - `PUT /users/me/password`: Update user password.
+  - `DELETE /users/me`: Delete user account.
+  - `POST /users/me/consent`: Add user consent.
+  - `DELETE /users/me/consent`: Remove user consent.
+- Task tags management endpoints:
+  - `POST /tasks/:id/tags/:tagId`: Add a tag to a task.
+  - `DELETE /tasks/:id/tags/:tagId`: Remove a tag from a task.
+
+### Changed
+
+- Updated dependencies: `zod` (4.3.6), `pino` (10.3.0), `cors` (2.8.6), `@types/node` (25.0.10).
+
 ## [0.1.13] - 2026-01-21
 
 ### Added

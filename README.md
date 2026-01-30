@@ -154,6 +154,59 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Auth**: Bearer Token
   - **Response**: `200 OK` with user profile.
 
+- **User Management**
+
+  - **Update User Info**
+    - **URL**: `/users/me`
+    - **Method**: `PUT`
+    - **Auth**: Bearer Token
+    - **Body**:
+      ```json
+      {
+        "first_name": "Jane",
+        "last_name": "Doe"
+      }
+      ```
+    - **Response**: `200 OK` with updated user profile.
+
+  - **Update Email**
+    - **URL**: `/users/me/email`
+    - **Method**: `PUT`
+    - **Auth**: Bearer Token
+    - **Body**:
+      ```json
+      {
+        "email": "newemail@example.com",
+        "password": "currentpassword"
+      }
+      ```
+    - **Response**: `200 OK`.
+
+  - **Update Password**
+    - **URL**: `/users/me/password`
+    - **Method**: `PUT`
+    - **Auth**: Bearer Token
+    - **Body**:
+      ```json
+      {
+        "old_password": "currentpassword",
+        "new_password": "newsecurepassword"
+      }
+      ```
+    - **Response**: `200 OK`.
+
+  - **Delete Account**
+    - **URL**: `/users/me`
+    - **Method**: `DELETE`
+    - **Auth**: Bearer Token
+    - **Response**: `204 No Content`.
+
+  - **Manage Consent**
+    - **URL**: `/users/me/consent`
+    - **Method**: `POST` (Add) / `DELETE` (Remove)
+    - **Auth**: Bearer Token
+    - **Response**: `200 OK`.
+
 ### Projects
 
 - **Create Project**
@@ -326,6 +379,20 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Method**: `DELETE`
   - **Auth**: Bearer Token
   - **Response**: `204 No Content`.
+
+### Task Tags
+
+- **Add Tag to Task**
+  - **URL**: `/tasks/:id/tags/:tagId`
+  - **Method**: `POST`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with updated task tags.
+
+- **Remove Tag from Task**
+  - **URL**: `/tasks/:id/tags/:tagId`
+  - **Method**: `DELETE`
+  - **Auth**: Bearer Token
+  - **Response**: `200 OK` with updated task tags.
 
 ## 🧰 Tech Stack
 

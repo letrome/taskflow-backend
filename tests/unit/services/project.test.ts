@@ -143,6 +143,25 @@ describe("Project Service", () => {
 				),
 			).rejects.toThrow("Creator does not exist");
 		});
+
+		it("should throw BadRequestError if member does not exist", async () => {
+			vi.mocked(getUser).mockResolvedValue({
+				_id: "creator-id",
+			} as unknown as IUser);
+			vi.mocked(Project).mockImplementation(
+				class {
+					save = vi.fn().mockRejectedValue(new Error("Validation Error"));
+				} as unknown as typeof Project,
+			);
+			(isMemberDoesNotExistError as unknown as Mock).mockReturnValue(true);
+
+			await expect(
+				createProject(
+					{ title: "Test", members: ["invalid-id"] } as unknown as CreateOrUpdateProjectDTO,
+					"creator-id",
+				),
+			).rejects.toThrow("Member does not exist");
+		});
 	});
 
 	describe("getProjectForUser", () => {

@@ -1,7 +1,9 @@
+import { BadRequestError } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
 import type { IUser } from "@src/services/models/user.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
+import * as taskService from "@src/services/task.js";
 import { getUser } from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
 import type { Response } from "express";
@@ -45,6 +47,7 @@ export const deleteTag = async (
 	const tag = await tagService.getTag(tag_id);
 
 	await checkUserCanUpdateProject(tag.project.toString(), user);
+	await checkNoTaskIsUsingTag(tag_id);
 
 	const deletedTag = await tagService.deleteTag(tag_id);
 	res.status(200).json(deletedTag);
@@ -52,4 +55,11 @@ export const deleteTag = async (
 
 const checkUserCanUpdateProject = async (project_id: string, user: IUser) => {
 	await projectService.getProjectForUser(project_id, user);
+};
+
+const checkNoTaskIsUsingTag = async (tag_id: string) => {
+	const task = await taskService.getTasksForTag(tag_id);
+	if (task.length > 0) {
+		throw new BadRequestError("Tag is used by a task");
+	}
 };

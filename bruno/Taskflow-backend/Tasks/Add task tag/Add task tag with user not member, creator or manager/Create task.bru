@@ -1,11 +1,11 @@
 meta {
-  name: Patch task state
+  name: Create task
   type: http
-  seq: 4
+  seq: 3
 }
 
-patch {
-  url: {{baseurl}}/tasks/{{task_id}}
+post {
+  url: {{baseurl}}/projects/{{project_id}}/tasks
   body: json
   auth: bearer
 }
@@ -16,16 +16,22 @@ auth:bearer {
 
 body:json {
   {
+    "title": "Task title",
+    "description": "Task description",
+    "due_date": "{{start_date}}",
+    "priority": "LOW",
+    "state": "IN_PROGRESS",
     "assignee": "{{user_id_b}}"
   }
 }
 
 assert {
-  res.status: eq 200
+  res.status: eq 201
   res.body.title: eq Task title
   res.body.description: eq Task description
-  res.body.priority: eq MEDIUM
-  res.body.state: eq OPEN
+  res.body.due_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.priority: eq LOW
+  res.body.state: eq IN_PROGRESS
   res.body.project: eq {{project_id}}
   res.body.assignee: eq {{user_id_b}}
   res.body.tags: isArray
@@ -36,6 +42,10 @@ assert {
 script:pre-request {
   const now = new Date();
   bru.setVar("due_date", `${now}`);
+}
+
+script:post-response {
+  bru.setVar("task_id",res.body.id)
 }
 
 settings {

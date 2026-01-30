@@ -1,5 +1,5 @@
 meta {
-  name: Patch task state
+  name: Patch task
   type: http
   seq: 4
 }
@@ -16,7 +16,7 @@ auth:bearer {
 
 body:json {
   {
-    "priority": "hIgH"
+    "due_date": "{{due_date}}"
   }
 }
 
@@ -24,7 +24,8 @@ assert {
   res.status: eq 200
   res.body.title: eq Task title
   res.body.description: eq Task description
-  res.body.priority: eq HIGH
+  res.body.due_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.priority: eq MEDIUM
   res.body.state: eq OPEN
   res.body.project: eq {{project_id}}
   res.body.tags: isArray

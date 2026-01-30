@@ -23,9 +23,9 @@ body:json {
 }
 
 assert {
-  res.status: eq 400
+  res.status: eq 404
   res.body.status: eq error
-  res.body.message: eq Tag does not exist
+  res.body.message: eq Tag not found
 }
 
 script:pre-request {

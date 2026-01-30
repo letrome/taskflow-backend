@@ -1,0 +1,32 @@
+meta {
+  name: Add task tag
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/tasks/{{invalid_task_id}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Task not found
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("invalid_task_id", "6961182914d673fca73a59e2");
+  bru.setVar("tag_id", "6961182914d673fca73a59e2");
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -190,6 +190,14 @@ export const createProjectTask = async (
 	const user = await userService.getUser(user_id);
 	await projectService.getProjectForUser(project_id, user);
 
+	if (req.body.tags) {
+		await Promise.all(
+			req.body.tags.map((tag_id: string) =>
+				tagService.checkTagExistForProject(tag_id, project_id),
+			),
+		);
+	}
+
 	const createdTask = await taskService.createTask(req.body, project_id);
 	res.status(201).json(createdTask);
 };

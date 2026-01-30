@@ -155,9 +155,7 @@ export const addProjectMember = async (
 	try {
 		const includeMembers = false;
 		const project = await getProjectForUser(id, user, includeMembers);
-		if (!project) {
-			throw new NotFoundError("Project not found");
-		}
+
 
 		const existingMembersSet = new Set(
 			project.members.map((m) => m.toString()),

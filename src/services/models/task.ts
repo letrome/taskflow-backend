@@ -20,7 +20,7 @@ export interface ITask extends mongoose.Document {
 	state: State;
 	project: mongoose.Types.ObjectId;
 	assignee?: mongoose.Types.ObjectId;
-	tags: mongoose.Types.ObjectId[];
+	tags: mongoose.Types.Array<mongoose.Types.ObjectId>;
 }
 
 const taskSchema = new mongoose.Schema<ITask>(

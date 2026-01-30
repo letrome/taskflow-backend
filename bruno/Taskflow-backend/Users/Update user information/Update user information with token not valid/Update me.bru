@@ -1,0 +1,37 @@
+meta {
+  name: Update me
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseurl}}/users/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{invalid_token}}
+}
+
+body:json {
+  {
+    "first_name": "John",
+    "last_name": "Doe"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  bru.setVar("invalid_token","exJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NzI1MDcxOWFjYzdjMTExOTljMTEwYSIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3NjkwOTkzODAsImV4cCI6MTc2OTE4NTc4MH0.knsiKSqOidPh3BA1ZJw9uxsSPoKVhe5EzoJnV-9FhnQ")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

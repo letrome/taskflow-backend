@@ -1,0 +1,30 @@
+meta {
+  name: Me
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseurl}}/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{expired_token}}
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  bru.setVar("expired_token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NzI1MjVlYTg3Mjg0MTQzYTkwOWJjMiIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE3NjkwOTk4NzMsImV4cCI6MTc2OTA5OTg4M30.V21auafupRHKpdkzrGTE-C4fZZGNRP1X170UytWM3g8")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

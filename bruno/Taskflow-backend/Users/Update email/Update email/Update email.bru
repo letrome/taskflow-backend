@@ -1,0 +1,43 @@
+meta {
+  name: Update email
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseurl}}/users/me/email
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "{{new_email}}",
+    "password": "{{unique_password}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.email: eq {{new_email}}
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles: isArray
+  res.body.roles[0]: eq ROLE_USER
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("new_email", `${uuid}@example.com`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

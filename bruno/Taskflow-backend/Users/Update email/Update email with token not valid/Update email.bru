@@ -1,0 +1,40 @@
+meta {
+  name: Update email
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseurl}}/users/me/email
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{invalid_token}}
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "{{unique_password}}"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  bru.setVar("invalid_token","invalid")
+  const uuid = require("uuid").v4()
+  bru.setVar("unique_email", `${uuid}@example.com`);
+  bru.setVar("unique_password", `${uuid}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

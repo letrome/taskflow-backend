@@ -1,0 +1,33 @@
+meta {
+  name: Login (2)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseurl}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "{{unique_password}}"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Invalid email/password combination
+}
+
+script:post-response {
+  bru.setVar("token", res.body.token);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

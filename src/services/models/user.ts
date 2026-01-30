@@ -12,6 +12,8 @@ export interface IUser extends mongoose.Document {
 	first_name: string;
 	last_name: string;
 	roles: Roles[];
+	consent: boolean;
+	last_consent_date: Date;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -25,6 +27,8 @@ const userSchema = new mongoose.Schema<IUser>(
 			enum: Object.values(Roles),
 			default: [Roles.ROLE_USER],
 		},
+		consent: { type: Boolean, default: false },
+		last_consent_date: { type: Date, required: false },
 	},
 	{
 		toJSON: {

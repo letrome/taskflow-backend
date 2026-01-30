@@ -112,6 +112,7 @@ describe("Integration Tests", () => {
 				first_name: "First",
 				last_name: "Last",
 				roles: ["ROLE_USER"],
+				consent: false,
 				created_at: expect.any(String),
 			});
 		});
@@ -192,6 +193,7 @@ describe("Integration Tests", () => {
 				first_name: "First",
 				last_name: "Last",
 				roles: ["ROLE_USER"],
+				consent: false,
 				created_at: expect.any(String),
 			});
 		});

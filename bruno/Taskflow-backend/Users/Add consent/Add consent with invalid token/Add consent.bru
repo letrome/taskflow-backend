@@ -1,0 +1,30 @@
+meta {
+  name: Add consent
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseurl}}/users/me/consent
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{invalid_token}}
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  bru.setVar("invalid_token","invalid")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Me
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq User not found
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

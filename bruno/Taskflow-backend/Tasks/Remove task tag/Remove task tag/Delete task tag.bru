@@ -1,0 +1,36 @@
+meta {
+  name: Delete task tag
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseurl}}/tasks/{{task_id}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "tags": ["{{tag_id}}"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body[0]: eq {{tag_id}}
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,6 +1,7 @@
 import { NotFoundError } from "@src/core/errors.js";
 import type { ITask } from "@src/services/models/task.js";
 import * as projectService from "@src/services/project.js";
+import * as tagService from "@src/services/tag.js";
 import * as taskService from "@src/services/task.js";
 import * as userService from "@src/services/user.js";
 import type { AuthenticatedRequest } from "@src/types/authenticated-request.js";
@@ -33,6 +34,13 @@ export const patchTask = async (
 
 	const task = await taskService.getTask(task_id);
 	await checkUserCanReadOrUpdateTask(task, user_id);
+	if (req.body.tags) {
+		await Promise.all(
+			req.body.tags.map((tag_id: string) =>
+				tagService.checkTagExistForProject(tag_id, task.project.toString()),
+			),
+		);
+	}
 
 	const updatedTask = await taskService.patchTask(task_id, req.body);
 
@@ -68,6 +76,39 @@ export const deleteTask = async (
 	const deletedTask = await taskService.deleteTask(task_id);
 
 	res.status(200).json(deletedTask);
+};
+
+export const addTaskTag = async (
+	req: AuthenticatedRequest<{ id: string; tagId: string }>,
+	res: Response,
+) => {
+	const task_id = req.params.id;
+	const tag_id = req.params.tagId;
+	const user_id = req.auth.userId;
+
+	const task = await taskService.getTask(task_id);
+	await checkUserCanReadOrUpdateTask(task, user_id);
+	await tagService.checkTagExistForProject(tag_id, task.project.toString());
+
+	const updatedTask = await taskService.addTaskTag(task_id, tag_id);
+
+	res.status(200).json(updatedTask);
+};
+
+export const removeTaskTag = async (
+	req: AuthenticatedRequest<{ id: string; tagId: string }>,
+	res: Response,
+) => {
+	const task_id = req.params.id;
+	const tag_id = req.params.tagId;
+	const user_id = req.auth.userId;
+
+	const task = await taskService.getTask(task_id);
+	await checkUserCanReadOrUpdateTask(task, user_id);
+
+	const updatedTask = await taskService.removeTaskTag(task_id, tag_id);
+
+	res.status(200).json(updatedTask);
 };
 
 const checkUserCanReadOrUpdateTask = async (task: ITask, user_id: string) => {

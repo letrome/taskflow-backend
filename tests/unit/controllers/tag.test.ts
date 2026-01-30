@@ -1,6 +1,7 @@
 import { deleteTag, patchTag } from "@src/controllers/tag.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
+import * as taskService from "@src/services/task.js";
 import * as userService from "@src/services/user.js";
 import type { Request, Response } from "express";
 import { describe, expect, it, vi } from "vitest";
@@ -8,6 +9,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@src/services/project.js");
 vi.mock("@src/services/tag.js");
 vi.mock("@src/services/user.js");
+vi.mock("@src/services/task.js");
 
 describe("Tag Controller", () => {
 	const mockResponse = () => {
@@ -115,6 +117,8 @@ describe("Tag Controller", () => {
 			vi.mocked(tagService.getTag).mockResolvedValue(tag as any);
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			vi.mocked(tagService.deleteTag).mockResolvedValue(tag as any);
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(taskService.getTasksForTag).mockResolvedValue([] as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await deleteTag(req as any, res);
@@ -143,6 +147,29 @@ describe("Tag Controller", () => {
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await expect(deleteTag(req as any, res)).rejects.toThrow(error);
 			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should throw BadRequestError if tag is used by a task", async () => {
+			const req = {
+				params: { id: "tag-id" },
+				auth: { userId: "user-id" },
+			} as unknown as Request;
+			const res = mockResponse();
+
+			const user = { _id: "user-id" };
+			const tag = { _id: "tag-id", project: "project-id" };
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(tagService.getTag).mockResolvedValue(tag as any);
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(taskService.getTasksForTag).mockResolvedValue([{ _id: "task-id" }] as any);
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			await expect(deleteTag(req as any, res)).rejects.toThrow(
+				"Tag is used by a task",
+			);
 		});
 	});
 });

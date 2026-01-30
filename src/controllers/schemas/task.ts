@@ -98,3 +98,5 @@ export const taskStateParamSchema = z.object({
 		z.enum(TaskState),
 	),
 });
+
+export const tagIdSchema = createIdParamSchema("Tag not found", "tagId");

@@ -2,8 +2,13 @@ import type {
 	CreateTaskDTO,
 	PatchTaskDTO,
 } from "@src/controllers/schemas/task.js";
-import { BadRequestError, NotFoundError } from "@src/core/errors.js";
+import {
+	BadRequestError,
+	ConflictError,
+	NotFoundError,
+} from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
+import type { Types } from "mongoose";
 
 import {
 	stringToObjectId,
@@ -52,6 +57,10 @@ export const getTasksForProject = async (
 	return await Task.find({ project: project_id });
 };
 
+export const getTasksForTag = async (tag_id: string): Promise<ITask[]> => {
+	return await Task.find({ tags: tag_id });
+};
+
 export const getTask = async (task_id: string): Promise<ITask> => {
 	const task = await Task.findById(task_id);
 	if (!task) {
@@ -87,7 +96,9 @@ export const patchTask = async (
 		task.assignee = stringToObjectId(taskData.assignee);
 	}
 	if (taskData.tags) {
-		task.tags = taskData.tags.map((tag) => stringToObjectId(tag));
+		task.tags = taskData.tags.map((tag) =>
+			stringToObjectId(tag),
+		) as Types.Array<Types.ObjectId>;
 	}
 
 	return await task.save();
@@ -100,4 +111,51 @@ export const deleteTask = async (task_id: string): Promise<ITask> => {
 	}
 
 	return task;
+};
+
+export const addTaskTag = async (
+	task_id: string,
+	tag_id: string,
+): Promise<string[]> => {
+	const task = await Task.findById(task_id);
+	if (!task) {
+		throw new NotFoundError("Task not found");
+	}
+
+	const tagObjectId = stringToObjectId(tag_id);
+	if (task.tags.some((t) => t.equals(tagObjectId))) {
+		throw new ConflictError("Tag already assigned");
+	}
+
+	task.tags.push(tagObjectId);
+
+	try {
+		const savedTask = await task.save();
+		return savedTask.tags.map((tag) => tag.toString());
+	} catch (error) {
+		if (isTagDoesNotExistError(error as Error)) {
+			logger.debug(error);
+			throw new BadRequestError("Tag does not exist");
+		}
+		throw error;
+	}
+};
+
+export const removeTaskTag = async (
+	task_id: string,
+	tag_id: string,
+): Promise<string[]> => {
+	const task = await Task.findById(task_id);
+	if (!task) {
+		throw new NotFoundError("Task not found");
+	}
+
+	if (!task.tags.some((t) => t.equals(stringToObjectId(tag_id)))) {
+		throw new BadRequestError("Tag does not exist");
+	}
+
+	task.tags.pull(stringToObjectId(tag_id));
+
+	await task.save();
+	return [tag_id];
 };

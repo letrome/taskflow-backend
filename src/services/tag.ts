@@ -78,3 +78,13 @@ export const deleteTag = async (tagId: string): Promise<ITag> => {
 	}
 	return tag;
 };
+
+export const checkTagExistForProject = async (
+	tag_id: string,
+	project_id: string,
+) => {
+	const tag = await getTag(tag_id);
+	if (!tag || tag.project.toString() !== project_id) {
+		throw new NotFoundError("Tag not found");
+	}
+};

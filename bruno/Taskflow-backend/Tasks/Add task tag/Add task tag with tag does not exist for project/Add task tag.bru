@@ -1,0 +1,31 @@
+meta {
+  name: Add task tag
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseurl}}/tasks/{{task_id}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.status: eq error
+  res.body.message: eq Tag not found
+}
+
+script:pre-request {
+  const now = new Date();
+  bru.setVar("due_date", `${now}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

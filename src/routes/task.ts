@@ -1,3 +1,4 @@
+import { tagIdSchema } from "@src/controllers/schemas/tag.js";
 import {
 	patchTaskSchema,
 	taskIdSchema,
@@ -39,6 +40,22 @@ router.delete(
 	jwtAuth,
 	validateParams(taskIdSchema),
 	taskCtrl.deleteTask as unknown as RequestHandler,
+);
+
+router.post(
+	"/:id/tags/:tagId",
+	jwtAuth,
+	validateParams(taskIdSchema),
+	validateParams(tagIdSchema),
+	taskCtrl.addTaskTag as unknown as RequestHandler,
+);
+
+router.delete(
+	"/:id/tags/:tagId",
+	jwtAuth,
+	validateParams(taskIdSchema),
+	validateParams(tagIdSchema),
+	taskCtrl.removeTaskTag as unknown as RequestHandler,
 );
 
 export default router;

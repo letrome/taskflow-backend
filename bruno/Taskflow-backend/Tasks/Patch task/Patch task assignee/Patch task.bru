@@ -1,5 +1,5 @@
 meta {
-  name: Patch task state
+  name: Patch task
   type: http
   seq: 4
 }
@@ -16,17 +16,18 @@ auth:bearer {
 
 body:json {
   {
-    "title": "New Task title"
+    "assignee": "{{user_id_b}}"
   }
 }
 
 assert {
   res.status: eq 200
-  res.body.title: eq New Task title
+  res.body.title: eq Task title
   res.body.description: eq Task description
   res.body.priority: eq MEDIUM
   res.body.state: eq OPEN
   res.body.project: eq {{project_id}}
+  res.body.assignee: eq {{user_id_b}}
   res.body.tags: isArray
   res.body.tags.length: eq 0
   res.body.id: matches ^[0-9a-f]{24}$

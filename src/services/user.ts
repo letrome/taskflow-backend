@@ -1,7 +1,7 @@
 import type {
 	CreateUserDTO,
-	PatchEmailDTO,
-	PatchPasswordDTO,
+	UpdateEmailDTO,
+	UpdatePasswordDTO,
 	PatchUserInformationDTO,
 	UpdateUserInformationDTO,
 } from "@src/controllers/schemas/user.js";
@@ -84,7 +84,7 @@ export const deleteUser = async (id: string): Promise<IUser> => {
 
 export const updatePassword = async (
 	id: string,
-	userData: PatchPasswordDTO,
+	userData: UpdatePasswordDTO,
 ): Promise<IUser> => {
 	const user = await User.findById(id).select("+password_hash");
 	if (!user) {
@@ -104,7 +104,7 @@ export const updatePassword = async (
 
 export const updateEmail = async (
 	id: string,
-	userData: PatchEmailDTO,
+	userData: UpdateEmailDTO,
 ): Promise<IUser> => {
 	const user = await User.findById(id).select("+password_hash");
 	if (!user) {

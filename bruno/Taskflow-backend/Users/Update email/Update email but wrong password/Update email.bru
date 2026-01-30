@@ -1,0 +1,39 @@
+meta {
+  name: Update email
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseurl}}/users/me/email
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "{{new_email}}",
+    "password": "{{wrong_password}}"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Invalid password
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("new_email", `${uuid}@example.com`);
+  bru.setVar("wrong_password", `${uuid}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

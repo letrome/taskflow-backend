@@ -1,0 +1,36 @@
+meta {
+  name: Patch me
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseurl}}/users/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{invalid_token}}
+}
+
+body:json {
+  {
+    "last_name": "Doe"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.status: eq error
+  res.body.message: eq Unauthorized
+}
+
+script:pre-request {
+  bru.setVar("invalid_token","invalid")
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

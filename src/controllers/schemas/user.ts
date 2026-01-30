@@ -21,6 +21,38 @@ export const createUserSchema = z.object({
 		.default([UserRole.ROLE_USER]),
 });
 
+export const updateUserInformationSchema = z.object({
+	first_name: z.string().min(1, "First name is required"),
+	last_name: z.string().min(1, "Last name is required"),
+});
+
+export const patchUserInformationSchema = z.object({
+	first_name: z.string().min(1, "First name is required").optional(),
+	last_name: z.string().min(1, "Last name is required").optional(),
+});
+
+export const updatePasswordSchema = z.object({
+	old_password: z
+		.string()
+		.min(8, "Password must be at least 8 characters long"),
+	new_password: z
+		.string()
+		.min(8, "Password must be at least 8 characters long"),
+});
+
+export const updateEmailSchema = z.object({
+	email: z.email("Invalid email format"),
+	password: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
 export type CreateUserDTO = z.infer<typeof createUserSchema>;
+export type UpdateUserInformationDTO = z.infer<
+	typeof updateUserInformationSchema
+>;
+export type PatchUserInformationDTO = z.infer<
+	typeof patchUserInformationSchema
+>;
+export type UpdatePasswordDTO = z.infer<typeof updatePasswordSchema>;
+export type UpdateEmailDTO = z.infer<typeof updateEmailSchema>;
 
 export const userIdSchema = createIdParamSchema("User not found");

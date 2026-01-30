@@ -39,6 +39,7 @@ describe("Integration Tests Auth", () => {
 				first_name: "John",
 				last_name: "Doe",
 				roles: ["ROLE_USER"],
+				consent: false,
 				created_at: expect.any(String),
 			});
 		});

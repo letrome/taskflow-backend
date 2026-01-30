@@ -1,0 +1,27 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseurl}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{unique_email}}",
+    "password": "{{unique_password}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("token", res.body.token);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

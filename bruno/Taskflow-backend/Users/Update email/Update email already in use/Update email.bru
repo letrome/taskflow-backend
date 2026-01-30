@@ -1,0 +1,33 @@
+meta {
+  name: Update email
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseurl}}/users/me/email
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "{{unique_email_2}}",
+    "password": "{{unique_password_1}}"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body.status: eq error
+  res.body.message: eq Email already exists
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

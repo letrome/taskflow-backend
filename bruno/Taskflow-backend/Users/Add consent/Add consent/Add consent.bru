@@ -1,0 +1,38 @@
+meta {
+  name: Add consent
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseurl}}/users/me/consent
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.email: eq {{unique_email}}
+  res.body.first_name: eq endt
+  res.body.last_name: eq oend
+  res.body.roles: isArray
+  res.body.roles[0]: eq ROLE_USER
+  res.body.id: matches ^[0-9a-f]{24}$
+  res.body.created_at: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+  res.body.consent: eq true
+  res.body.last_consent_date: matches ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{0,3}Z$
+}
+
+script:pre-request {
+  const uuid = require("uuid").v4()
+  bru.setVar("new_email", `${uuid}@example.com`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

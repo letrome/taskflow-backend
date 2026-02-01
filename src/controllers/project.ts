@@ -219,7 +219,7 @@ export const getProjectTasks = async (
 	const tasks = await taskService.getTasksForProject(
 		req.taskQuery?.query ?? {},
 		req.taskQuery?.populate ?? false,
-		req.taskQuery?.sort ?? [],
+		req.taskQuery?.sort ?? undefined,
 		req.taskQuery?.pagination ?? {},
 	);
 	res.status(200).json(tasks);

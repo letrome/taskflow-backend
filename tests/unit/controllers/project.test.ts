@@ -431,7 +431,7 @@ describe("Project Controller", () => {
 			expect(taskService.getTasksForProject).toHaveBeenCalledWith(
 				{},
 				false,
-				[],
+				undefined,
 				{},
 			);
 			expect(res.status).toHaveBeenCalledWith(200);

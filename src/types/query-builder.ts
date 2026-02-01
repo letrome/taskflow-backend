@@ -2,14 +2,20 @@ import type { TaskPriority, TaskState } from "@src/controllers/schemas/task.js";
 import type { ITask } from "@src/services/models/task.js";
 import type { FilterQuery } from "mongoose";
 
+export interface PaginationQuery {
+	offset?: string | number;
+	limit?: string | number;
+}
+
+export type SortQuery = Record<string, 1 | -1> | undefined;
+
+export type PopulateQuery = boolean | string[];
+
 export interface TaskFilterResult {
 	query: FilterQuery<ITask>;
-	pagination: {
-		offset?: string | number;
-		limit?: string | number;
-	};
-	sort: Record<string, 1 | -1> | undefined;
-	populate: boolean | string[];
+	pagination: PaginationQuery;
+	sort: SortQuery;
+	populate: PopulateQuery;
 }
 
 export interface ValidatedTaskQuery {

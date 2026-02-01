@@ -1,3 +1,4 @@
+import logger from "@src/core/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import type { ZodType } from "zod";
 
@@ -7,9 +8,8 @@ export const validate = (schema: ZodType) => {
 			req.body = schema.parse(req.body);
 			next();
 		} catch (error) {
-			console.error(
-				"Validation Error details:",
-				JSON.stringify(error, null, 2),
+			logger.error(
+				`Validation Error details: ${JSON.stringify(error, null, 2)}`,
 			);
 			next(error);
 		}
@@ -19,14 +19,12 @@ export const validate = (schema: ZodType) => {
 export const validateParams = (schema: ZodType) => {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
-			// biome-ignore lint/suspicious/noExplicitAny: Need to handle generic parsed params
-			const parsed = schema.parse(req.params) as Record<string, any>;
-			req.params = { ...req.params, ...parsed };
+			const parsed = schema.parse(req.params);
+			req.params = { ...req.params, ...(parsed as object) };
 			next();
 		} catch (error) {
-			console.error(
-				"Validation Params Error details:",
-				JSON.stringify(error, null, 2),
+			logger.error(
+				`Validation Params Error details: ${JSON.stringify(error, null, 2)}`,
 			);
 			next(error);
 		}
@@ -36,15 +34,12 @@ export const validateParams = (schema: ZodType) => {
 export const validateQuery = (schema: ZodType) => {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
-			// biome-ignore lint/suspicious/noExplicitAny: Need to handle generic parsed query
-			const parsed = schema.parse(req.query) as Record<string, any>;
-			console.log("ValidateQuery PARSED object:", JSON.stringify(parsed));
+			const parsed = schema.parse(req.query);
 			req.validatedQuery = parsed;
 			next();
 		} catch (error) {
-			console.error(
-				"Validation Query Error details:",
-				JSON.stringify(error, null, 2),
+			logger.error(
+				`Validation Query Error details: ${JSON.stringify(error, null, 2)}`,
 			);
 			next(error);
 		}

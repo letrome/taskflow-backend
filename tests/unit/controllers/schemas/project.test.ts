@@ -16,9 +16,6 @@ describe("Project Schema Validation", () => {
 		};
 
 		const result = createOrUpdateProjectSchema.safeParse(input);
-		if (!result.success) {
-			console.error(JSON.stringify(result.error.issues, null, 2));
-		}
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.start_date).toBeInstanceOf(Date);
@@ -113,9 +110,6 @@ describe("Patch Project Schema Validation", () => {
 			members: ["507f1f77bcf86cd799439011"],
 		};
 		const result = patchProjectSchema.safeParse(input);
-		if (!result.success) {
-			console.error(JSON.stringify(result.error.issues, null, 2));
-		}
 		expect(result.success).toBe(true);
 	});
 

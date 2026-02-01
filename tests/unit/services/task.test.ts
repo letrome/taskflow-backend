@@ -122,20 +122,22 @@ describe("Task Service", () => {
 	describe("getTasksForProject", () => {
 		it("should return tasks for a project", async () => {
 			const tasks = [mockTaskInstance];
-			const mockPopulate = vi.fn().mockResolvedValue(tasks);
-			(Task.find as Mock).mockReturnValue({ populate: mockPopulate });
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking complex Mongoose Query type
+			const mockQuery = Promise.resolve(tasks) as any;
+			mockQuery.setOptions = vi.fn();
+			mockQuery.populate = vi.fn();
+			(Task.find as Mock).mockReturnValue(mockQuery);
 			const projectId = "project-id";
 
 			const result = await getTasksForProject(
 				{ project: projectId },
 				false,
-				[],
+				undefined,
 				{},
 			);
 
-			expect(Task.find).toHaveBeenCalledWith({ project: projectId }, null, {
-				sort: [],
-			});
+			expect(Task.find).toHaveBeenCalledWith({ project: projectId });
+			expect(mockQuery.setOptions).toHaveBeenCalledWith({ sort: undefined });
 			expect(result).toBe(tasks);
 		});
 	});

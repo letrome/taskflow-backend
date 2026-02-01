@@ -8,14 +8,6 @@ import type {
 import type { NextFunction, Request, Response } from "express";
 import type { FilterQuery } from "mongoose";
 
-declare global {
-	namespace Express {
-		interface Request {
-			validatedQuery?: ValidatedTaskQuery;
-		}
-	}
-}
-
 export const queryBuilderMiddleware = (
 	req: Request,
 	_res: Response,
@@ -26,11 +18,11 @@ export const queryBuilderMiddleware = (
 		const project_id = (Array.isArray(id) ? id[0] : id) || "";
 		// We expect validatedQuery to be present because of validation middleware
 		// If not, we fallback to empty object but type safety suggests validatedQuery should be used if available
-		const query = req.validatedQuery || ({} as ValidatedTaskQuery);
+		const query =
+			(req.validatedQuery as ValidatedTaskQuery) || ({} as ValidatedTaskQuery);
 		req.taskQuery = parseQuery(query, project_id);
 		next();
 	} catch (error) {
-		console.error("Query Builder Error:", error);
 		logger.debug({ err: error }, "Error parsing query parameters");
 		throw new BadRequestError("Invalid query parameters");
 	}

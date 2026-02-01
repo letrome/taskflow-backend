@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-01
+
+### Added
+
+- Advanced query capabilities for `GET /projects/:id/tasks`:
+  - **Pagination**: Support for `offset` and `limit`.
+  - **Sorting**: Sort by multiple fields using `sort` parameter (e.g., `+due_date,-priority`).
+  - **Filtering**: Filter by `priority`, `state`, `tags` (supporting multiple values).
+  - **Date Filtering**: Filter by `due_date` range using `due_date_from` and `due_date_to`.
+  - **Search**: Text search on task title via `search` parameter.
+  - **Population**: Optional `populate` parameter to retrieve full details for assignee and tags.
+
 ## [0.1.14] - 2026-01-30
 
 ### Added

@@ -2,7 +2,7 @@ import app from "@src/app.js";
 import { TaskPriority, TaskState } from "@src/controllers/schemas/task.js";
 import {
 	MongoDBContainer,
-	type StartedMongoDBContainer
+	type StartedMongoDBContainer,
 } from "@testcontainers/mongodb";
 import mongoose from "mongoose";
 import request from "supertest";

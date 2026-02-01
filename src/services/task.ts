@@ -57,26 +57,30 @@ export const createTask = async (
 
 export const getTasksForProject = async (
 	query: FilterQuery<ITask>,
-	populate: PopulateQuery<ITask>,
-	sort: SortQuery<ITask>,
-	pagination: PaginationQuery<ITask>,
+	populate: PopulateQuery,
+	sort: SortQuery,
+	pagination: PaginationQuery,
 ): Promise<ITask[]> => {
 	const options: QueryOptions<ITask> = {
 		sort,
 	};
 	if (pagination) {
-		// biome-ignore lint/suspicious/noExplicitAny: PaginationQuery type is not fully defined
-		const p = pagination as any;
+		const p = pagination;
 		if (p.limit) {
-			options.limit = Number.parseInt(p.limit, 10);
+			options.limit = Number.parseInt(String(p.limit), 10);
 		}
 		if (p.offset) {
-			options.skip = Number.parseInt(p.offset, 10);
+			options.skip = Number.parseInt(String(p.offset), 10);
 		}
 	}
 
-	// biome-ignore lint/suspicious/noExplicitAny: Casting query to any to avoid exactOptionalPropertyTypes mismatch, and populate to any to handle potential boolean mismatch
-	return await Task.find(query as any, null, options).populate(populate as any);
+	// biome-ignore lint/suspicious/noExplicitAny: exactOptionalPropertyTypes mismatch in Mongoose FilterQuery
+	const findQuery = Task.find(query as any);
+	findQuery.setOptions(options);
+	if (Array.isArray(populate)) {
+		findQuery.populate(populate);
+	}
+	return await findQuery;
 };
 
 export const getTasksForTag = async (tag_id: string): Promise<ITask[]> => {

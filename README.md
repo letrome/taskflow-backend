@@ -348,6 +348,17 @@ A backend service for the TaskFlow application, built with Node.js, Express, and
   - **Method**: `GET`
   - **Auth**: Bearer Token
   - **Response**: `200 OK` with list of tasks.
+  - **Query Parameters**:
+    - **Pagination**: `offset` (number), `limit` (number).
+    - **Sort**: `sort` (comma-separated fields, e.g., `due_date,-priority`).
+    - **Search**: `search` (string, matches title).
+    - **Filters**:
+      - `priority`: List of priorities.
+      - `state`: List of states.
+      - `tags`: List of tag IDs.
+      - `due_date_from`: Start date (ISO string).
+      - `due_date_to`: End date (ISO string).
+    - **Populate**: `populate=true` to include full assignee and tag objects strings instead of IDs.
 
 - **Get Task by ID**
   - **URL**: `/tasks/:id`

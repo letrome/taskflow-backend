@@ -51,31 +51,22 @@ describe("Task Service - Tags", () => {
 		// Use string literals or Enums if available.
 		// Based on model definition: Priority.LOW, State.OPEN
 
-		try {
-			const task = await createTask(
-				{
-					title: "Test Task Duplicate",
-					description: "Desc",
-					priority: TaskPriority.LOW,
-					state: TaskState.OPEN,
-					assignee: user._id.toString(),
-					tags: [tag._id.toString()],
-				},
-				project._id.toString(),
-			);
+		const task = await createTask(
+			{
+				title: "Test Task Duplicate",
+				description: "Desc",
+				priority: TaskPriority.LOW,
+				state: TaskState.OPEN,
+				assignee: user._id.toString(),
+				tags: [tag._id.toString()],
+			},
+			project._id.toString(),
+		);
 
-			// Action & Assert
-			await expect(
-				addTaskTag(task._id.toString(), tag._id.toString()),
-			).rejects.toThrow(ConflictError);
-		} catch (error: unknown) {
-			console.error(
-				"Test 1 Setup Error:",
-				JSON.stringify(error as Error, null, 2),
-			);
-			console.error("Test 1 Error Message:", (error as Error).message);
-			throw error;
-		}
+		// Action & Assert
+		await expect(
+			addTaskTag(task._id.toString(), tag._id.toString()),
+		).rejects.toThrow(ConflictError);
 	});
 
 	it("should throw BadRequestError when adding a non-existent tag", async () => {
@@ -94,37 +85,28 @@ describe("Task Service - Tags", () => {
 			start_date: new Date(),
 		});
 
-		try {
-			const task = await createTask(
-				{
-					title: "Test Task NonExistent",
-					description: "Desc",
-					priority: TaskPriority.LOW,
-					state: TaskState.OPEN,
-					assignee: user._id.toString(),
-					tags: [],
-				},
-				project._id.toString(),
-			);
+		const task = await createTask(
+			{
+				title: "Test Task NonExistent",
+				description: "Desc",
+				priority: TaskPriority.LOW,
+				state: TaskState.OPEN,
+				assignee: user._id.toString(),
+				tags: [],
+			},
+			project._id.toString(),
+		);
 
-			const nonExistentTagId = new mongoose.Types.ObjectId().toString();
+		const nonExistentTagId = new mongoose.Types.ObjectId().toString();
 
-			// Action & Assert
-			await expect(
-				addTaskTag(task._id.toString(), nonExistentTagId),
-			).rejects.toThrow(BadRequestError);
+		// Action & Assert
+		await expect(
+			addTaskTag(task._id.toString(), nonExistentTagId),
+		).rejects.toThrow(BadRequestError);
 
-			await expect(
-				addTaskTag(task._id.toString(), nonExistentTagId),
-			).rejects.toThrow("Tag does not exist");
-		} catch (error: unknown) {
-			console.error(
-				"Test 2 Setup Error:",
-				JSON.stringify(error as Error, null, 2),
-			);
-			console.error("Test 2 Error Message:", (error as Error).message);
-			throw error;
-		}
+		await expect(
+			addTaskTag(task._id.toString(), nonExistentTagId),
+		).rejects.toThrow("Tag does not exist");
 	});
 	it("should add a tag successfully", async () => {
 		// Setup
@@ -146,52 +128,32 @@ describe("Task Service - Tags", () => {
 			project: project._id,
 		});
 
-		try {
-			const task = await createTask(
-				{
-					title: "Test Task Success",
-					description: "Desc",
-					priority: TaskPriority.LOW,
-					state: TaskState.OPEN,
-					assignee: user._id.toString(),
-					tags: [],
-				},
-				project._id.toString(),
-			);
+		const task = await createTask(
+			{
+				title: "Test Task Success",
+				description: "Desc",
+				priority: TaskPriority.LOW,
+				state: TaskState.OPEN,
+				assignee: user._id.toString(),
+				tags: [],
+			},
+			project._id.toString(),
+		);
 
-			// Action
-			const result = await addTaskTag(task._id.toString(), tag._id.toString());
+		// Action
+		const result = await addTaskTag(task._id.toString(), tag._id.toString());
 
-			// Assert
-			expect(result).toHaveLength(1);
-			expect(result[0]).toBe(tag._id.toString());
+		// Assert
+		expect(result).toHaveLength(1);
+		expect(result[0]).toBe(tag._id.toString());
 
-			const updatedTask = await Task.findById(task._id);
-			expect(updatedTask).toBeDefined();
-			// biome-ignore lint/style/noNonNullAssertion: assert above
-			expect(updatedTask!.tags).toHaveLength(1);
-			// biome-ignore lint/style/noNonNullAssertion: assert above
-			expect(updatedTask!.tags[0]!.toString()).toBe(tag._id.toString());
-		} catch (error: unknown) {
-			console.error(
-				"Test 3 Setup Error:",
-				JSON.stringify(error as Error, null, 2),
-			);
-			console.error("Test 3 Error Message:", (error as Error).message);
-			throw error;
-		}
+		const updatedTask = await Task.findById(task._id);
+		expect(updatedTask).toBeDefined();
+		// biome-ignore lint/style/noNonNullAssertion: assert above
+		expect(updatedTask!.tags).toHaveLength(1);
+		// biome-ignore lint/style/noNonNullAssertion: assert above
+		expect(updatedTask!.tags[0]!.toString()).toBe(tag._id.toString());
 	});
-
-	// Use existing task_service import which should export removeTaskTag
-	// Import removeTaskTag at the top if not already imported (it is not in original file view, only addTaskTag)
-
-	// Note: I need to update imports first if I can't do it in this chunk easily.
-	// But wait, I can modify the import line in another chunk or this one if I am careful.
-	// The previous view_file showed import at line 5:
-	// import { addTaskTag, createTask } from "@src/services/task.js";
-	// I should update that line too.
-
-	// Changing instruction to allow multiple chunks.
 
 	it("should remove a tag successfully", async () => {
 		// Setup
@@ -213,35 +175,26 @@ describe("Task Service - Tags", () => {
 			project: project._id,
 		});
 
-		try {
-			const task = await createTask(
-				{
-					title: "Test Task Remove",
-					description: "Desc",
-					priority: TaskPriority.LOW,
-					state: TaskState.OPEN,
-					assignee: user._id.toString(),
-					tags: [tag._id.toString()],
-				},
-				project._id.toString(),
-			);
+		const task = await createTask(
+			{
+				title: "Test Task Remove",
+				description: "Desc",
+				priority: TaskPriority.LOW,
+				state: TaskState.OPEN,
+				assignee: user._id.toString(),
+				tags: [tag._id.toString()],
+			},
+			project._id.toString(),
+		);
 
-			// Action
-			await removeTaskTag(task._id.toString(), tag._id.toString());
+		// Action
+		await removeTaskTag(task._id.toString(), tag._id.toString());
 
-			// Assert
-			const updatedTask = await Task.findById(task._id);
-			expect(updatedTask).toBeDefined();
-			// biome-ignore lint/style/noNonNullAssertion: assert above
-			expect(updatedTask!.tags).toHaveLength(0);
-		} catch (error: unknown) {
-			console.error(
-				"Test 4 Setup Error:",
-				JSON.stringify(error as Error, null, 2),
-			);
-			console.error("Test 4 Error Message:", (error as Error).message);
-			throw error;
-		}
+		// Assert
+		const updatedTask = await Task.findById(task._id);
+		expect(updatedTask).toBeDefined();
+		// biome-ignore lint/style/noNonNullAssertion: assert above
+		expect(updatedTask!.tags).toHaveLength(0);
 	});
 
 	it("should throw BadRequestError when removing a tag not assigned to the task", async () => {

@@ -6,7 +6,19 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:8.2.3
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongosh
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -23,6 +35,8 @@ jobs:
           cache: "pnpm"
 
       - name: Install and Test
+        env:
+          MONGO_URI: mongodb://localhost:27017/test
         run: |
           pnpm install
           pnpm run test:unit

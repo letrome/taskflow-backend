@@ -4,6 +4,8 @@ import helmet from "helmet";
 import { ALLOWED_ORIGINS, PORT } from "./core/config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { metricsMiddleware } from "./middlewares/metrics.js";
+import swaggerUi from "swagger-ui-express";
+import openapiDocument from "../openapi.json" with { type: "json" };
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
@@ -23,6 +25,8 @@ app.set("port", PORT);
 
 app.use(metricsMiddleware);
 app.use(express.json());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 app.use("/", adminRoutes);
 app.use("/auth", authRoutes);

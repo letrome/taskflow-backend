@@ -157,7 +157,10 @@ describe("Project Service", () => {
 
 			await expect(
 				createProject(
-					{ title: "Test", members: ["invalid-id"] } as unknown as CreateOrUpdateProjectDTO,
+					{
+						title: "Test",
+						members: ["invalid-id"],
+					} as unknown as CreateOrUpdateProjectDTO,
 					"creator-id",
 				),
 			).rejects.toThrow("Member does not exist");

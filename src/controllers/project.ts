@@ -3,6 +3,7 @@ import type {
 	CreateOrUpdateProjectDTO,
 	PatchProjectDTO,
 } from "@src/controllers/schemas/project.js";
+import logger from "@src/core/logger.js";
 import * as projectService from "@src/services/project.js";
 import * as tagService from "@src/services/tag.js";
 import * as taskService from "@src/services/task.js";
@@ -213,6 +214,13 @@ export const getProjectTasks = async (
 	const user = await userService.getUser(user_id);
 	await projectService.getProjectForUser(project_id, user);
 
-	const tasks = await taskService.getTasksForProject(project_id);
+	logger.info(req.taskQuery);
+
+	const tasks = await taskService.getTasksForProject(
+		req.taskQuery?.query ?? {},
+		req.taskQuery?.populate ?? false,
+		req.taskQuery?.sort ?? [],
+		req.taskQuery?.pagination ?? {},
+	);
 	res.status(200).json(tasks);
 };

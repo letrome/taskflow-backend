@@ -163,8 +163,11 @@ describe("Tag Controller", () => {
 			vi.mocked(userService.getUser).mockResolvedValue(user as any);
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			vi.mocked(tagService.getTag).mockResolvedValue(tag as any);
-			// biome-ignore lint/suspicious/noExplicitAny: Mocking
-			vi.mocked(taskService.getTasksForTag).mockResolvedValue([{ _id: "task-id" }] as any);
+
+			vi.mocked(taskService.getTasksForTag).mockResolvedValue([
+				{ _id: "task-id" },
+				// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			] as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await expect(deleteTag(req as any, res)).rejects.toThrow(

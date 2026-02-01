@@ -8,8 +8,12 @@ import {
 	NotFoundError,
 } from "@src/core/errors.js";
 import logger from "@src/core/logger.js";
-import type { Types } from "mongoose";
-
+import type {
+	PaginationQuery,
+	PopulateQuery,
+	SortQuery,
+} from "@src/types/query-builder.js";
+import type { FilterQuery, QueryOptions, Types } from "mongoose";
 import {
 	stringToObjectId,
 	taskPriorityToModelPriority,
@@ -52,9 +56,27 @@ export const createTask = async (
 };
 
 export const getTasksForProject = async (
-	project_id: string,
+	query: FilterQuery<ITask>,
+	populate: PopulateQuery<ITask>,
+	sort: SortQuery<ITask>,
+	pagination: PaginationQuery<ITask>,
 ): Promise<ITask[]> => {
-	return await Task.find({ project: project_id });
+	const options: QueryOptions<ITask> = {
+		sort,
+	};
+	if (pagination) {
+		// biome-ignore lint/suspicious/noExplicitAny: PaginationQuery type is not fully defined
+		const p = pagination as any;
+		if (p.limit) {
+			options.limit = Number.parseInt(p.limit, 10);
+		}
+		if (p.offset) {
+			options.skip = Number.parseInt(p.offset, 10);
+		}
+	}
+
+	// biome-ignore lint/suspicious/noExplicitAny: Casting query to any to avoid exactOptionalPropertyTypes mismatch, and populate to any to handle potential boolean mismatch
+	return await Task.find(query as any, null, options).populate(populate as any);
 };
 
 export const getTasksForTag = async (tag_id: string): Promise<ITask[]> => {

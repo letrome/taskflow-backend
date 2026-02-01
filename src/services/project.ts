@@ -156,7 +156,6 @@ export const addProjectMember = async (
 		const includeMembers = false;
 		const project = await getProjectForUser(id, user, includeMembers);
 
-
 		const existingMembersSet = new Set(
 			project.members.map((m) => m.toString()),
 		);

@@ -113,7 +113,9 @@ describe("Task Service - Tags", () => {
 			mockSave.mockRejectedValue(error);
 			(isTagDoesNotExistError as unknown as Mock).mockReturnValue(true);
 
-			await expect(addTaskTag(taskId, tagId)).rejects.toThrow("Tag does not exist");
+			await expect(addTaskTag(taskId, tagId)).rejects.toThrow(
+				"Tag does not exist",
+			);
 		});
 
 		it("should rethrow other errors on save", async () => {

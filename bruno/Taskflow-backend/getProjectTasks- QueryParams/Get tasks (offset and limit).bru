@@ -1,0 +1,36 @@
+meta {
+  name: Get tasks (offset and limit)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks?offset=1&limit=2
+  body: none
+  auth: bearer
+}
+
+params:query {
+  offset: 1
+  limit: 2
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].id: eq {{task_id_2}}
+  res.body[1].id: eq {{task_id_3}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

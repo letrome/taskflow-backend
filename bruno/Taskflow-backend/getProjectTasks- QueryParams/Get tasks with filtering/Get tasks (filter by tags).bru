@@ -1,0 +1,40 @@
+meta {
+  name: Get tasks (filter by tags)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks?tags={{tag_id_1}},{{tag_id_2}}
+  body: none
+  auth: bearer
+}
+
+params:query {
+  tags: {{tag_id_1}},{{tag_id_2}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].id: eq {{task_id_2}}
+  res.body[1].id: eq {{task_id_3}}
+  res.body[2].id: eq {{task_id_5}}
+  res.body[3].id: eq {{task_id_6}}
+  res.body[4].id: eq {{task_id_7}}
+  res.body[5].id: eq {{task_id_8}}
+  res.body[6].id: eq {{task_id_9}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -32,3 +32,21 @@ export const validateParams = (schema: ZodType) => {
 		}
 	};
 };
+
+export const validateQuery = (schema: ZodType) => {
+	return (req: Request, _res: Response, next: NextFunction) => {
+		try {
+			// biome-ignore lint/suspicious/noExplicitAny: Need to handle generic parsed query
+			const parsed = schema.parse(req.query) as Record<string, any>;
+			console.log("ValidateQuery PARSED object:", JSON.stringify(parsed));
+			req.validatedQuery = parsed;
+			next();
+		} catch (error) {
+			console.error(
+				"Validation Query Error details:",
+				JSON.stringify(error, null, 2),
+			);
+			next(error);
+		}
+	};
+};

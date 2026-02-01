@@ -1,0 +1,42 @@
+meta {
+  name: Get tasks (sort)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks?sort=priority,-title
+  body: none
+  auth: bearer
+}
+
+params:query {
+  sort: priority,-title
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].id: eq {{task_id_9}}
+  res.body[1].id: eq {{task_id_8}}
+  res.body[2].id: eq {{task_id_7}}
+  res.body[3].id: eq {{task_id_3}}
+  res.body[4].id: eq {{task_id_2}}
+  res.body[5].id: eq {{task_id_1}}
+  res.body[6].id: eq {{task_id_6}}
+  res.body[7].id: eq {{task_id_4}}
+  res.body[8].id: eq {{task_id_5}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

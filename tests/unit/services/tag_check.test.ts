@@ -17,10 +17,10 @@ vi.mock("@src/services/models/tag.js", async () => {
 });
 
 describe("Tag Service - Checks", () => {
-    // Reset mocks before each test to ensure clean state
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+	// Reset mocks before each test to ensure clean state
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
 
 	describe("checkTagExistForProject", () => {
 		it("should return void if tag exists and belongs to project", async () => {
@@ -53,7 +53,7 @@ describe("Tag Service - Checks", () => {
 		it("should throw NotFoundError if tag belongs to different project", async () => {
 			const tagId = new mongoose.Types.ObjectId().toString();
 			const projectId = new mongoose.Types.ObjectId().toString();
-            const otherProjectId = new mongoose.Types.ObjectId().toString();
+			const otherProjectId = new mongoose.Types.ObjectId().toString();
 
 			(Tag.findById as Mock).mockResolvedValue({
 				_id: tagId,

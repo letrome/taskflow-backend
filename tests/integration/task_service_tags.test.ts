@@ -71,7 +71,7 @@ describe("Task Service - Tags", () => {
 		} catch (error: unknown) {
 			console.error(
 				"Test 1 Setup Error:",
-				JSON.stringify((error as any).errors, null, 2),
+				JSON.stringify(error as Error, null, 2),
 			);
 			console.error("Test 1 Error Message:", (error as Error).message);
 			throw error;
@@ -120,7 +120,7 @@ describe("Task Service - Tags", () => {
 		} catch (error: unknown) {
 			console.error(
 				"Test 2 Setup Error:",
-				JSON.stringify((error as any).errors, null, 2),
+				JSON.stringify(error as Error, null, 2),
 			);
 			console.error("Test 2 Error Message:", (error as Error).message);
 			throw error;
@@ -171,11 +171,11 @@ describe("Task Service - Tags", () => {
 			// biome-ignore lint/style/noNonNullAssertion: assert above
 			expect(updatedTask!.tags).toHaveLength(1);
 			// biome-ignore lint/style/noNonNullAssertion: assert above
-			expect(updatedTask!.tags[0].toString()).toBe(tag._id.toString());
+			expect(updatedTask!.tags[0]!.toString()).toBe(tag._id.toString());
 		} catch (error: unknown) {
 			console.error(
 				"Test 3 Setup Error:",
-				JSON.stringify((error as any).errors, null, 2),
+				JSON.stringify(error as Error, null, 2),
 			);
 			console.error("Test 3 Error Message:", (error as Error).message);
 			throw error;
@@ -237,7 +237,7 @@ describe("Task Service - Tags", () => {
 		} catch (error: unknown) {
 			console.error(
 				"Test 4 Setup Error:",
-				JSON.stringify((error as any).errors, null, 2),
+				JSON.stringify(error as Error, null, 2),
 			);
 			console.error("Test 4 Error Message:", (error as Error).message);
 			throw error;

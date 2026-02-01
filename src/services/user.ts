@@ -1,8 +1,8 @@
 import type {
 	CreateUserDTO,
+	PatchUserInformationDTO,
 	UpdateEmailDTO,
 	UpdatePasswordDTO,
-	PatchUserInformationDTO,
 	UpdateUserInformationDTO,
 } from "@src/controllers/schemas/user.js";
 import {

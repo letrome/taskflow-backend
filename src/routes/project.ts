@@ -6,11 +6,18 @@ import {
 	patchProjectSchema,
 	projectIdSchema,
 } from "@src/controllers/schemas/project.js";
-
 import { createTagSchema } from "@src/controllers/schemas/tag.js";
-import { createTaskSchema } from "@src/controllers/schemas/task.js";
+import {
+	createTaskSchema,
+	taskQuerySchema,
+} from "@src/controllers/schemas/task.js";
 import { jwtAuth } from "@src/middlewares/auth.js";
-import { validate, validateParams } from "@src/middlewares/validate.js";
+import { queryBuilderMiddleware } from "@src/middlewares/query-builder.js";
+import {
+	validate,
+	validateParams,
+	validateQuery,
+} from "@src/middlewares/validate.js";
 import { type RequestHandler, Router } from "express";
 
 const router: Router = Router();
@@ -90,6 +97,8 @@ router.get(
 	"/:id/tasks",
 	jwtAuth,
 	validateParams(projectIdSchema),
+	validateQuery(taskQuerySchema),
+	queryBuilderMiddleware,
 	projectCtrl.getProjectTasks as unknown as RequestHandler,
 );
 

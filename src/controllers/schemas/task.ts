@@ -100,3 +100,54 @@ export const taskStateParamSchema = z.object({
 });
 
 export const tagIdSchema = createIdParamSchema("Tag not found", "tagId");
+
+export const taskQuerySchema = z.object({
+	offset: z.coerce.number().min(0).default(0),
+	limit: z.coerce.number().min(1).max(50).default(50),
+	search: z.string().optional(),
+	priority: z.preprocess((val) => {
+		if (val === undefined || val === null) return [];
+		return (val as string).toUpperCase().split(",");
+	}, z.array(z.enum(TaskPriority)).optional()),
+	state: z.preprocess((val) => {
+		if (val === undefined || val === null) return [];
+		return (val as string).split(",");
+	}, z.array(z.enum(TaskState)).optional()),
+	tags: z
+		.preprocess(
+			(val) => {
+				if (val === undefined || val === null) return [];
+				return (val as string).split(",");
+			},
+			z.array(objectIdSchema("Invalid tag ID")),
+		)
+		.default([]),
+	due_date: z
+		.object({
+			gte: z
+				.string()
+				.optional()
+				.transform((str, ctx) => transformToDate("Due date gte")(str, ctx)),
+			lte: z
+				.string()
+				.optional()
+				.transform((str, ctx) => transformToDate("Due date lte")(str, ctx)),
+		})
+		.optional(),
+	due_date_from: z
+		.string()
+		.optional()
+		.transform((str, ctx) => transformToDate("Due date from")(str, ctx)),
+	due_date_to: z
+		.string()
+		.optional()
+		.transform((str, ctx) => transformToDate("Due date to")(str, ctx)),
+	sort: z
+		.string()
+		.regex(/^[+-]?\w+(?:,[+-]?\w+)*$/, "Invalid sort format")
+		.optional(),
+	populate: z.preprocess(
+		(val) => val === "true" || val === true,
+		z.boolean().optional(),
+	),
+});

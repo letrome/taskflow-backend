@@ -428,7 +428,12 @@ describe("Project Controller", () => {
 
 			expect(userService.getUser).toHaveBeenCalledWith("user-id");
 			expect(projectService.getProjectForUser).toHaveBeenCalledWith("p1", user);
-			expect(taskService.getTasksForProject).toHaveBeenCalledWith("p1");
+			expect(taskService.getTasksForProject).toHaveBeenCalledWith(
+				{},
+				false,
+				[],
+				{},
+			);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith(tasks);
 		});

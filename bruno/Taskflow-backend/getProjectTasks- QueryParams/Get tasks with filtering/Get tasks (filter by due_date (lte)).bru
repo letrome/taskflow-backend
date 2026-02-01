@@ -1,0 +1,35 @@
+meta {
+  name: Get tasks (filter by due_date (lte))
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks?due_date_to={{due_date_2}}
+  body: none
+  auth: bearer
+}
+
+params:query {
+  due_date_to: {{due_date_2}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].id: eq {{task_id_1}}
+  res.body[1].id: eq {{task_id_2}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

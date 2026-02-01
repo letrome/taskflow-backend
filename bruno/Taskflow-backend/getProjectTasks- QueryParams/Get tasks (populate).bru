@@ -1,0 +1,35 @@
+meta {
+  name: Get tasks (populate)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseurl}}/projects/{{project_id}}/tasks?populate=true
+  body: none
+  auth: bearer
+}
+
+params:query {
+  populate: true
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body[0].assignee.email: eq {{unique_email_user_a}}
+  res.body[1].tags[0].name: eq Tag1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

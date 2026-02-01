@@ -122,12 +122,20 @@ describe("Task Service", () => {
 	describe("getTasksForProject", () => {
 		it("should return tasks for a project", async () => {
 			const tasks = [mockTaskInstance];
-			(Task.find as Mock).mockResolvedValue(tasks);
+			const mockPopulate = vi.fn().mockResolvedValue(tasks);
+			(Task.find as Mock).mockReturnValue({ populate: mockPopulate });
 			const projectId = "project-id";
 
-			const result = await getTasksForProject(projectId);
+			const result = await getTasksForProject(
+				{ project: projectId },
+				false,
+				[],
+				{},
+			);
 
-			expect(Task.find).toHaveBeenCalledWith({ project: projectId });
+			expect(Task.find).toHaveBeenCalledWith({ project: projectId }, null, {
+				sort: [],
+			});
 			expect(result).toBe(tasks);
 		});
 	});

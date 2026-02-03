@@ -364,16 +364,27 @@ describe("Project Controller", () => {
 		it("should return tags and 200", async () => {
 			const req = {
 				params: { id: "p1" },
+				auth: { userId: "user-id" },
 			} as unknown as Request;
 			const res = mockResponse();
 
+			const user = { _id: "user-id" };
 			const tags = [{ _id: "t1" }];
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+			vi.mocked(projectService.getProjectForUser).mockResolvedValue({
+				_id: "p1",
+				// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			} as any);
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			vi.mocked(tagService.getTagsForProject).mockResolvedValue(tags as any);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking
 			await getProjectTags(req as any, res);
 
+			expect(userService.getUser).toHaveBeenCalledWith("user-id");
+			expect(projectService.getProjectForUser).toHaveBeenCalledWith("p1", user);
 			expect(tagService.getTagsForProject).toHaveBeenCalledWith("p1");
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith(tags);
@@ -392,10 +403,19 @@ describe("Project Controller", () => {
 		it("should call next with error if service fails", async () => {
 			const req = {
 				params: { id: "p1" },
+				auth: { userId: "user-id" },
 			} as unknown as Request;
 			const res = mockResponse();
 
+			const user = { _id: "user-id" };
 			const error = new Error("Service Error");
+
+			// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			vi.mocked(userService.getUser).mockResolvedValue(user as any);
+			vi.mocked(projectService.getProjectForUser).mockResolvedValue({
+				_id: "p1",
+				// biome-ignore lint/suspicious/noExplicitAny: Mocking
+			} as any);
 			vi.mocked(tagService.getTagsForProject).mockRejectedValue(error);
 
 			// biome-ignore lint/suspicious/noExplicitAny: Mocking

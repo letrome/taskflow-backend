@@ -167,10 +167,14 @@ export const getProjectTags = async (
 	req: AuthenticatedRequest<{ id: string }>,
 	res: Response,
 ) => {
-	const project_id = req.params.id;
-	if (!project_id) {
-		throw new Error("Project ID is required");
+const project_id = req.params.id;
+	const user_id = req.auth?.userId;
+	if (!user_id || !project_id) {
+		throw new Error("User ID and project_id are required");
 	}
+
+	const user = await userService.getUser(user_id);
+	await projectService.getProjectForUser(project_id, user);
 
 	const tags = await tagService.getTagsForProject(project_id);
 	res.status(200).json(tags);

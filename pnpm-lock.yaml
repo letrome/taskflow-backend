@@ -34,11 +34,11 @@ importers:
         specifier: ^9.0.3
         version: 9.0.3
       mongoose:
-        specifier: ^9.1.5
-        version: 9.1.5(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)
+        specifier: ^9.1.6
+        version: 9.1.6(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)
       mongoose-unique-validator:
         specifier: ^5.0.1
-        version: 5.0.1(mongoose@9.1.5(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7))
+        version: 5.0.1(mongoose@9.1.6(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7))
       pino:
         specifier: ^10.3.0
         version: 10.3.0
@@ -1626,8 +1626,8 @@ packages:
     resolution: {integrity: sha512-Ry9wCtIZ5kGqkJoi6aD8KjxFZEx78guTQDnpXWiNthsxzrxAK/i8E6pCHAIZTbaEFWcOCvbecMukfK7XUvyLpQ==}
     engines: {node: '>=6.9.0'}
 
-  bson@7.1.1:
-    resolution: {integrity: sha512-TtJgBB+QyOlWjrbM+8bRgH84VM/xrDjyBFgSgGrfZF4xvt6gbEDtcswm27Tn9F9TWsjQybxT8b8VpCP/oJK4Dw==}
+  bson@7.2.0:
+    resolution: {integrity: sha512-YCEo7KjMlbNlyHhz7zAZNDpIpQbd+wOEHJYezv0nMYTn4x31eIUM2yomNNubclAt63dObUzKHWsBLJ9QcZNSnQ==}
     engines: {node: '>=20.19.0'}
 
   btoa@1.2.1:
@@ -2183,6 +2183,7 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globby@11.1.0:
@@ -2613,8 +2614,8 @@ packages:
   mongodb-connection-string-url@2.6.0:
     resolution: {integrity: sha512-WvTZlI9ab0QYtTYnuMLgobULWhokRjtC7db9LtcVfJ+Hsnyr5eo6ZtNAt3Ly24XZScGMelOcGtm7lSn0332tPQ==}
 
-  mongodb-connection-string-url@7.0.0:
-    resolution: {integrity: sha512-irhhjRVLE20hbkRl4zpAYLnDMM+zIZnp0IDB9akAFFUZp/3XdOfwwddc7y6cNvF2WCEtfTYRwYbIfYa2kVY0og==}
+  mongodb-connection-string-url@7.0.1:
+    resolution: {integrity: sha512-h0AZ9A7IDVwwHyMxmdMXKy+9oNlF0zFoahHiX3vQ8e3KFcSP3VmsmfvtRSuLPxmyv2vjIDxqty8smTgie/SNRQ==}
     engines: {node: '>=20.19.0'}
 
   mongodb@4.17.2:
@@ -2653,12 +2654,12 @@ packages:
     peerDependencies:
       mongoose: ^8.0.0
 
-  mongoose@6.13.8:
-    resolution: {integrity: sha512-JHKco/533CyVrqCbyQsnqMpLn8ZCiKrPDTd2mvo2W7ygIvhygWjX2wj+RPjn6upZZgw0jC6U51RD7kUsyK8NBg==}
+  mongoose@6.13.9:
+    resolution: {integrity: sha512-x8XpK0SEDJtAtMoOF2U9aGrGXN6kbu01TqhznGLnA4B1oPXNb4Lye0MgmfxF9J2Dva7wf49VOgClk2fuKQYGHw==}
     engines: {node: '>=12.0.0'}
 
-  mongoose@9.1.5:
-    resolution: {integrity: sha512-N6gypEO+wLmZp8kCYNQmrEWxVMT0KhyHvVttBZoKA/1ngY7aUsBjqHzCPtDgz+i8JAnqMOiEKmuJIDEQu1b9Dw==}
+  mongoose@9.1.6:
+    resolution: {integrity: sha512-ZrtgRsJKtW3od36TVXtAnrNHOO3rqhsqfVut6IzyWyJeLLeLTqW66qej/0qB37GZd5jL06nHfAceTikkfnSqbA==}
     engines: {node: '>=20.19.0'}
 
   mpath@0.9.0:
@@ -5403,7 +5404,7 @@ snapshots:
   '@types/mongoose-unique-validator@1.0.9':
     dependencies:
       '@types/node': 25.0.10
-      mongoose: 6.13.8
+      mongoose: 6.13.9
     transitivePeerDependencies:
       - aws-crt
       - supports-color
@@ -5890,7 +5891,7 @@ snapshots:
     dependencies:
       buffer: 5.7.1
 
-  bson@7.1.1: {}
+  bson@7.2.0: {}
 
   btoa@1.2.1: {}
 
@@ -6910,7 +6911,7 @@ snapshots:
       '@types/whatwg-url': 8.2.2
       whatwg-url: 11.0.0
 
-  mongodb-connection-string-url@7.0.0:
+  mongodb-connection-string-url@7.0.1:
     dependencies:
       '@types/whatwg-url': 13.0.0
       whatwg-url: 14.2.0
@@ -6929,20 +6930,20 @@ snapshots:
   mongodb@7.0.0(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7):
     dependencies:
       '@mongodb-js/saslprep': 1.4.5
-      bson: 7.1.1
-      mongodb-connection-string-url: 7.0.0
+      bson: 7.2.0
+      mongodb-connection-string-url: 7.0.1
     optionalDependencies:
       '@aws-sdk/credential-providers': 3.971.0
       socks: 2.8.7
 
-  mongoose-unique-validator@5.0.1(mongoose@9.1.5(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)):
+  mongoose-unique-validator@5.0.1(mongoose@9.1.6(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)):
     dependencies:
       lodash.foreach: 4.5.0
       lodash.get: 4.4.2
       lodash.merge: 4.6.2
-      mongoose: 9.1.5(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)
+      mongoose: 9.1.6(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)
 
-  mongoose@6.13.8:
+  mongoose@6.13.9:
     dependencies:
       bson: 4.7.2
       kareem: 2.5.1
@@ -6955,7 +6956,7 @@ snapshots:
       - aws-crt
       - supports-color
 
-  mongoose@9.1.5(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7):
+  mongoose@9.1.6(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7):
     dependencies:
       kareem: 3.0.0
       mongodb: 7.0.0(@aws-sdk/credential-providers@3.971.0)(socks@2.8.7)

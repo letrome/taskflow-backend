@@ -53,7 +53,7 @@
 		"fast-xml-parser": ">=5.3.4",
 		"helmet": "^8.1.0",
 		"jsonwebtoken": "^9.0.3",
-		"mongoose": "^9.1.5",
+		"mongoose": "^9.1.6",
 		"mongoose-unique-validator": "^5.0.1",
 		"pino": "^10.3.0",
 		"prom-client": "^15.1.3",

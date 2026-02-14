@@ -50,7 +50,7 @@
 		"cors": "^2.8.6",
 		"dotenv": "^17.2.3",
 		"express": "^5.2.1",
-		"fast-xml-parser": ">=5.3.4",
+		"fast-xml-parser": ">=5.3.5",
 		"helmet": "^8.1.0",
 		"jsonwebtoken": "^9.0.3",
 		"mongoose": "^9.1.5",
